@@ -91,7 +91,7 @@ export const SprintCreationForm: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      const webhookUrl = formData.webhookUrl || 'https://your-n8n-webhook-url.com/webhook/sprint-creation';
+      const webhookUrl = formData.webhookUrl || 'https://freedomology.app.n8n.cloud/webhook-test/98e2f8f3-553a-45c7-a7a9-567bc1e9c8c6';
       
       const response = await fetch(webhookUrl, {
         method: 'POST',
