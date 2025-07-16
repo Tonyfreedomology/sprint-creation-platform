@@ -10,6 +10,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { ArrowRight, ArrowLeft, Sparkles, Users, Brain, Heart, DollarSign, CheckCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { SprintGenerationLoading } from './SprintGenerationLoading';
+import { SprintReviewPage } from './SprintReviewPage';
 
 interface SprintFormData {
   // Creator Info
@@ -36,6 +38,31 @@ interface SprintFormData {
   webhookUrl: string;
 }
 
+interface GeneratedContent {
+  sprintId: string;
+  sprintTitle: string;
+  sprintDescription: string;
+  sprintDuration: string;
+  sprintCategory: string;
+  dailyLessons: Array<{
+    day: number;
+    title: string;
+    content: string;
+    exercise: string;
+    affirmation?: string;
+  }>;
+  emailSequence: Array<{
+    day: number;
+    subject: string;
+    content: string;
+  }>;
+  creatorInfo: {
+    name: string;
+    email: string;
+    bio: string;
+  };
+}
+
 const initialFormData: SprintFormData = {
   creatorName: '',
   creatorEmail: '',
@@ -58,6 +85,9 @@ export const SprintCreationForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<SprintFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
+  const [showReviewPage, setShowReviewPage] = useState(false);
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -89,6 +119,7 @@ export const SprintCreationForm: React.FC = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setIsGenerating(true);
     
     try {
       const webhookUrl = formData.webhookUrl || 'https://freedomology.app.n8n.cloud/webhook-test/98e2f8f3-553a-45c7-a7a9-567bc1e9c8c6';
@@ -106,26 +137,60 @@ export const SprintCreationForm: React.FC = () => {
       });
 
       if (response.ok) {
-        toast({
-          title: "Sprint Creation Initiated! 🎉",
-          description: "Your sprint is being processed. You'll receive an email with next steps shortly.",
-        });
+        const generatedContent = await response.json();
+        setGeneratedContent(generatedContent);
+        setShowReviewPage(true);
+        setIsGenerating(false);
         
-        // Reset form
-        setFormData(initialFormData);
-        setCurrentStep(1);
+        toast({
+          title: "Sprint Generated Successfully! 🎉",
+          description: "Review and edit your generated content before finalizing.",
+        });
       } else {
-        throw new Error('Failed to submit');
+        throw new Error('Failed to generate content');
       }
     } catch (error) {
       toast({
-        title: "Something went wrong",
+        title: "Generation Failed",
         description: "Please try again or contact support if the issue persists.",
         variant: "destructive",
       });
+      setIsGenerating(false);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleFinalize = async (editedContent: GeneratedContent) => {
+    const finalizeWebhookUrl = formData.webhookUrl?.replace('webhook-test', 'webhook-finalize') || 
+      'https://freedomology.app.n8n.cloud/webhook-finalize/98e2f8f3-553a-45c7-a7a9-567bc1e9c8c6';
+    
+    const response = await fetch(finalizeWebhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...editedContent,
+        timestamp: new Date().toISOString(),
+        source: 'freedomology-sprint-finalize'
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to finalize sprint');
+    }
+
+    // Reset form after successful finalization
+    setFormData(initialFormData);
+    setCurrentStep(1);
+    setGeneratedContent(null);
+    setShowReviewPage(false);
+  };
+
+  const handleBackToForm = () => {
+    setShowReviewPage(false);
+    setIsGenerating(false);
   };
 
   const renderStep = () => {
@@ -482,6 +547,29 @@ export const SprintCreationForm: React.FC = () => {
     }
   };
 
+  // Show loading screen during generation
+  if (isGenerating && !showReviewPage) {
+    return (
+      <SprintGenerationLoading
+        sprintTitle={formData.sprintTitle}
+        sprintDuration={formData.sprintDuration}
+        creatorName={formData.creatorName}
+      />
+    );
+  }
+
+  // Show review page after generation
+  if (showReviewPage && generatedContent) {
+    return (
+      <SprintReviewPage
+        generatedContent={generatedContent}
+        onBack={handleBackToForm}
+        onFinalize={handleFinalize}
+      />
+    );
+  }
+
+  // Show form by default
   return (
     <div className="max-w-2xl mx-auto">
       <Card className="border-primary/20 shadow-elegant">
