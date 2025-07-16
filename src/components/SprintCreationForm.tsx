@@ -137,7 +137,37 @@ export const SprintCreationForm: React.FC = () => {
       });
 
       if (response.ok) {
-        const generatedContent = await response.json();
+        let generatedContent;
+        
+        try {
+          const responseText = await response.text();
+          
+          // If response is empty or not JSON, it means N8n workflow is still being built
+          if (!responseText || responseText.trim() === '') {
+            toast({
+              title: "Webhook Connected! 🎉",
+              description: "Your N8n workflow received the data. Complete your workflow to generate content.",
+            });
+            // Keep loading screen showing until workflow is complete
+            return;
+          }
+          
+          generatedContent = JSON.parse(responseText);
+          
+          // Validate that we have the expected structure
+          if (!generatedContent || !generatedContent.sprintId || !generatedContent.dailyLessons) {
+            throw new Error('Invalid generated content structure');
+          }
+          
+        } catch (parseError) {
+          toast({
+            title: "Webhook Connected! 🎉",
+            description: "Your N8n workflow received the data. Complete your workflow to generate content.",
+          });
+          // Keep loading screen showing until workflow is complete
+          return;
+        }
+        
         setGeneratedContent(generatedContent);
         setShowReviewPage(true);
         setIsGenerating(false);
