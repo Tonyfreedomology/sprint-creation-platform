@@ -36,6 +36,10 @@ interface SprintFormData {
   goals: string;
   specialRequirements: string;
   webhookUrl: string;
+  
+  // New required fields for n8n integration
+  voiceSampleFile: File | null;
+  participantEmails: string;
 }
 
 interface GeneratedContent {
@@ -79,6 +83,8 @@ const initialFormData: SprintFormData = {
   goals: '',
   specialRequirements: '',
   webhookUrl: '',
+  voiceSampleFile: null,
+  participantEmails: '',
 };
 
 export const SprintCreationForm: React.FC = () => {
@@ -105,6 +111,11 @@ export const SprintCreationForm: React.FC = () => {
     }));
   };
 
+  const handleVoiceFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    setFormData(prev => ({ ...prev, voiceSampleFile: file }));
+  };
+
   const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -122,67 +133,97 @@ export const SprintCreationForm: React.FC = () => {
     setIsGenerating(true);
     
     try {
-      const webhookUrl = formData.webhookUrl || 'https://freedomology.app.n8n.cloud/webhook-test/98e2f8f3-553a-45c7-a7a9-567bc1e9c8c6';
+      const webhookUrl = formData.webhookUrl || 'https://freedomology.app.n8n.cloud/webhook/create-sprint';
+      
+      // Upload voice sample file first if provided
+      let voiceSampleUrl = '';
+      if (formData.voiceSampleFile) {
+        // In production, you'd upload to a cloud storage service
+        // For now, we'll create a temporary URL
+        voiceSampleUrl = URL.createObjectURL(formData.voiceSampleFile);
+      }
+      
+      // Map frontend data to n8n expected format
+      const n8nPayload = {
+        sprint_theme: formData.sprintTitle,
+        duration: parseInt(formData.sprintDuration),
+        teaching_goals: formData.goals,
+        voice_sample_url: voiceSampleUrl,
+        email_style: formData.toneStyle,
+        participant_emails: formData.participantEmails,
+        creator_name: formData.creatorName,
+        personalization_data: `Target Audience: ${formData.targetAudience}. Experience Level: ${formData.experience}. Content Types: ${formData.contentTypes.join(', ')}. Special Requirements: ${formData.specialRequirements}`,
+        // Additional context for AI generation
+        sprint_description: formData.sprintDescription,
+        sprint_category: formData.sprintCategory,
+        creator_email: formData.creatorEmail,
+        creator_bio: formData.creatorBio,
+        content_generation: formData.contentGeneration,
+        timestamp: new Date().toISOString(),
+        source: 'freedomology-sprint-creator'
+      };
       
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          timestamp: new Date().toISOString(),
-          source: 'freedomology-sprint-creator'
-        }),
+        body: JSON.stringify(n8nPayload),
       });
 
       if (response.ok) {
-        let generatedContent;
+        const responseText = await response.text();
         
-        try {
-          const responseText = await response.text();
-          
-          // If response is empty or not JSON, it means N8n workflow is still being built
-          if (!responseText || responseText.trim() === '') {
-            toast({
-              title: "Webhook Connected! 🎉",
-              description: "Your N8n workflow received the data. Complete your workflow to generate content.",
-            });
-            // Keep loading screen showing until workflow is complete
-            return;
-          }
-          
-          generatedContent = JSON.parse(responseText);
-          
-          // Validate that we have the expected structure
-          if (!generatedContent || !generatedContent.sprintId || !generatedContent.dailyLessons) {
-            throw new Error('Invalid generated content structure');
-          }
-          
-        } catch (parseError) {
+        // Check if we got a proper response
+        if (!responseText || responseText.trim() === '') {
           toast({
-            title: "Webhook Connected! 🎉",
-            description: "Your N8n workflow received the data. Complete your workflow to generate content.",
+            title: "Sprint Creation Started! 🎉",
+            description: "Your N8n workflow is processing the sprint. This may take a few minutes.",
           });
-          // Keep loading screen showing until workflow is complete
+          setIsGenerating(false);
           return;
         }
         
-        setGeneratedContent(generatedContent);
-        setShowReviewPage(true);
-        setIsGenerating(false);
-        
-        toast({
-          title: "Sprint Generated Successfully! 🎉",
-          description: "Review and edit your generated content before finalizing.",
-        });
+        try {
+          const responseData = JSON.parse(responseText);
+          
+          // Check if this is the initial webhook response
+          if (responseData.message || !responseData.sprintId) {
+            toast({
+              title: "Sprint Creation Started! 🎉",
+              description: responseData.message || "Your sprint is being generated. Check back in a few minutes.",
+            });
+            setIsGenerating(false);
+            return;
+          }
+          
+          // If we have generated content, show it
+          if (responseData.sprintId && responseData.dailyLessons) {
+            setGeneratedContent(responseData);
+            setShowReviewPage(true);
+            setIsGenerating(false);
+            
+            toast({
+              title: "Sprint Generated Successfully! 🎉",
+              description: "Review and edit your generated content before finalizing.",
+            });
+          }
+        } catch (parseError) {
+          toast({
+            title: "Sprint Creation Started! 🎉",
+            description: "Your sprint is being processed. The workflow will handle content generation.",
+          });
+          setIsGenerating(false);
+        }
       } else {
-        throw new Error('Failed to generate content');
+        const errorText = await response.text();
+        throw new Error(`Failed to create sprint: ${response.status} - ${errorText}`);
       }
     } catch (error) {
+      console.error('Sprint creation error:', error);
       toast({
-        title: "Generation Failed",
-        description: "Please try again or contact support if the issue persists.",
+        title: "Sprint Creation Failed",
+        description: error instanceof Error ? error.message : "Please check your connection and try again.",
         variant: "destructive",
       });
       setIsGenerating(false);
@@ -497,6 +538,25 @@ export const SprintCreationForm: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div>
+                <Label htmlFor="voiceSample">Voice Sample for Cloning (Optional)</Label>
+                <Input
+                  id="voiceSample"
+                  type="file"
+                  accept="audio/*,.mp3,.wav,.m4a"
+                  onChange={handleVoiceFileChange}
+                  className="mt-1"
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Upload a clear 30-60 second audio sample for AI voice cloning (optional)
+                </p>
+                {formData.voiceSampleFile && (
+                  <p className="text-sm text-green-600 mt-1">
+                    ✓ File selected: {formData.voiceSampleFile.name}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         );
@@ -529,6 +589,20 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
+                <Label htmlFor="participantEmails">Participant Email List</Label>
+                <Textarea
+                  id="participantEmails"
+                  placeholder="Enter participant emails separated by commas:\nexample1@email.com, example2@email.com, example3@email.com"
+                  value={formData.participantEmails}
+                  onChange={(e) => handleInputChange('participantEmails', e.target.value)}
+                  className="mt-1 min-h-[100px]"
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  List all participant emails who will receive the daily sprint content
+                </p>
+              </div>
+
+              <div>
                 <Label htmlFor="webhookUrl">N8N Webhook URL (Optional)</Label>
                 <Input
                   id="webhookUrl"
@@ -551,6 +625,8 @@ export const SprintCreationForm: React.FC = () => {
                   <div><strong>Content Generation:</strong> {formData.contentGeneration}</div>
                   <div><strong>Content Types:</strong> {formData.contentTypes.join(', ') || 'None selected'}</div>
                   <div><strong>Tone:</strong> {formData.toneStyle}</div>
+                  <div><strong>Participants:</strong> {formData.participantEmails ? formData.participantEmails.split(',').length : 0} people</div>
+                  <div><strong>Voice Sample:</strong> {formData.voiceSampleFile ? 'Uploaded' : 'None'}</div>
                 </div>
               </div>
             </div>
@@ -565,13 +641,13 @@ export const SprintCreationForm: React.FC = () => {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return formData.creatorName && formData.creatorEmail;
+        return formData.creatorName.trim() && formData.creatorEmail.trim() && formData.creatorEmail.includes('@');
       case 2:
-        return formData.sprintTitle && formData.sprintDescription && formData.sprintCategory;
+        return formData.sprintTitle.trim() && formData.sprintDescription.trim() && formData.sprintCategory;
       case 3:
         return formData.contentGeneration && formData.contentTypes.length > 0;
       case 4:
-        return true;
+        return formData.participantEmails.trim(); // Require at least some participant emails
       default:
         return false;
     }
