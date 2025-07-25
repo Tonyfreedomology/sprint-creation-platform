@@ -70,48 +70,70 @@ interface SprintGenerationLoadingProps {
   sprintTitle: string;
   sprintDuration: string;
   creatorName: string;
+  currentStep?: string;
+  progress?: number;
 }
 
-export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = ({
-  sprintTitle,
-  sprintDuration,
-  creatorName
+export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = ({ 
+  sprintTitle, 
+  sprintDuration, 
+  creatorName,
+  currentStep: providedStep = '',
+  progress: providedProgress = 0
 }) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [overallProgress, setOverallProgress] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    const totalDuration = loadingSteps.reduce((sum, step) => sum + step.duration, 0);
-    let elapsed = 0;
-    
-    const interval = setInterval(() => {
-      elapsed += 100;
-      const newProgress = Math.min((elapsed / totalDuration) * 100, 100);
-      setProgress(newProgress);
-      
-      // Update current step
-      let currentStepIndex = 0;
-      let stepElapsed = 0;
-      
-      for (let i = 0; i < loadingSteps.length; i++) {
-        if (elapsed <= stepElapsed + loadingSteps[i].duration) {
-          currentStepIndex = i;
-          break;
+  React.useEffect(() => {
+    // Use provided progress or simulate it
+    if (providedProgress > 0) {
+      setOverallProgress(providedProgress);
+      const stepThreshold = 100 / loadingSteps.length;
+      const newStepIndex = Math.min(
+        Math.floor(providedProgress / stepThreshold),
+        loadingSteps.length - 1
+      );
+      setCurrentStepIndex(newStepIndex);
+      setCompletedSteps(prev => {
+        const newCompleted = new Set(prev);
+        for (let i = 0; i < newStepIndex; i++) {
+          newCompleted.add(loadingSteps[i].id);
         }
-        stepElapsed += loadingSteps[i].duration;
-      }
-      
-      if (currentStepIndex !== currentStep) {
-        setCurrentStep(currentStepIndex);
-        setCompletedSteps(prev => [...prev, loadingSteps[currentStepIndex - 1]?.id].filter(Boolean));
-      }
-    }, 100);
+        return newCompleted;
+      });
+    } else {
+      // Fallback simulation
+      const interval = setInterval(() => {
+        setOverallProgress(prev => {
+          const newProgress = Math.min(prev + 2, 95);
+          
+          const stepThreshold = 100 / loadingSteps.length;
+          const newStepIndex = Math.min(
+            Math.floor(newProgress / stepThreshold),
+            loadingSteps.length - 1
+          );
+          
+          if (newStepIndex !== currentStepIndex) {
+            setCurrentStepIndex(newStepIndex);
+            setCompletedSteps(prev => {
+              const newCompleted = new Set(prev);
+              if (currentStepIndex > 0) {
+                newCompleted.add(loadingSteps[currentStepIndex - 1]?.id);
+              }
+              return newCompleted;
+            });
+          }
+          
+          return newProgress;
+        });
+      }, 500);
 
-    return () => clearInterval(interval);
-  }, [currentStep]);
+      return () => clearInterval(interval);
+    }
+  }, [currentStepIndex, loadingSteps.length, providedProgress]);
 
-  const currentStepData = loadingSteps[currentStep];
+  const currentStepData = loadingSteps[currentStepIndex];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center">
@@ -139,10 +161,10 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
               <div className="flex items-center justify-between mb-4">
                 <div className="text-sm text-muted-foreground">Overall Progress</div>
                 <div className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  {Math.round(progress)}%
+                  {Math.round(overallProgress)}%
                 </div>
               </div>
-              <Progress value={progress} className="h-3 mb-6" />
+              <Progress value={overallProgress} className="h-3 mb-6" />
               
               {/* Current Step */}
               <div className="flex items-center gap-4 p-4 bg-gradient-card rounded-lg border border-primary/10">
@@ -170,21 +192,21 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
                   <div
                     key={step.id}
                     className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
-                      completedSteps.includes(step.id)
+                      completedSteps.has(step.id)
                         ? 'bg-green-50 border border-green-200'
-                        : index === currentStep
+                         : index === currentStepIndex
                         ? 'bg-gradient-card border border-primary/20'
                         : 'bg-muted/30'
                     }`}
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      completedSteps.includes(step.id)
+                      completedSteps.has(step.id)
                         ? 'bg-green-500 text-white'
-                        : index === currentStep
+                        : index === currentStepIndex
                         ? 'bg-gradient-primary text-white animate-pulse'
                         : 'bg-muted text-muted-foreground'
                     }`}>
-                      {completedSteps.includes(step.id) ? (
+                      {completedSteps.has(step.id) ? (
                         <CheckCircle className="w-4 h-4" />
                       ) : (
                         step.icon
@@ -192,9 +214,9 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
                     </div>
                     <div className="flex-1">
                       <div className={`font-medium ${
-                        completedSteps.includes(step.id)
+                        completedSteps.has(step.id)
                           ? 'text-green-700'
-                          : index === currentStep
+                          : index === currentStepIndex
                           ? 'text-foreground'
                           : 'text-muted-foreground'
                       }`}>
@@ -204,7 +226,7 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
                         {step.description}
                       </div>
                     </div>
-                    {completedSteps.includes(step.id) && (
+                    {completedSteps.has(step.id) && (
                       <CheckCircle className="w-5 h-5 text-green-500" />
                     )}
                   </div>

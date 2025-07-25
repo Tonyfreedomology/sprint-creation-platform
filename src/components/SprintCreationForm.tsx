@@ -12,6 +12,8 @@ import { ArrowRight, ArrowLeft, Sparkles, Users, Brain, Heart, DollarSign, Check
 import { toast } from '@/hooks/use-toast';
 import { SprintGenerationLoading } from './SprintGenerationLoading';
 import { SprintReviewPage } from './SprintReviewPage';
+import { OpenAIKeyModal } from './OpenAIKeyModal';
+import { SprintGenerationService } from '@/services/sprintGeneration';
 
 interface SprintFormData {
   // Creator Info
@@ -94,6 +96,9 @@ export const SprintCreationForm: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const [showReviewPage, setShowReviewPage] = useState(false);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generationStep, setGenerationStep] = useState('');
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -129,101 +134,46 @@ export const SprintCreationForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    // Check for stored API key or show modal
+    const storedApiKey = localStorage.getItem('openai_api_key');
+    if (!storedApiKey) {
+      setShowApiKeyModal(true);
+      return;
+    }
+    
+    await generateSprintWithApiKey(storedApiKey);
+  };
+
+  const generateSprintWithApiKey = async (apiKey: string) => {
     setIsSubmitting(true);
     setIsGenerating(true);
+    setGenerationProgress(0);
+    setGenerationStep('Starting generation...');
     
     try {
-      const webhookUrl = formData.webhookUrl || 'https://freedomology.app.n8n.cloud/webhook/create-sprint';
+      const sprintService = new SprintGenerationService(apiKey);
       
-      // Upload voice sample file first if provided
-      let voiceSampleUrl = '';
-      if (formData.voiceSampleFile) {
-        // In production, you'd upload to a cloud storage service
-        // For now, we'll create a temporary URL
-        voiceSampleUrl = URL.createObjectURL(formData.voiceSampleFile);
-      }
-      
-      // Map frontend data to n8n expected format
-      const n8nPayload = {
-        sprint_theme: formData.sprintTitle,
-        duration: parseInt(formData.sprintDuration),
-        teaching_goals: formData.goals,
-        voice_sample_url: voiceSampleUrl,
-        email_style: formData.toneStyle,
-        participant_emails: formData.participantEmails,
-        creator_name: formData.creatorName,
-        personalization_data: `Target Audience: ${formData.targetAudience}. Experience Level: ${formData.experience}. Content Types: ${formData.contentTypes.join(', ')}. Special Requirements: ${formData.specialRequirements}`,
-        // Additional context for AI generation
-        sprint_description: formData.sprintDescription,
-        sprint_category: formData.sprintCategory,
-        creator_email: formData.creatorEmail,
-        creator_bio: formData.creatorBio,
-        content_generation: formData.contentGeneration,
-        timestamp: new Date().toISOString(),
-        source: 'freedomology-sprint-creator'
-      };
-      
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(n8nPayload),
-      });
-
-      if (response.ok) {
-        const responseText = await response.text();
-        
-        // Check if we got a proper response
-        if (!responseText || responseText.trim() === '') {
-          toast({
-            title: "Sprint Creation Started! 🎉",
-            description: "Your N8n workflow is processing the sprint. This may take a few minutes.",
-          });
-          setIsGenerating(false);
-          return;
+      const generatedData = await sprintService.generateSprint(
+        formData,
+        (step: string, progress: number) => {
+          setGenerationStep(step);
+          setGenerationProgress(progress);
         }
-        
-        try {
-          const responseData = JSON.parse(responseText);
-          
-          // Check if this is the initial webhook response
-          if (responseData.message || !responseData.sprintId) {
-            toast({
-              title: "Sprint Creation Started! 🎉",
-              description: responseData.message || "Your sprint is being generated. Check back in a few minutes.",
-            });
-            setIsGenerating(false);
-            return;
-          }
-          
-          // If we have generated content, show it
-          if (responseData.sprintId && responseData.dailyLessons) {
-            setGeneratedContent(responseData);
-            setShowReviewPage(true);
-            setIsGenerating(false);
-            
-            toast({
-              title: "Sprint Generated Successfully! 🎉",
-              description: "Review and edit your generated content before finalizing.",
-            });
-          }
-        } catch (parseError) {
-          toast({
-            title: "Sprint Creation Started! 🎉",
-            description: "Your sprint is being processed. The workflow will handle content generation.",
-          });
-          setIsGenerating(false);
-        }
-      } else {
-        const errorText = await response.text();
-        throw new Error(`Failed to create sprint: ${response.status} - ${errorText}`);
-      }
-    } catch (error) {
-      console.error('Sprint creation error:', error);
+      );
+      
+      setGeneratedContent(generatedData);
+      setShowReviewPage(true);
+      setIsGenerating(false);
+      
       toast({
-        title: "Sprint Creation Failed",
-        description: error instanceof Error ? error.message : "Please check your connection and try again.",
+        title: "Sprint Generated Successfully! 🎉",
+        description: "Review and edit your generated content before finalizing.",
+      });
+    } catch (error) {
+      console.error('Sprint generation error:', error);
+      toast({
+        title: "Sprint Generation Failed",
+        description: error instanceof Error ? error.message : "Please check your API key and try again.",
         variant: "destructive",
       });
       setIsGenerating(false);
@@ -233,30 +183,29 @@ export const SprintCreationForm: React.FC = () => {
   };
 
   const handleFinalize = async (editedContent: GeneratedContent) => {
-    const finalizeWebhookUrl = formData.webhookUrl?.replace('webhook-test', 'webhook-finalize') || 
-      'https://freedomology.app.n8n.cloud/webhook-finalize/98e2f8f3-553a-45c7-a7a9-567bc1e9c8c6';
-    
-    const response = await fetch(finalizeWebhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...editedContent,
-        timestamp: new Date().toISOString(),
-        source: 'freedomology-sprint-finalize'
-      }),
-    });
+    try {
+      // Save to localStorage for now - in production you'd send to your backend
+      localStorage.setItem(`sprint_${editedContent.sprintId}`, JSON.stringify(editedContent));
+      
+      toast({
+        title: "Sprint Finalized Successfully! 🎉",
+        description: "Your sprint has been saved and is ready to use.",
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to finalize sprint');
+      // Reset form after successful finalization
+      setFormData(initialFormData);
+      setCurrentStep(1);
+      setGeneratedContent(null);
+      setShowReviewPage(false);
+    } catch (error) {
+      console.error('Sprint finalization error:', error);
+      toast({
+        title: "Finalization Failed",
+        description: "There was an error saving your sprint. Please try again.",
+        variant: "destructive",
+      });
+      throw error;
     }
-
-    // Reset form after successful finalization
-    setFormData(initialFormData);
-    setCurrentStep(1);
-    setGeneratedContent(null);
-    setShowReviewPage(false);
   };
 
   const handleBackToForm = () => {
@@ -660,6 +609,8 @@ export const SprintCreationForm: React.FC = () => {
         sprintTitle={formData.sprintTitle}
         sprintDuration={formData.sprintDuration}
         creatorName={formData.creatorName}
+        currentStep={generationStep}
+        progress={generationProgress}
       />
     );
   }
