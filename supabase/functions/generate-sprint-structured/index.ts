@@ -89,6 +89,25 @@ async function generateCompletion(prompt: string, apiKey: string, maxTokens: num
   return data.choices[0]?.message?.content || '';
 }
 
+function cleanJsonResponse(response: string): string {
+  // Remove markdown code blocks if present
+  let cleaned = response.trim();
+  
+  // Remove ```json at the start
+  if (cleaned.startsWith('```json')) {
+    cleaned = cleaned.substring(7);
+  } else if (cleaned.startsWith('```')) {
+    cleaned = cleaned.substring(3);
+  }
+  
+  // Remove ``` at the end
+  if (cleaned.endsWith('```')) {
+    cleaned = cleaned.substring(0, cleaned.length - 3);
+  }
+  
+  return cleaned.trim();
+}
+
 async function generateMasterPlan(formData: SprintFormData, apiKey: string): Promise<MasterPlan> {
   const prompt = `You are an expert curriculum designer and life coach. Create a comprehensive master plan for a ${formData.sprintDuration}-day sprint titled "${formData.sprintTitle}".
 
@@ -142,7 +161,8 @@ Make sure each day has a unique focus that builds toward the overall goals. No t
   console.log('Raw master plan response length:', response.length);
   
   try {
-    return JSON.parse(response);
+    const cleanedResponse = cleanJsonResponse(response);
+    return JSON.parse(cleanedResponse);
   } catch (error) {
     console.error('Failed to parse master plan response:', response);
     console.error('Parse error:', error);
@@ -202,7 +222,8 @@ Output as JSON in this exact format:
   console.log(`Raw script response for day ${day} length:`, response.length);
   
   try {
-    return JSON.parse(response);
+    const cleanedResponse = cleanJsonResponse(response);
+    return JSON.parse(cleanedResponse);
   } catch (error) {
     console.error(`Failed to parse script response for day ${day}:`, response);
     console.error('Parse error:', error);
@@ -251,7 +272,8 @@ Output as JSON in this exact format:
   console.log(`Raw email response for day ${day} length:`, response.length);
   
   try {
-    return JSON.parse(response);
+    const cleanedResponse = cleanJsonResponse(response);
+    return JSON.parse(cleanedResponse);
   } catch (error) {
     console.error(`Failed to parse email response for day ${day}:`, response);
     console.error('Parse error:', error);
