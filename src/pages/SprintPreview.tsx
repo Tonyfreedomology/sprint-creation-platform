@@ -67,6 +67,7 @@ export const SprintPreview: React.FC = () => {
   const [generatingAudio, setGeneratingAudio] = useState<Record<number, boolean>>({});
   const [playingAudio, setPlayingAudio] = useState<Record<number, boolean>>({});
   const [audioElements, setAudioElements] = useState<Record<number, HTMLAudioElement>>({});
+  const [realtimeChannel, setRealtimeChannel] = useState<any>(null);
 
   useEffect(() => {
     if (location.state?.generatedContent) {
@@ -83,6 +84,15 @@ export const SprintPreview: React.FC = () => {
       navigate('/');
     }
   }, [location.state, navigate]);
+
+  // Cleanup real-time channel on unmount
+  useEffect(() => {
+    return () => {
+      if (realtimeChannel) {
+        supabase.removeChannel(realtimeChannel);
+      }
+    };
+  }, [realtimeChannel]);
 
   const handleLessonEdit = (dayIndex: number, field: string, value: string) => {
     if (!sprintData) return;
@@ -117,87 +127,108 @@ export const SprintPreview: React.FC = () => {
       return;
     }
 
-    // Generate remaining content in background
-    for (let batch = 1; batch <= Math.ceil(remainingDays / 5); batch++) {
-      const startDay = currentLessons + ((batch - 1) * 5) + 1;
-      const endDay = Math.min(currentLessons + (batch * 5), totalDays);
-      const batchDays = Array.from({ length: endDay - startDay + 1 }, (_, i) => startDay + i);
+    // Start real-time generation process
+    const channelName = `sprint-generation-${initialContent.sprintId}`;
+    const channel = supabase.channel(channelName);
+
+    // Listen for lesson updates
+    channel.on('broadcast', { event: 'lesson-generated' }, (payload) => {
+      console.log('Received lesson update:', payload);
+      const { lesson, email } = payload.payload;
       
-      try {
-        const { data, error } = await supabase.functions.invoke('generate-sprint-batch', {
-          body: {
-            formData: location.state?.formData || {},
-            batchDays,
-            sprintId: initialContent.sprintId
-          }
-        });
-
-        if (error) {
-          console.error('Batch generation error:', error);
-          continue;
-        }
-
-        const { batchLessons, batchEmails } = data;
+      setSprintData(prev => {
+        if (!prev) return prev;
         
-        // Update sprint data with new content
-        setSprintData(prev => {
-          if (!prev) return prev;
-          
-          const updatedLessons = [...prev.dailyLessons];
-          const updatedEmails = [...prev.emailSequence];
-          
-          // Replace placeholder content with generated content
-          batchLessons.forEach((lesson: any) => {
-            const existingIndex = updatedLessons.findIndex(l => l.day === lesson.day);
-            if (existingIndex >= 0) {
-              updatedLessons[existingIndex] = lesson;
-            } else {
-              updatedLessons.push(lesson);
-            }
-          });
-          
-          batchEmails.forEach((email: any) => {
-            const existingIndex = updatedEmails.findIndex(e => e.day === email.day);
-            if (existingIndex >= 0) {
-              updatedEmails[existingIndex] = email;
-            } else {
-              updatedEmails.push(email);
-            }
-          });
-          
-          // Sort by day
+        const updatedLessons = [...prev.dailyLessons];
+        const updatedEmails = [...prev.emailSequence];
+        
+        // Replace placeholder with generated content
+        const lessonIndex = updatedLessons.findIndex(l => l.day === lesson.day);
+        if (lessonIndex >= 0) {
+          updatedLessons[lessonIndex] = lesson;
+        } else {
+          updatedLessons.push(lesson);
           updatedLessons.sort((a, b) => a.day - b.day);
-          updatedEmails.sort((a, b) => a.day - b.day);
-          
-          return {
-            ...prev,
-            dailyLessons: updatedLessons,
-            emailSequence: updatedEmails
-          };
-        });
+        }
         
-        // Update progress
-        const newProgress = (endDay / totalDays) * 100;
-        setGenerationProgress(newProgress);
+        if (email) {
+          const emailIndex = updatedEmails.findIndex(e => e.day === email.day);
+          if (emailIndex >= 0) {
+            updatedEmails[emailIndex] = email;
+          } else {
+            updatedEmails.push(email);
+            updatedEmails.sort((a, b) => a.day - b.day);
+          }
+        }
         
-        // Show toast for completed batch
-        toast({
-          title: `Days ${startDay}-${endDay} Generated`,
-          description: "New content has been added to your sprint!",
-        });
-        
-      } catch (error) {
-        console.error('Background generation error:', error);
-      }
-    }
-    
-    setIsGenerating(false);
-    setGenerationProgress(100);
-    
-    toast({
-      title: "Generation Complete! 🎉",
-      description: "All sprint content has been generated.",
+        return {
+          ...prev,
+          dailyLessons: updatedLessons,
+          emailSequence: updatedEmails
+        };
+      });
+      
+      // Update progress
+      const newProgress = (lesson.day / totalDays) * 100;
+      setGenerationProgress(newProgress);
+      
+      // Show toast for completed lesson
+      toast({
+        title: `Day ${lesson.day} Generated`,
+        description: lesson.title,
+      });
     });
+
+    // Listen for completion
+    channel.on('broadcast', { event: 'generation-complete' }, () => {
+      console.log('Generation complete');
+      setIsGenerating(false);
+      setGenerationProgress(100);
+      
+      toast({
+        title: "Generation Complete! 🎉",
+        description: "All sprint content has been generated.",
+      });
+      
+      // Clean up channel
+      supabase.removeChannel(channel);
+    });
+
+    // Subscribe to channel
+    await channel.subscribe();
+    setRealtimeChannel(channel);
+
+    // Start the generation process
+    try {
+      const { error } = await supabase.functions.invoke('generate-sprint-realtime', {
+        body: {
+          formData: location.state?.formData || {},
+          sprintId: initialContent.sprintId,
+          startDay: currentLessons + 1,
+          totalDays: totalDays,
+          channelName: channelName
+        }
+      });
+
+      if (error) {
+        console.error('Failed to start real-time generation:', error);
+        // Fallback to basic batch approach
+        setIsGenerating(false);
+        toast({
+          title: "Generation Error",
+          description: "Failed to start background generation. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Real-time generation error:', error);
+      setIsGenerating(false);
+      toast({
+        title: "Generation Error", 
+        description: "Failed to start background generation. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const generateAudio = async (text: string, lessonDay: number) => {
