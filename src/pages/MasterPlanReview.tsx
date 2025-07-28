@@ -204,15 +204,26 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
                           </Button>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{day.theme}</h3>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setEditingDay(index)}
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-semibold">{day.theme}</h3>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setEditingDay(index)}
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{day.learningObjective}</p>
+                          {day.keyTakeaways.length > 0 && (
+                            <div className="mt-2">
+                              <span className="text-xs font-medium text-muted-foreground">Key Points: </span>
+                              <span className="text-xs text-muted-foreground">
+                                {day.keyTakeaways.slice(0, 2).join(' • ')}{day.keyTakeaways.length > 2 ? '...' : ''}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

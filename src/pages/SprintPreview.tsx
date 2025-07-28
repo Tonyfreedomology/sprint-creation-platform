@@ -418,9 +418,68 @@ export const SprintPreview: React.FC = () => {
   };
 
   const saveSprint = () => {
+    if (!sprintData) return;
+    
+    // Create a comprehensive document for export
+    const docContent = [
+      `${sprintData.sprintTitle}\n`,
+      `Created by: ${sprintData.creatorInfo.name}\n`,
+      `Duration: ${sprintData.sprintDuration} days\n`,
+      `Category: ${sprintData.sprintCategory}\n\n`,
+      `Description:\n${sprintData.sprintDescription}\n\n`,
+      '='.repeat(80) + '\nDAILY LESSONS\n' + '='.repeat(80) + '\n\n',
+      ...sprintData.dailyLessons.map(lesson => 
+        `Day ${lesson.day}: ${lesson.title}\n\n` +
+        `Content:\n${lesson.content}\n\n` +
+        `Exercise:\n${lesson.exercise}\n\n` +
+        `Affirmation:\n${lesson.affirmation}\n\n` +
+        '-'.repeat(40) + '\n\n'
+      ),
+      '='.repeat(80) + '\nEMAIL SEQUENCE\n' + '='.repeat(80) + '\n\n',
+      ...sprintData.emailSequence.map(email => 
+        `Day ${email.day}: ${email.subject}\n\n` +
+        `${email.content}\n\n` +
+        '-'.repeat(40) + '\n\n'
+      )
+    ].join('');
+    
+    const blob = new Blob([docContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${sprintData.sprintTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_complete.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
     toast({
       title: "Sprint Saved",
-      description: "Your sprint has been saved successfully!",
+      description: "Your complete sprint has been downloaded as a text document!",
+    });
+  };
+
+  const downloadAllAudio = () => {
+    if (!sprintData || Object.keys(audioUrls).length === 0) {
+      toast({
+        title: "No Audio Available",
+        description: "Generate some audio files first before downloading.",
+      });
+      return;
+    }
+    
+    // Create a zip file would be ideal, but for now download each audio file
+    Object.entries(audioUrls).forEach(([day, url]) => {
+      const lesson = sprintData.dailyLessons.find(l => l.day === parseInt(day));
+      if (lesson && url) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Day_${day}_${lesson.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.mp3`;
+        link.click();
+      }
+    });
+    
+    toast({
+      title: "Audio Files Downloaded",
+      description: `Downloaded ${Object.keys(audioUrls).length} audio files.`,
     });
   };
 
@@ -432,13 +491,13 @@ export const SprintPreview: React.FC = () => {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${sprintData.sprintTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_sprint.json`;
+    link.download = `${sprintData.sprintTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_data.json`;
     link.click();
     URL.revokeObjectURL(url);
     
     toast({
-      title: "Sprint Exported",
-      description: "Your sprint has been downloaded as a JSON file.",
+      title: "Data Exported",
+      description: "Your sprint data has been downloaded as a JSON file.",
     });
   };
 
@@ -482,11 +541,15 @@ export const SprintPreview: React.FC = () => {
           <div className="flex gap-2">
             <Button variant="outline" onClick={saveSprint}>
               <Save className="w-4 h-4 mr-2" />
-              Save
+              Save as Document
+            </Button>
+            <Button variant="outline" onClick={downloadAllAudio} disabled={Object.keys(audioUrls).length === 0}>
+              <Volume2 className="w-4 h-4 mr-2" />
+              Download Audio
             </Button>
             <Button variant="outline" onClick={exportSprint}>
               <Download className="w-4 h-4 mr-2" />
-              Export
+              Export Data
             </Button>
           </div>
         </div>
@@ -544,10 +607,10 @@ export const SprintPreview: React.FC = () => {
                     <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-blue-900">
-                        Generating remaining lessons...
+                        Your lessons are being generated and will appear below one by one
                       </p>
                       <p className="text-xs text-blue-700">
-                        You can start reviewing and editing the content below while we create the rest!
+                        This may take a few minutes to create the entire sprint. Feel free to edit or tweak any content as it appears, and generate audio versions by pressing the "Generate Audio" button on each lesson.
                       </p>
                     </div>
                   </div>
