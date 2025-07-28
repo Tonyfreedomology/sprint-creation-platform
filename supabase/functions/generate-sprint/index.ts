@@ -1,5 +1,5 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -35,6 +35,8 @@ interface OpenAIResponse {
 }
 
 async function generateCompletion(prompt: string, apiKey: string, maxTokens: number = 2000): Promise<string> {
+  console.log('Making OpenAI request with prompt length:', prompt.length);
+  
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -55,10 +57,13 @@ async function generateCompletion(prompt: string, apiKey: string, maxTokens: num
   });
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+    const errorText = await response.text();
+    console.error('OpenAI API error:', response.status, response.statusText, errorText);
+    throw new Error(`OpenAI API error: ${response.status} ${response.statusText} - ${errorText}`);
   }
 
   const data: OpenAIResponse = await response.json();
+  console.log('OpenAI response received, content length:', data.choices[0]?.message?.content?.length || 0);
   return data.choices[0]?.message?.content || '';
 }
 
@@ -93,12 +98,16 @@ Output as JSON in this exact format:
   "affirmation": "[Powerful affirmation]"
 }`;
 
+  console.log(`Generating daily script for day ${day}`);
   const response = await generateCompletion(prompt, apiKey, 1500);
+  console.log('Raw OpenAI response for daily script:', response);
+  
   try {
     return JSON.parse(response);
   } catch (error) {
-    console.error('Failed to parse OpenAI response:', response);
-    throw new Error('Invalid JSON response from OpenAI');
+    console.error('Failed to parse OpenAI response for daily script:', response);
+    console.error('Parse error:', error);
+    throw new Error(`Invalid JSON response from OpenAI for daily script: ${error.message}`);
   }
 }
 
@@ -149,12 +158,16 @@ Output as JSON in this exact format:
   ]
 }`;
 
+  console.log(`Generating email sequence for day ${day}`);
   const response = await generateCompletion(prompt, apiKey, 2000);
+  console.log('Raw OpenAI response for email sequence:', response);
+  
   try {
     return JSON.parse(response);
   } catch (error) {
-    console.error('Failed to parse OpenAI response:', response);
-    throw new Error('Invalid JSON response from OpenAI');
+    console.error('Failed to parse OpenAI response for email sequence:', response);
+    console.error('Parse error:', error);
+    throw new Error(`Invalid JSON response from OpenAI for email sequence: ${error.message}`);
   }
 }
 
@@ -163,17 +176,30 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  console.log('Edge function called with method:', req.method);
+
   try {
-    const { formData } = await req.json()
+    const requestBody = await req.json();
+    console.log('Request body received');
+    const { formData } = requestBody;
     
     // Get the OpenAI API key from Supabase secrets
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    console.log('OpenAI API key available:', !!openaiApiKey);
+    
     if (!openaiApiKey) {
-      throw new Error('OpenAI API key not configured')
+      console.error('OpenAI API key not configured');
+      throw new Error('OpenAI API key not configured');
     }
 
-    const sprintData = formData as SprintFormData
-    const sprintId = `sprint_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const sprintData = formData as SprintFormData;
+    console.log('Sprint data received:', {
+      title: sprintData.sprintTitle,
+      duration: sprintData.sprintDuration,
+      creatorName: sprintData.creatorName
+    });
+    
+    const sprintId = `sprint_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     const generatedContent: any = {
       sprintId,
@@ -188,13 +214,17 @@ serve(async (req) => {
       },
       dailyLessons: [],
       emailSequence: []
-    }
+    };
 
-    const duration = parseInt(sprintData.sprintDuration)
-    const personalizationData = `Target Audience: ${sprintData.targetAudience}. Experience Level: ${sprintData.experience}. Content Types: ${sprintData.contentTypes.join(', ')}. Special Requirements: ${sprintData.specialRequirements}`
+    const duration = parseInt(sprintData.sprintDuration);
+    console.log('Generating content for', duration, 'days');
+    
+    const personalizationData = `Target Audience: ${sprintData.targetAudience}. Experience Level: ${sprintData.experience}. Content Types: ${sprintData.contentTypes.join(', ')}. Special Requirements: ${sprintData.specialRequirements}`;
 
     // Generate content for each day
     for (let day = 1; day <= duration; day++) {
+      console.log(`Starting generation for day ${day} of ${duration}`);
+      
       // Generate daily script
       const dailyScript = await generateDailyScript(
         sprintData.sprintTitle,
@@ -215,7 +245,8 @@ serve(async (req) => {
         openaiApiKey
       )
 
-      generatedContent.dailyLessons.push(dailyScript)
+      console.log(`Completed generation for day ${day}`);
+      generatedContent.dailyLessons.push(dailyScript);
       
       // Transform email sequence to match expected format
       if (emailSequence.emails) {
@@ -230,6 +261,8 @@ serve(async (req) => {
         });
       }
     }
+    
+    console.log('All content generated successfully. Total lessons:', generatedContent.dailyLessons.length, 'Total emails:', generatedContent.emailSequence.length);
 
     return new Response(
       JSON.stringify({ generatedContent }),
@@ -237,10 +270,18 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Sprint generation error:', error)
+    console.error('Sprint generation error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-    )
+    );
   }
 })
