@@ -148,38 +148,20 @@ export const SprintCreationForm: React.FC = () => {
 
   const generateSprintWithApiKey = async () => {
     setIsSubmitting(true);
-    setIsGenerating(true);
-    setGenerationProgress(0);
-    setGenerationStep('Starting generation...');
     
     try {
-      const { data, error } = await supabase.functions.invoke('generate-sprint', {
-        body: { formData }
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Failed to generate sprint');
-      }
-
-      const { generatedContent } = data;
-      
-      // Navigate to preview page with generated content
-      navigate('/sprint-preview', { 
-        state: { generatedContent }
-      });
-      
-      toast({
-        title: "Sprint Generated Successfully! 🎉",
-        description: "Review and edit your generated content.",
+      // Navigate to generation page instead of directly generating
+      navigate('/sprint-generation', { 
+        state: { formData },
+        replace: true 
       });
     } catch (error) {
-      console.error('Sprint generation error:', error);
+      console.error('Navigation error:', error);
       toast({
-        title: "Sprint Generation Failed",
-        description: error instanceof Error ? error.message : "Failed to generate sprint. Please ensure your OpenAI API key is configured.",
+        title: "Navigation Failed",
+        description: "Failed to proceed to generation page.",
         variant: "destructive",
       });
-      setIsGenerating(false);
     } finally {
       setIsSubmitting(false);
     }
