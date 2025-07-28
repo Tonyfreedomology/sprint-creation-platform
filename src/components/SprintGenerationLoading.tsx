@@ -103,10 +103,10 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
         return newCompleted;
       });
     } else {
-      // Fallback simulation
+      // Fallback simulation with proper step completion
       const interval = setInterval(() => {
         setOverallProgress(prev => {
-          const newProgress = Math.min(prev + 2, 95);
+          const newProgress = Math.min(prev + 1.5, 100);
           
           const stepThreshold = 100 / loadingSteps.length;
           const newStepIndex = Math.min(
@@ -118,8 +118,9 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
             setCurrentStepIndex(newStepIndex);
             setCompletedSteps(prev => {
               const newCompleted = new Set(prev);
-              if (currentStepIndex > 0) {
-                newCompleted.add(loadingSteps[currentStepIndex - 1]?.id);
+              // Mark the previous step as completed when moving to next step
+              for (let i = 0; i < newStepIndex; i++) {
+                newCompleted.add(loadingSteps[i].id);
               }
               return newCompleted;
             });
@@ -127,7 +128,7 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
           
           return newProgress;
         });
-      }, 500);
+      }, 800);
 
       return () => clearInterval(interval);
     }
