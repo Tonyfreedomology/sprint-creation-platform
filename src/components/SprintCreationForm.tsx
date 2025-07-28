@@ -13,7 +13,7 @@ import { toast } from '@/hooks/use-toast';
 import { SprintGenerationLoading } from './SprintGenerationLoading';
 import { SprintReviewPage } from './SprintReviewPage';
 import { OpenAIKeyModal } from './OpenAIKeyModal';
-import { SprintGenerationService } from '@/services/sprintGeneration';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SprintFormData {
   // Creator Info
@@ -134,34 +134,26 @@ export const SprintCreationForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    // Check for stored API key or show modal
-    const storedApiKey = localStorage.getItem('openai_api_key');
-    if (!storedApiKey) {
-      setShowApiKeyModal(true);
-      return;
-    }
-    
-    await generateSprintWithApiKey(storedApiKey);
+    await generateSprintWithApiKey();
   };
 
-  const generateSprintWithApiKey = async (apiKey: string) => {
+  const generateSprintWithApiKey = async () => {
     setIsSubmitting(true);
     setIsGenerating(true);
     setGenerationProgress(0);
     setGenerationStep('Starting generation...');
     
     try {
-      const sprintService = new SprintGenerationService(apiKey);
-      
-      const generatedData = await sprintService.generateSprint(
-        formData,
-        (step: string, progress: number) => {
-          setGenerationStep(step);
-          setGenerationProgress(progress);
-        }
-      );
-      
-      setGeneratedContent(generatedData);
+      const { data, error } = await supabase.functions.invoke('generate-sprint', {
+        body: { formData }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to generate sprint');
+      }
+
+      const { generatedContent } = data;
+      setGeneratedContent(generatedContent);
       setShowReviewPage(true);
       setIsGenerating(false);
       
@@ -173,7 +165,7 @@ export const SprintCreationForm: React.FC = () => {
       console.error('Sprint generation error:', error);
       toast({
         title: "Sprint Generation Failed",
-        description: error instanceof Error ? error.message : "Please check your API key and try again.",
+        description: error instanceof Error ? error.message : "Failed to generate sprint. Please ensure your OpenAI API key is configured.",
         variant: "destructive",
       });
       setIsGenerating(false);
