@@ -50,7 +50,25 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('ElevenLabs API error:', response.status, response.statusText, errorText);
-      throw new Error(`ElevenLabs API error: ${response.status} ${response.statusText}`);
+      
+      let errorMessage = `ElevenLabs API error: ${response.status} ${response.statusText}`;
+      
+      // Parse error details if available
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.detail) {
+          if (errorData.detail.status === 'quota_exceeded') {
+            errorMessage = `ElevenLabs quota exceeded. You need ${errorData.detail.message.match(/(\d+) credits are required/)?.[1] || 'more'} credits but only have ${errorData.detail.message.match(/You have (\d+) credits/)?.[1] || 'insufficient'} remaining. Please check your ElevenLabs account.`;
+          } else if (errorData.detail.message) {
+            errorMessage = `ElevenLabs error: ${errorData.detail.message}`;
+          }
+        }
+      } catch (parseError) {
+        // If we can't parse the error, use the raw text
+        errorMessage += `: ${errorText}`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     // Get audio as array buffer and convert to base64 safely
