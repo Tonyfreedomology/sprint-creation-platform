@@ -81,6 +81,17 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
   const handleApproveAndGenerate = async () => {
     setIsGenerating(true);
     
+    console.log('About to start content generation');
+    console.log('Sprint ID:', sprintId);
+    console.log('Channel Name:', channelName);
+    
+    if (!sprintId || !channelName) {
+      console.error('Missing sprintId or channelName!', { sprintId, channelName });
+      toast.error('Missing sprint information. Please try again.');
+      setIsGenerating(false);
+      return;
+    }
+    
     try {
       console.log('Starting content generation with:', { sprintId, channelName, phase: 'content-generation' });
       
@@ -101,11 +112,10 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
         throw new Error(response.error.message || 'Unknown error from function');
       }
 
-      toast.success('Content generation started! Redirecting to preview...');
+      console.log('About to navigate to sprint preview with URL:', `/sprint-preview?id=${sprintId}&channel=${channelName}`);
       
       // Navigate immediately to the preview page
-      console.log('Navigating to sprint preview...');
-      navigate(`/sprint-preview?id=${sprintId}&channel=${channelName}`);
+      window.location.href = `/sprint-preview?id=${sprintId}&channel=${channelName}`;
 
     } catch (error) {
       console.error('Error starting content generation:', error);
