@@ -153,24 +153,44 @@ export const SprintCreationForm: React.FC = () => {
     setGenerationStep('Starting generation...');
     
     try {
-      // Start with initial batch to get first few lessons quickly
-      const { data, error } = await supabase.functions.invoke('generate-sprint', {
+      // Start with initial content (first 3 days)
+      const { data: initialData, error: initialError } = await supabase.functions.invoke('generate-sprint', {
         body: { formData }
       });
 
-      if (error) {
-        throw new Error(error.message || 'Failed to generate sprint');
+      if (initialError) {
+        throw new Error(initialError.message || 'Failed to generate initial sprint content');
       }
 
-      const { generatedContent } = data;
+      const { generatedContent } = initialData;
+      
+      // Create unique channel for real-time updates
+      const channelName = `sprint-generation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Start real-time generation for remaining days if sprint is longer than 3 days
+      const totalDays = parseInt(formData.sprintDuration);
+      if (totalDays > 3) {
+        // Fire and forget the real-time generation
+        supabase.functions.invoke('generate-sprint-realtime', {
+          body: { 
+            formData,
+            sprintId: generatedContent.sprintId,
+            startDay: 4,
+            totalDays,
+            channelName
+          }
+        }).catch(error => {
+          console.error('Background generation failed:', error);
+        });
+      }
       
       // Navigate to preview page immediately with initial content
       navigate('/sprint-preview', { 
         state: { 
-          generatedContent,
+          sprintData: generatedContent,
           formData,
-          isGenerating: true,
-          totalDays: parseInt(formData.sprintDuration)
+          channelName,
+          isGenerating: totalDays > 3
         }
       });
       
