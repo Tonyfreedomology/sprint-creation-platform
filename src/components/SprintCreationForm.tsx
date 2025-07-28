@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -90,6 +91,7 @@ const initialFormData: SprintFormData = {
 };
 
 export const SprintCreationForm: React.FC = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<SprintFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -158,13 +160,15 @@ export const SprintCreationForm: React.FC = () => {
       }
 
       const { generatedContent } = data;
-      setGeneratedContent(generatedContent);
-      setShowReviewPage(true);
-      setIsGenerating(false);
+      
+      // Navigate to preview page with generated content
+      navigate('/sprint-preview', { 
+        state: { generatedContent }
+      });
       
       toast({
         title: "Sprint Generated Successfully! 🎉",
-        description: "Review and edit your generated content before finalizing.",
+        description: "Review and edit your generated content.",
       });
     } catch (error) {
       console.error('Sprint generation error:', error);
