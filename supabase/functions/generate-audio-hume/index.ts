@@ -111,8 +111,7 @@ serve(async (req) => {
     const requestBody = {
       utterances: [{
         text: text,
-        description: finalVoiceDescription || "Warm, professional coach with encouraging confidence",
-        ...(finalActingInstructions && { actingInstructions: finalActingInstructions })
+        description: finalVoiceDescription || "Warm, professional coach with encouraging confidence"
       }],
       ...(context && { context: { generationId: context } }),
       numGenerations: Math.min(numGenerations, 5), // Hume allows max 5 generations
@@ -134,7 +133,19 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Hume API error:', response.status, response.statusText, errorText);
+      console.error('Hume API error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        errorBody: errorText,
+        requestUrl: 'https://api.hume.ai/v1/tts/synthesize/json',
+        requestHeaders: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Hume-Api-Key': humeApiKey ? '[PRESENT]' : '[MISSING]',
+        },
+        requestBody: requestBody
+      });
       
       let errorMessage = `Hume API error: ${response.status} ${response.statusText}`;
       
@@ -145,10 +156,14 @@ serve(async (req) => {
           errorMessage = `Hume error: ${errorData.error}`;
         } else if (errorData.message) {
           errorMessage = `Hume error: ${errorData.message}`;
+        } else if (errorData.detail) {
+          errorMessage = `Hume error: ${errorData.detail}`;
         }
       } catch (parseError) {
         // If we can't parse the error, use the raw text
-        errorMessage += `: ${errorText}`;
+        if (errorText) {
+          errorMessage += `: ${errorText}`;
+        }
       }
       
       throw new Error(errorMessage);
