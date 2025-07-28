@@ -21,6 +21,7 @@ interface SprintFormData {
   experience: string;
   goals: string;
   specialRequirements: string;
+  voiceId: string;
   voiceSampleFile: File | null;
   writingStyleFile: File | null;
   participantEmails: string;
@@ -198,6 +199,7 @@ serve(async (req) => {
       sprintDescription: sprintData.sprintDescription,
       sprintDuration: sprintData.sprintDuration,
       sprintCategory: sprintData.sprintCategory,
+      voiceId: sprintData.voiceId,
       creatorInfo: {
         name: sprintData.creatorName,
         email: sprintData.creatorEmail,
