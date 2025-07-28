@@ -93,6 +93,20 @@ export const SprintPreview: React.FC = () => {
     const channel = supabase.channel(channelName);
     
     channel
+      .on('broadcast', { event: 'structure-generation-started' }, (payload) => {
+        console.log('Structure generation started:', payload);
+        toast({
+          title: "Creating Master Plan",
+          description: "Generating structured curriculum...",
+        });
+      })
+      .on('broadcast', { event: 'structure-generated' }, (payload) => {
+        console.log('Sprint structure created:', payload);
+        toast({
+          title: "Master Plan Created!",
+          description: "Now generating detailed content for each day...",
+        });
+      })
       .on('broadcast', { event: 'lesson-generated' }, (payload) => {
         console.log('Received new lesson:', payload);
         
@@ -103,6 +117,7 @@ export const SprintPreview: React.FC = () => {
             const updatedData = { ...prevData };
             const lesson = payload.payload.lesson;
             const email = payload.payload.email;
+            const structure = payload.payload.structure;
             
             // Add lesson to dailyLessons array
             const existingLessonIndex = updatedData.dailyLessons.findIndex(l => l.day === lesson.day);
@@ -128,18 +143,35 @@ export const SprintPreview: React.FC = () => {
             const progress = Math.round((completedDays / totalDays) * 100);
             setGenerationProgress(progress);
             
+            // Show success toast with structure info if available
+            const theme = structure?.theme || lesson.title;
+            toast({
+              title: `Day ${lesson.day} Generated`,
+              description: theme,
+            });
+            
             return updatedData;
           });
         }
       })
-      .on('broadcast', { event: 'generation-complete' }, () => {
+      .on('broadcast', { event: 'generation-complete' }, (payload) => {
         console.log('Generation completed');
         setIsGenerating(false);
         setGenerationProgress(100);
         
         toast({
-          title: "Generation Complete!",
-          description: "All lessons have been generated successfully.",
+          title: "Generation Complete! 🎉",
+          description: payload.payload?.message || "All lessons have been generated successfully.",
+        });
+      })
+      .on('broadcast', { event: 'generation-error' }, (payload) => {
+        console.log('Generation error:', payload);
+        setIsGenerating(false);
+        
+        toast({
+          title: "Generation Error",
+          description: payload.payload?.message || "There was an error during generation.",
+          variant: "destructive"
         });
       })
       .subscribe();

@@ -150,10 +150,10 @@ export const SprintCreationForm: React.FC = () => {
     setIsSubmitting(true);
     setIsGenerating(true);
     setGenerationProgress(0);
-    setGenerationStep('Starting generation...');
+    setGenerationStep('Creating master plan...');
     
     try {
-      // Start with initial content (first 3 days)
+      // Start with initial content (first 3 days) - keep this for immediate preview
       const { data: initialData, error: initialError } = await supabase.functions.invoke('generate-sprint', {
         body: { formData }
       });
@@ -167,22 +167,24 @@ export const SprintCreationForm: React.FC = () => {
       // Create unique channel for real-time updates
       const channelName = `sprint-generation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
-      // Start real-time generation for remaining days if sprint is longer than 3 days
-      const totalDays = parseInt(formData.sprintDuration);
-      if (totalDays > 3) {
-        // Fire and forget the real-time generation
-        supabase.functions.invoke('generate-sprint-realtime', {
-          body: { 
-            formData,
-            sprintId: generatedContent.sprintId,
-            startDay: 4,
-            totalDays,
-            channelName
-          }
-        }).catch(error => {
-          console.error('Background generation failed:', error);
+      // Use the new structured generation approach for all days
+      console.log('Starting structured generation with channel:', channelName);
+      
+      // Start the structured generation process
+      supabase.functions.invoke('generate-sprint-structured', {
+        body: {
+          formData: formData,
+          sprintId: generatedContent.sprintId,
+          channelName: channelName
+        }
+      }).catch(error => {
+        console.error('Structured generation failed:', error);
+        toast({
+          title: "Background Generation Error",
+          description: "Structure generation failed, but you can still review the initial content.",
+          variant: "destructive"
         });
-      }
+      });
       
       // Navigate to preview page immediately with initial content
       navigate('/sprint-preview', { 
@@ -190,7 +192,8 @@ export const SprintCreationForm: React.FC = () => {
           sprintData: generatedContent,
           formData,
           channelName,
-          isGenerating: totalDays > 3
+          isGenerating: true,
+          generationType: 'structured'
         }
       });
       
