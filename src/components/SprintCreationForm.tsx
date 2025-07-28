@@ -173,10 +173,13 @@ export const SprintCreationForm: React.FC = () => {
         })
         .on('broadcast', { event: 'structure-generated' }, (payload) => {
           console.log('Master plan generated:', payload.payload);
-          setMasterPlan(payload.payload.structure);
-          setShowMasterPlanReview(true);
           setIsGenerating(false);
           supabase.removeChannel(channel);
+          
+          // Navigate to master plan review page
+          const masterPlanData = encodeURIComponent(JSON.stringify(payload.payload.structure));
+          const formDataEncoded = encodeURIComponent(JSON.stringify(formData));
+          navigate(`/master-plan-review?masterPlan=${masterPlanData}&formData=${formDataEncoded}&sprintId=${newSprintId}&channelName=${newChannelName}`);
         })
         .subscribe();
       
