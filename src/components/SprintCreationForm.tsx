@@ -153,49 +153,77 @@ export const SprintCreationForm: React.FC = () => {
     setGenerationStep('Creating master plan...');
     
     try {
-      // Start with initial content (first 3 days) - keep this for immediate preview
-      const { data: initialData, error: initialError } = await supabase.functions.invoke('generate-sprint', {
-        body: { formData }
-      });
-
-      if (initialError) {
-        throw new Error(initialError.message || 'Failed to generate initial sprint content');
-      }
-
-      const { generatedContent } = initialData;
-      
       // Create unique channel for real-time updates
       const channelName = `sprint-generation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       
-      // Use the new structured generation approach for all days
-      console.log('Starting structured generation with channel:', channelName);
+      // Set up channel to listen for initial completion before redirecting
+      const channel = supabase.channel(channelName);
+      
+      let sprintData: any = null;
+      let firstThreeDaysReady = false;
+      
+      channel
+        .on('broadcast', { event: 'structure-generation-started' }, () => {
+          setGenerationStep('Creating master plan...');
+        })
+        .on('broadcast', { event: 'structure-generated' }, (payload) => {
+          setGenerationStep('Generating first 3 days...');
+          // Create initial sprint data structure
+          sprintData = {
+            sprintId: `sprint_${Date.now()}`,
+            sprintTitle: formData.sprintTitle,
+            sprintDescription: formData.sprintDescription,
+            dailyLessons: [],
+            emailSequence: [],
+            structure: payload.payload.structure
+          };
+        })
+        .on('broadcast', { event: 'lesson-generated' }, (payload) => {
+          if (!sprintData) return;
+          
+          const lesson = payload.payload.lesson;
+          const email = payload.payload.email;
+          
+          // Add to our temporary data
+          sprintData.dailyLessons.push(lesson);
+          sprintData.emailSequence.push(email);
+          
+          setGenerationStep(`Generated Day ${lesson.day}...`);
+          
+          // Check if we have first 3 days ready
+          if (sprintData.dailyLessons.length >= 3 && !firstThreeDaysReady) {
+            firstThreeDaysReady = true;
+            
+            // Navigate to preview page with first 3 days
+            navigate('/sprint-preview', { 
+              state: { 
+                sprintData,
+                formData,
+                channelName,
+                isGenerating: true,
+                generationType: 'structured',
+                initialDaysReady: true
+              }
+            });
+            
+            // Clean up this channel since preview page will take over
+            supabase.removeChannel(channel);
+          }
+        })
+        .subscribe();
       
       // Start the structured generation process
-      supabase.functions.invoke('generate-sprint-structured', {
+      const { error: structuredError } = await supabase.functions.invoke('generate-sprint-structured', {
         body: {
           formData: formData,
-          sprintId: generatedContent.sprintId,
+          sprintId: `sprint_${Date.now()}`,
           channelName: channelName
         }
-      }).catch(error => {
-        console.error('Structured generation failed:', error);
-        toast({
-          title: "Background Generation Error",
-          description: "Structure generation failed, but you can still review the initial content.",
-          variant: "destructive"
-        });
       });
       
-      // Navigate to preview page immediately with initial content
-      navigate('/sprint-preview', { 
-        state: { 
-          sprintData: generatedContent,
-          formData,
-          channelName,
-          isGenerating: true,
-          generationType: 'structured'
-        }
-      });
+      if (structuredError) {
+        throw new Error(structuredError.message || 'Failed to start structured generation');
+      }
       
     } catch (error) {
       console.error('Navigation error:', error);

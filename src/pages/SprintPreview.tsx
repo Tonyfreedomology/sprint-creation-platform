@@ -93,20 +93,6 @@ export const SprintPreview: React.FC = () => {
     const channel = supabase.channel(channelName);
     
     channel
-      .on('broadcast', { event: 'structure-generation-started' }, (payload) => {
-        console.log('Structure generation started:', payload);
-        toast({
-          title: "Creating Master Plan",
-          description: "Generating structured curriculum...",
-        });
-      })
-      .on('broadcast', { event: 'structure-generated' }, (payload) => {
-        console.log('Sprint structure created:', payload);
-        toast({
-          title: "Master Plan Created!",
-          description: "Now generating detailed content for each day...",
-        });
-      })
       .on('broadcast', { event: 'lesson-generated' }, (payload) => {
         console.log('Received new lesson:', payload);
         
@@ -143,12 +129,14 @@ export const SprintPreview: React.FC = () => {
             const progress = Math.round((completedDays / totalDays) * 100);
             setGenerationProgress(progress);
             
-            // Show success toast with structure info if available
-            const theme = structure?.theme || lesson.title;
-            toast({
-              title: `Day ${lesson.day} Generated`,
-              description: theme,
-            });
+            // Only show toast for days beyond the initial 3 (since those were ready when page loaded)
+            if (lesson.day > 3) {
+              const theme = structure?.theme || lesson.title;
+              toast({
+                title: `Day ${lesson.day} Generated`,
+                description: theme,
+              });
+            }
             
             return updatedData;
           });
