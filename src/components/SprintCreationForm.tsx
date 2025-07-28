@@ -15,6 +15,7 @@ import { SprintGenerationLoading } from './SprintGenerationLoading';
 import { SprintReviewPage } from './SprintReviewPage';
 import { OpenAIKeyModal } from './OpenAIKeyModal';
 import { supabase } from '@/integrations/supabase/client';
+import MasterPlanReview from '@/pages/MasterPlanReview';
 
 interface SprintFormData {
   // Creator Info
@@ -103,6 +104,10 @@ export const SprintCreationForm: React.FC = () => {
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generationStep, setGenerationStep] = useState('');
+  const [masterPlan, setMasterPlan] = useState<any>(null);
+  const [showMasterPlanReview, setShowMasterPlanReview] = useState(false);
+  const [sprintId, setSprintId] = useState('');
+  const [channelName, setChannelName] = useState('');
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -153,85 +158,50 @@ export const SprintCreationForm: React.FC = () => {
     setGenerationStep('Creating master plan...');
     
     try {
-      // Create unique channel for real-time updates
-      const channelName = `sprint-generation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      // Create unique identifiers
+      const newSprintId = `sprint_${Date.now()}`;
+      const newChannelName = `sprint-generation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      setSprintId(newSprintId);
+      setChannelName(newChannelName);
       
-      // Set up channel to listen for initial completion before redirecting
-      const channel = supabase.channel(channelName);
-      
-      let sprintData: any = null;
-      let firstThreeDaysReady = false;
+      // Set up channel to listen for master plan completion
+      const channel = supabase.channel(newChannelName);
       
       channel
         .on('broadcast', { event: 'structure-generation-started' }, () => {
           setGenerationStep('Creating master plan...');
         })
         .on('broadcast', { event: 'structure-generated' }, (payload) => {
-          setGenerationStep('Generating first 3 days...');
-          // Create initial sprint data structure
-          sprintData = {
-            sprintId: `sprint_${Date.now()}`,
-            sprintTitle: formData.sprintTitle,
-            sprintDescription: formData.sprintDescription,
-            dailyLessons: [],
-            emailSequence: [],
-            structure: payload.payload.structure
-          };
-        })
-        .on('broadcast', { event: 'lesson-generated' }, (payload) => {
-          if (!sprintData) return;
-          
-          const lesson = payload.payload.lesson;
-          const email = payload.payload.email;
-          
-          // Add to our temporary data
-          sprintData.dailyLessons.push(lesson);
-          sprintData.emailSequence.push(email);
-          
-          setGenerationStep(`Generated Day ${lesson.day}...`);
-          
-          // Check if we have first 3 days ready
-          if (sprintData.dailyLessons.length >= 3 && !firstThreeDaysReady) {
-            firstThreeDaysReady = true;
-            
-            // Navigate to preview page with first 3 days
-            navigate('/sprint-preview', { 
-              state: { 
-                sprintData,
-                formData,
-                channelName,
-                isGenerating: true,
-                generationType: 'structured',
-                initialDaysReady: true
-              }
-            });
-            
-            // Clean up this channel since preview page will take over
-            supabase.removeChannel(channel);
-          }
+          console.log('Master plan generated:', payload.payload);
+          setMasterPlan(payload.payload.structure);
+          setShowMasterPlanReview(true);
+          setIsGenerating(false);
+          supabase.removeChannel(channel);
         })
         .subscribe();
       
-      // Start the structured generation process
+      // Start master plan generation only
       const { error: structuredError } = await supabase.functions.invoke('generate-sprint-structured', {
         body: {
           formData: formData,
-          sprintId: `sprint_${Date.now()}`,
-          channelName: channelName
+          sprintId: newSprintId,
+          channelName: newChannelName,
+          phase: 'master-plan-only'
         }
       });
       
       if (structuredError) {
-        throw new Error(structuredError.message || 'Failed to start structured generation');
+        throw new Error(structuredError.message || 'Failed to start master plan generation');
       }
       
     } catch (error) {
-      console.error('Navigation error:', error);
+      console.error('Master plan generation error:', error);
       toast({
-        title: "Navigation Failed",
-        description: "Failed to proceed to generation page.",
+        title: "Generation Failed",
+        description: "Failed to generate master plan.",
         variant: "destructive",
       });
+      setIsGenerating(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -702,6 +672,19 @@ export const SprintCreationForm: React.FC = () => {
         generatedContent={generatedContent}
         onBack={handleBackToForm}
         onFinalize={handleFinalize}
+      />
+    );
+  }
+
+  // Show master plan review
+  if (showMasterPlanReview && masterPlan) {
+    return (
+      <MasterPlanReview
+        masterPlan={masterPlan}
+        formData={formData}
+        sprintId={sprintId}
+        channelName={channelName}
+        onBack={() => setShowMasterPlanReview(false)}
       />
     );
   }

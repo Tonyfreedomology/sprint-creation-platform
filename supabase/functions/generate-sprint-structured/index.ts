@@ -36,6 +36,18 @@ interface DayStructure {
   connectionToNext: string;
 }
 
+interface MasterPlan {
+  overallStructure: {
+    phases: Array<{
+      name: string;
+      days: string;
+      focus: string;
+    }>;
+    progressionArc: string;
+  };
+  dailyPlans: DayStructure[];
+}
+
 interface OpenAIResponse {
   choices: Array<{
     message: {
@@ -77,8 +89,8 @@ async function generateCompletion(prompt: string, apiKey: string, maxTokens: num
   return data.choices[0]?.message?.content || '';
 }
 
-async function generateSprintStructure(formData: SprintFormData, apiKey: string): Promise<DayStructure[]> {
-  const prompt = `You are an expert curriculum designer and life coach. Create a comprehensive ${formData.sprintDuration}-day sprint structure for "${formData.sprintTitle}".
+async function generateMasterPlan(formData: SprintFormData, apiKey: string): Promise<MasterPlan> {
+  const prompt = `You are an expert curriculum designer and life coach. Create a comprehensive master plan for a ${formData.sprintDuration}-day sprint titled "${formData.sprintTitle}".
 
 Sprint Details:
 - Title: ${formData.sprintTitle}
@@ -98,39 +110,43 @@ Create a logical progression that:
 4. Avoids redundancy and ensures unique value each day
 5. Creates a cohesive transformation journey
 
-For each day, provide:
-- A unique theme that advances the overall goal
-- A specific learning objective (what they'll achieve that day)
-- 3-4 key takeaways they should have by the end
-- How this day builds on previous days' concepts
-- How this day prepares them for upcoming lessons
-
-Output as JSON array in this exact format:
-[
-  {
-    "day": 1,
-    "theme": "Clear, compelling theme for day 1",
-    "learningObjective": "Specific, measurable outcome for day 1",
-    "keyTakeaways": ["takeaway 1", "takeaway 2", "takeaway 3"],
-    "buildingBlocks": "What foundational elements this day establishes",
-    "connectionToPrevious": "N/A for day 1",
-    "connectionToNext": "How this prepares for day 2"
+Return a JSON object with this exact structure:
+{
+  "overallStructure": {
+    "phases": [
+      {
+        "name": "Foundation Phase",
+        "days": "1-7", 
+        "focus": "Building awareness and initial habits"
+      }
+    ],
+    "progressionArc": "Description of how the sprint progresses from day 1 to ${formData.sprintDuration}"
   },
-  ...
-]
+  "dailyPlans": [
+    {
+      "day": 1,
+      "theme": "Clear, compelling day theme",
+      "learningObjective": "What participants will learn",
+      "keyTakeaways": ["takeaway1", "takeaway2", "takeaway3"],
+      "buildingBlocks": "How this builds on previous days",
+      "connectionToPrevious": "How this connects to yesterday",
+      "connectionToNext": "How this prepares for tomorrow"
+    }
+  ]
+}
 
-Ensure each day has a UNIQUE focus and avoids repeating content from other days.`;
+Make sure each day has a unique focus that builds toward the overall goals. No two days should be repetitive.`;
 
-  console.log('Generating sprint structure...');
+  console.log('Generating master plan...');
   const response = await generateCompletion(prompt, apiKey, 4000);
-  console.log('Raw sprint structure response length:', response.length);
+  console.log('Raw master plan response length:', response.length);
   
   try {
     return JSON.parse(response);
   } catch (error) {
-    console.error('Failed to parse sprint structure response:', response);
+    console.error('Failed to parse master plan response:', response);
     console.error('Parse error:', error);
-    throw new Error(`Invalid JSON response for sprint structure: ${error.message}`);
+    throw new Error(`Invalid JSON response for master plan: ${error.message}`);
   }
 }
 
@@ -243,6 +259,165 @@ Output as JSON in this exact format:
   }
 }
 
+async function handleMasterPlanOnlyPhase(supabase: any, formData: SprintFormData, channelName: string, openaiApiKey: string) {
+  console.log('Phase: Master plan only');
+  
+  // Send initial status
+  await supabase.channel(channelName).send({
+    type: 'broadcast',
+    event: 'structure-generation-started',
+    payload: { status: 'starting' }
+  });
+
+  // Generate master plan
+  const masterPlan = await generateMasterPlan(formData, openaiApiKey);
+  console.log('Master plan generated with', masterPlan.dailyPlans.length, 'days');
+  
+  // Send master plan to frontend
+  await supabase.channel(channelName).send({
+    type: 'broadcast',
+    event: 'structure-generated',
+    payload: { 
+      structure: masterPlan,
+      message: 'Master plan created!'
+    }
+  });
+
+  return new Response(
+    JSON.stringify({ 
+      message: 'Master plan generated successfully',
+      masterPlan,
+      phase: 'master-plan-only'
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
+async function handleContentGenerationPhase(
+  supabase: any, 
+  formData: SprintFormData, 
+  sprintId: string, 
+  channelName: string, 
+  masterPlan: MasterPlan, 
+  openaiApiKey: string
+) {
+  console.log('Phase: Content generation with approved plan');
+  
+  // Start background content generation process
+  EdgeRuntime.waitUntil((async () => {
+    try {
+      const channel = supabase.channel(channelName);
+      
+      // Generate detailed content for each day using the approved master plan
+      for (let i = 0; i < masterPlan.dailyPlans.length; i++) {
+        const dayStructure = masterPlan.dailyPlans[i];
+        console.log(`Generating detailed content for day ${dayStructure.day}: ${dayStructure.theme}`);
+        
+        try {
+          // Generate script with full context
+          const dailyScript = await generateDailyScriptWithStructure(
+            formData,
+            dayStructure,
+            masterPlan.dailyPlans,
+            openaiApiKey
+          );
+
+          // Small delay to prevent rate limiting
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          // Generate email with structure context
+          const dailyEmail = await generateDailyEmailWithStructure(
+            formData,
+            dayStructure,
+            dailyScript,
+            openaiApiKey
+          );
+
+          const email = {
+            day: dayStructure.day,
+            subject: dailyEmail.subject,
+            content: dailyEmail.content
+          };
+
+          // Broadcast the lesson update in real-time
+          await channel.send({
+            type: 'broadcast',
+            event: 'lesson-generated',
+            payload: {
+              lesson: dailyScript,
+              email: email,
+              structure: dayStructure
+            }
+          });
+
+          console.log(`Completed and broadcasted day ${dayStructure.day}: ${dayStructure.theme}`);
+
+          // Delay between generations
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`Error generating content for day ${dayStructure.day}:`, error);
+          
+          // Still broadcast a placeholder so the UI updates
+          await channel.send({
+            type: 'broadcast',
+            event: 'lesson-generated',
+            payload: {
+              lesson: {
+                day: dayStructure.day,
+                title: `Day ${dayStructure.day}: ${dayStructure.theme}`,
+                content: `There was an error generating content for day ${dayStructure.day}. Please try regenerating this lesson.`,
+                exercise: `Exercise for day ${dayStructure.day} will be available after regeneration.`,
+                affirmation: `Affirmation for day ${dayStructure.day} will be available after regeneration.`
+              },
+              email: {
+                day: dayStructure.day,
+                subject: `Day ${dayStructure.day}: Content Generation Failed`,
+                content: `There was an error generating the email for day ${dayStructure.day}. Please try regenerating this content.`
+              },
+              structure: dayStructure
+            }
+          });
+        }
+      }
+      
+      // Broadcast completion
+      await channel.send({
+        type: 'broadcast',
+        event: 'generation-complete',
+        payload: { 
+          sprintId,
+          message: 'All content generated successfully!'
+        }
+      });
+      
+      console.log('All content generation completed');
+    } catch (error) {
+      console.error('Content generation process failed:', error);
+      
+      // Broadcast error
+      const channel = supabase.channel(channelName);
+      await channel.send({
+        type: 'broadcast',
+        event: 'generation-error',
+        payload: { 
+          error: error.message,
+          message: 'Generation failed. Please try again.'
+        }
+      });
+    }
+  })());
+
+  return new Response(
+    JSON.stringify({ 
+      message: 'Content generation started',
+      sprintId,
+      channelName,
+      phase: 'content-generation'
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
 serve(async (req) => {
   console.log('Structured sprint generation function called with method:', req.method);
 
@@ -253,7 +428,7 @@ serve(async (req) => {
   try {
     const requestBody = await req.json();
     console.log('Request body received for structured generation');
-    const { formData, sprintId, channelName } = requestBody;
+    const { formData, sprintId, channelName, phase, masterPlan } = requestBody;
     
     // Get API keys from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
@@ -273,148 +448,21 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const sprintData = formData as SprintFormData;
-    console.log('Processing structured generation for sprint:', sprintData.sprintTitle);
+    console.log('Processing structured generation for sprint:', sprintData.sprintTitle, 'Phase:', phase);
     
-    const duration = parseInt(sprintData.sprintDuration);
-
-    // Start background structured generation process
-    EdgeRuntime.waitUntil((async () => {
-      try {
-        // PHASE 1: Generate the master sprint structure
-        console.log('PHASE 1: Generating sprint structure...');
-        const channel = supabase.channel(channelName);
-        
-        await channel.send({
-          type: 'broadcast',
-          event: 'structure-generation-started',
-          payload: { message: 'Creating sprint master plan...' }
-        });
-
-        const sprintStructure = await generateSprintStructure(sprintData, openaiApiKey);
-        console.log('Sprint structure generated with', sprintStructure.length, 'days');
-        
-        await channel.send({
-          type: 'broadcast',
-          event: 'structure-generated',
-          payload: { 
-            structure: sprintStructure,
-            message: 'Master plan created! Generating detailed content...'
-          }
-        });
-
-        // Small delay before starting detailed generation
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // PHASE 2: Generate detailed content using the structure
-        console.log('PHASE 2: Generating detailed content for each day...');
-        
-        for (let i = 0; i < sprintStructure.length; i++) {
-          const dayStructure = sprintStructure[i];
-          console.log(`Generating detailed content for day ${dayStructure.day}: ${dayStructure.theme}`);
-          
-          try {
-            // Generate script with full context
-            const dailyScript = await generateDailyScriptWithStructure(
-              sprintData,
-              dayStructure,
-              sprintStructure,
-              openaiApiKey
-            );
-
-            // Small delay to prevent rate limiting
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // Generate email with structure context
-            const dailyEmail = await generateDailyEmailWithStructure(
-              sprintData,
-              dayStructure,
-              dailyScript,
-              openaiApiKey
-            );
-
-            const email = {
-              day: dayStructure.day,
-              subject: dailyEmail.subject,
-              content: dailyEmail.content
-            };
-
-            // Broadcast the lesson update in real-time
-            await channel.send({
-              type: 'broadcast',
-              event: 'lesson-generated',
-              payload: {
-                lesson: dailyScript,
-                email: email,
-                structure: dayStructure
-              }
-            });
-
-            console.log(`Completed and broadcasted day ${dayStructure.day}: ${dayStructure.theme}`);
-
-            // Delay between generations
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          } catch (error) {
-            console.error(`Error generating content for day ${dayStructure.day}:`, error);
-            
-            // Still broadcast a placeholder so the UI updates
-            await channel.send({
-              type: 'broadcast',
-              event: 'lesson-generated',
-              payload: {
-                lesson: {
-                  day: dayStructure.day,
-                  title: `Day ${dayStructure.day}: ${dayStructure.theme}`,
-                  content: `There was an error generating content for day ${dayStructure.day}. Please try regenerating this lesson.`,
-                  exercise: `Exercise for day ${dayStructure.day} will be available after regeneration.`,
-                  affirmation: `Affirmation for day ${dayStructure.day} will be available after regeneration.`
-                },
-                email: {
-                  day: dayStructure.day,
-                  subject: `Day ${dayStructure.day}: Content Generation Failed`,
-                  content: `There was an error generating the email for day ${dayStructure.day}. Please try regenerating this content.`
-                },
-                structure: dayStructure
-              }
-            });
-          }
-        }
-        
-        // Broadcast completion
-        await channel.send({
-          type: 'broadcast',
-          event: 'generation-complete',
-          payload: { 
-            sprintId,
-            message: 'All content generated with structured approach!'
-          }
-        });
-        
-        console.log('All structured content generation completed');
-      } catch (error) {
-        console.error('Structured generation process failed:', error);
-        
-        // Broadcast error
-        const channel = supabase.channel(channelName);
-        await channel.send({
-          type: 'broadcast',
-          event: 'generation-error',
-          payload: { 
-            error: error.message,
-            message: 'Generation failed. Please try again.'
-          }
-        });
-      }
-    })());
-
-    // Return immediate response
+    // Handle different phases
+    if (phase === 'master-plan-only') {
+      return await handleMasterPlanOnlyPhase(supabase, sprintData, channelName, openaiApiKey);
+    } else if (phase === 'content-generation') {
+      return await handleContentGenerationPhase(supabase, sprintData, sprintId, channelName, masterPlan, openaiApiKey);
+    }
+    
+    // Default response for unknown phase
     return new Response(
       JSON.stringify({ 
-        message: 'Structured generation started',
-        sprintId,
-        channelName,
-        approach: 'two-phase-structured'
+        error: 'Invalid phase specified. Use "master-plan-only" or "content-generation"'
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     );
 
   } catch (error) {
