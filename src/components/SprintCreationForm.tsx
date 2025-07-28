@@ -40,6 +40,7 @@ interface SprintFormData {
   specialRequirements: string;
   
   // Voice and delivery options
+  voiceId: string;
   voiceSampleFile: File | null;
   writingStyleFile: File | null;
   participantEmails: string;
@@ -85,6 +86,7 @@ const initialFormData: SprintFormData = {
   experience: '',
   goals: '',
   specialRequirements: '',
+  voiceId: 'EXAVITQu4vr4xnSDxMaL', // Default to Sarah
   voiceSampleFile: null,
   writingStyleFile: null,
   participantEmails: '',
@@ -483,6 +485,28 @@ export const SprintCreationForm: React.FC = () => {
                     <SelectItem value="inspiring">Inspiring & Uplifting</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="voiceId">Voice Selection for Audio Generation</Label>
+                <Select value={formData.voiceId} onValueChange={(value) => handleInputChange('voiceId', value)}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EXAVITQu4vr4xnSDxMaL">Sarah - Professional & Clear</SelectItem>
+                    <SelectItem value="9BWtsMINqrJLrRacOk9x">Aria - Warm & Engaging</SelectItem>
+                    <SelectItem value="CwhRBWXzGAHq8TQ4Fs17">Roger - Strong & Confident</SelectItem>
+                    <SelectItem value="FGY2WhTYpPnrIDTdsKH5">Laura - Friendly & Approachable</SelectItem>
+                    <SelectItem value="IKne3meq5aSn9XLyUdCD">Charlie - Energetic & Motivational</SelectItem>
+                    <SelectItem value="JBFqnCBsd6RMkjVDRZzb">George - Authoritative & Deep</SelectItem>
+                    <SelectItem value="N2lVS1w4EtoT3dr4eOWO">Callum - Calm & Reassuring</SelectItem>
+                    <SelectItem value="SAz9YHcvj6GT2YYXdXww">River - Gentle & Soothing</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Choose the voice that will narrate your audio lessons
+                </p>
               </div>
 
               <div>

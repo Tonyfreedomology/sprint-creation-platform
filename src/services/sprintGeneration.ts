@@ -16,6 +16,7 @@ export interface SprintFormData {
   goals: string;
   specialRequirements: string;
   participantEmails: string;
+  voiceId?: string;
 }
 
 export interface GeneratedContent {
@@ -24,6 +25,7 @@ export interface GeneratedContent {
   sprintDescription: string;
   sprintDuration: string;
   sprintCategory: string;
+  voiceId?: string;
   dailyLessons: Array<{
     day: number;
     title: string;
@@ -120,6 +122,7 @@ export class SprintGenerationService {
       sprintDescription: formData.sprintDescription,
       sprintDuration: formData.sprintDuration,
       sprintCategory: formData.sprintCategory,
+      voiceId: formData.voiceId,
       dailyLessons,
       emailSequence: emailSequences,
       creatorInfo: {

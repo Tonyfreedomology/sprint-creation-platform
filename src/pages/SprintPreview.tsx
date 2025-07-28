@@ -31,6 +31,7 @@ interface GeneratedContent {
   sprintDescription: string;
   sprintDuration: string;
   sprintCategory: string;
+  voiceId?: string;
   creatorInfo: {
     name: string;
     email: string;
@@ -47,8 +48,8 @@ interface GeneratedContent {
     day: number;
     subject: string;
     content: string;
-    type: string;
-    send_time: string;
+    type?: string;
+    send_time?: string;
   }>;
 }
 
@@ -105,7 +106,7 @@ export const SprintPreview: React.FC = () => {
       });
       
       const { data, error } = await supabase.functions.invoke('generate-audio', {
-        body: { text, voiceId: 'EXAVITQu4vr4xnSDxMaL' } // Sarah voice
+        body: { text, voiceId: sprintData?.voiceId || 'EXAVITQu4vr4xnSDxMaL' } // Use selected voice or default to Sarah
       });
 
       if (error) {

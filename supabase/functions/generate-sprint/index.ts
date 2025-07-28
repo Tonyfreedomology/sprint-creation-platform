@@ -75,7 +75,7 @@ async function generateDailyScript(
   teachingGoals: string,
   apiKey: string
 ): Promise<any> {
-  const prompt = `You are an expert life coach and content creator. Generate a daily lesson script for day ${day} of ${duration} of a sprint called "${sprintTheme}".
+  const prompt = `You are an expert life coach and content creator. Generate a comprehensive, flowing audio lesson script for day ${day} of ${duration} of a sprint called "${sprintTheme}".
 
 Context:
 - Sprint Theme: ${sprintTheme}
@@ -83,23 +83,25 @@ Context:
 - Teaching Goals: ${teachingGoals}
 - Personalization: ${personalizationData}
 
-Create a compelling, transformative daily lesson that includes:
-1. A powerful title for the day
-2. Main lesson content (inspiring, actionable, personal)
-3. A practical exercise or challenge
-4. An affirmation for the day
+Create a cohesive 4-5 minute audio script that naturally weaves together:
+- Opening welcome and context setting for the day
+- Core lesson content with stories, examples, and practical insights (4-5 detailed paragraphs)
+- Seamlessly introduce the daily challenge: "Your exercise for today is..."
+- Naturally conclude with the affirmation: "I want you to repeat this powerful affirmation..." or "Today's affirmation is..."
+
+The script should flow as one continuous narrative for audio delivery, not separate sections. Make it conversational, engaging, and actionable. Include specific real-world examples and practical steps.
 
 Output as JSON in this exact format:
 {
   "day": ${day},
   "title": "Day ${day}: [Compelling Title]",
-  "content": "[Main lesson content - inspiring and transformative]",
-  "exercise": "[Practical exercise or challenge]",
-  "affirmation": "[Powerful affirmation]"
+  "content": "[Complete flowing audio script that includes lesson, exercise introduction, and affirmation guidance - all woven together naturally for audio delivery]",
+  "exercise": "[The specific exercise/challenge mentioned in the script]",
+  "affirmation": "[The affirmation statement mentioned in the script]"
 }`;
 
   console.log(`Generating daily script for day ${day}`);
-  const response = await generateCompletion(prompt, apiKey, 1500);
+  const response = await generateCompletion(prompt, apiKey, 3000);
   console.log('Raw OpenAI response for daily script:', response);
   
   try {
@@ -111,7 +113,7 @@ Output as JSON in this exact format:
   }
 }
 
-async function generateEmailSequence(
+async function generateDailyEmail(
   sprintTheme: string,
   day: number,
   dailyScript: any,
@@ -119,7 +121,7 @@ async function generateEmailSequence(
   creatorName: string,
   apiKey: string
 ): Promise<any> {
-  const prompt = `You are an expert email marketing specialist. Create an email sequence for day ${day} of the "${sprintTheme}" sprint.
+  const prompt = `You are an expert email marketing specialist. Create a single engaging email for day ${day} of the "${sprintTheme}" sprint.
 
 Context:
 - Sprint Theme: ${sprintTheme}
@@ -128,38 +130,23 @@ Context:
 - Creator Name: ${creatorName}
 - Daily Lesson: ${JSON.stringify(dailyScript)}
 
-Create 3 emails for this day:
-1. Reminder email (sent in morning)
-2. Lesson email (sent with the main content)
-3. Follow-up email (sent in evening)
+Create one comprehensive email that:
+- Welcomes them to the day with enthusiasm
+- Delivers the key lesson insights and takeaways
+- Guides them through the exercise with clear instructions
+- Includes the affirmation in a meaningful way
+- Motivates them for action and reflection
+
+The email should feel personal, engaging, and actionable.
 
 Output as JSON in this exact format:
 {
-  "day": ${day},
-  "emails": [
-    {
-      "type": "reminder",
-      "subject": "[Engaging subject line]",
-      "content": "[Brief, encouraging reminder content]",
-      "send_time": "09:00"
-    },
-    {
-      "type": "lesson",
-      "subject": "[Main lesson subject line]",
-      "content": "[Full lesson email content including the daily lesson]",
-      "send_time": "12:00"
-    },
-    {
-      "type": "followup",
-      "subject": "[Follow-up subject line]",
-      "content": "[Reflection and encouragement content]",
-      "send_time": "18:00"
-    }
-  ]
+  "subject": "Day ${day}: [Compelling subject line]",
+  "content": "[Full email content with lesson insights, exercise guidance, and affirmation woven together naturally]"
 }`;
 
-  console.log(`Generating email sequence for day ${day}`);
-  const response = await generateCompletion(prompt, apiKey, 2000);
+  console.log(`Generating daily email for day ${day}`);
+  const response = await generateCompletion(prompt, apiKey, 1200);
   console.log('Raw OpenAI response for email sequence:', response);
   
   try {
@@ -167,7 +154,7 @@ Output as JSON in this exact format:
   } catch (error) {
     console.error('Failed to parse OpenAI response for email sequence:', response);
     console.error('Parse error:', error);
-    throw new Error(`Invalid JSON response from OpenAI for email sequence: ${error.message}`);
+    throw new Error(`Invalid JSON response from OpenAI for daily email: ${error.message}`);
   }
 }
 
@@ -239,8 +226,8 @@ serve(async (req) => {
           openaiApiKey
         );
 
-        // Generate email sequence
-        const emailSequence = await generateEmailSequence(
+        // Generate single daily email
+        const dailyEmail = await generateDailyEmail(
           sprintData.sprintTitle,
           day,
           dailyScript,
@@ -252,18 +239,12 @@ serve(async (req) => {
         console.log(`Completed generation for day ${day}`);
         generatedContent.dailyLessons.push(dailyScript);
         
-        // Transform email sequence to match expected format
-        if (emailSequence.emails) {
-          emailSequence.emails.forEach((email: any) => {
-            generatedContent.emailSequence.push({
-              day: day,
-              subject: email.subject,
-              content: email.content,
-              type: email.type,
-              send_time: email.send_time
-            });
-          });
-        }
+        // Add single daily email
+        generatedContent.emailSequence.push({
+          day: day,
+          subject: dailyEmail.subject,
+          content: dailyEmail.content
+        });
       } catch (error) {
         console.error(`Error generating content for day ${day}:`, error);
         // Continue with next day instead of failing completely
@@ -280,15 +261,11 @@ serve(async (req) => {
         affirmation: `Your affirmation for day ${day} will be created with the complete sprint generation.`
       });
 
-      // Add placeholder emails
-      ['reminder', 'lesson', 'followup'].forEach((type, index) => {
-        generatedContent.emailSequence.push({
-          day: day,
-          subject: `Day ${day} ${type} - [To be generated]`,
-          content: `This ${type} email content will be generated when you complete the full sprint creation.`,
-          type: type,
-          send_time: ['09:00', '12:00', '18:00'][index]
-        });
+      // Add placeholder email
+      generatedContent.emailSequence.push({
+        day: day,
+        subject: `Day ${day}: [To be generated]`,
+        content: `This daily email content will be generated when you complete the full sprint creation.`
       });
     }
     
