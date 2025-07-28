@@ -70,20 +70,82 @@ export const SprintPreview: React.FC = () => {
   const [realtimeChannel, setRealtimeChannel] = useState<any>(null);
 
   useEffect(() => {
-    if (location.state?.generatedContent) {
-      setSprintData(location.state.generatedContent);
+    // Check for either sprintData or generatedContent (legacy)
+    const contentData = location.state?.sprintData || location.state?.generatedContent;
+    
+    if (contentData) {
+      setSprintData(contentData);
       setIsGenerating(location.state.isGenerating || false);
-      setTotalDays(location.state.totalDays || 0);
       
-      // If still generating, start background generation for remaining content
-      if (location.state.isGenerating) {
-        continueGeneration(location.state.generatedContent);
+      // Set up real-time channel if provided
+      if (location.state.channelName && location.state.isGenerating) {
+        setupRealtimeChannel(location.state.channelName, contentData);
       }
     } else {
       // Redirect back if no data
       navigate('/');
     }
   }, [location.state, navigate]);
+
+  const setupRealtimeChannel = (channelName: string, contentData: GeneratedContent) => {
+    console.log('Setting up real-time channel:', channelName);
+    
+    const channel = supabase.channel(channelName);
+    
+    channel
+      .on('broadcast', { event: 'lesson-generated' }, (payload) => {
+        console.log('Received new lesson:', payload);
+        
+        if (payload.payload?.lesson && payload.payload?.email) {
+          setSprintData(prevData => {
+            if (!prevData) return prevData;
+            
+            const updatedData = { ...prevData };
+            const lesson = payload.payload.lesson;
+            const email = payload.payload.email;
+            
+            // Add lesson to dailyLessons array
+            const existingLessonIndex = updatedData.dailyLessons.findIndex(l => l.day === lesson.day);
+            if (existingLessonIndex >= 0) {
+              updatedData.dailyLessons[existingLessonIndex] = lesson;
+            } else {
+              updatedData.dailyLessons.push(lesson);
+              updatedData.dailyLessons.sort((a, b) => a.day - b.day);
+            }
+            
+            // Add email to emailSequence array
+            const existingEmailIndex = updatedData.emailSequence.findIndex(e => e.day === email.day);
+            if (existingEmailIndex >= 0) {
+              updatedData.emailSequence[existingEmailIndex] = email;
+            } else {
+              updatedData.emailSequence.push(email);
+              updatedData.emailSequence.sort((a, b) => a.day - b.day);
+            }
+            
+            // Update progress
+            const totalDays = parseInt(contentData.sprintDuration);
+            const completedDays = updatedData.dailyLessons.length;
+            const progress = Math.round((completedDays / totalDays) * 100);
+            setGenerationProgress(progress);
+            
+            return updatedData;
+          });
+        }
+      })
+      .on('broadcast', { event: 'generation-complete' }, () => {
+        console.log('Generation completed');
+        setIsGenerating(false);
+        setGenerationProgress(100);
+        
+        toast({
+          title: "Generation Complete!",
+          description: "All lessons have been generated successfully.",
+        });
+      })
+      .subscribe();
+    
+    setRealtimeChannel(channel);
+  };
 
   // Cleanup real-time channel on unmount
   useEffect(() => {
