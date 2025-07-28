@@ -37,10 +37,10 @@ interface SprintFormData {
   experience: string;
   goals: string;
   specialRequirements: string;
-  webhookUrl: string;
   
-  // New required fields for n8n integration
+  // Voice and delivery options
   voiceSampleFile: File | null;
+  writingStyleFile: File | null;
   participantEmails: string;
 }
 
@@ -84,8 +84,8 @@ const initialFormData: SprintFormData = {
   experience: '',
   goals: '',
   specialRequirements: '',
-  webhookUrl: '',
   voiceSampleFile: null,
+  writingStyleFile: null,
   participantEmails: '',
 };
 
@@ -119,6 +119,11 @@ export const SprintCreationForm: React.FC = () => {
   const handleVoiceFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
     setFormData(prev => ({ ...prev, voiceSampleFile: file }));
+  };
+
+  const handleWritingStyleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    setFormData(prev => ({ ...prev, writingStyleFile: file }));
   };
 
   const nextStep = () => {
@@ -442,14 +447,10 @@ export const SprintCreationForm: React.FC = () => {
                 <Label className="text-base font-semibold">Content Types (Select all that apply)</Label>
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   {[
-                    { id: 'video', label: 'Video Lessons' },
-                    { id: 'audio', label: 'Audio Messages' },
-                    { id: 'text', label: 'Written Content' },
-                    { id: 'exercises', label: 'Daily Exercises' },
-                    { id: 'worksheets', label: 'Worksheets' },
-                    { id: 'affirmations', label: 'Affirmations' },
-                    { id: 'meditations', label: 'Guided Meditations' },
-                    { id: 'challenges', label: 'Daily Challenges' },
+                    { id: 'text', label: 'Written Lessons' },
+                     { id: 'challenges', label: 'Daily Challenges' },
+                     { id: 'affirmations', label: 'Affirmations' },
+                     { id: 'exercises', label: 'Practical Exercises' },
                   ].map((type) => (
                     <div key={type.id} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
                       <Checkbox
@@ -492,15 +493,34 @@ export const SprintCreationForm: React.FC = () => {
                 <p className="text-sm text-muted-foreground mt-1">
                   Upload a clear 30-60 second audio sample for AI voice cloning (optional)
                 </p>
-                {formData.voiceSampleFile && (
-                  <p className="text-sm text-green-600 mt-1">
-                    ✓ File selected: {formData.voiceSampleFile.name}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        );
+                 {formData.voiceSampleFile && (
+                   <p className="text-sm text-green-600 mt-1">
+                     ✓ File selected: {formData.voiceSampleFile.name}
+                   </p>
+                 )}
+               </div>
+
+               <div>
+                 <Label htmlFor="writingStyle">Writing Style Sample (Optional)</Label>
+                 <Input
+                   id="writingStyle"
+                   type="file"
+                   accept=".txt,.docx,.pdf"
+                   onChange={handleWritingStyleFileChange}
+                   className="mt-1"
+                 />
+                 <p className="text-sm text-muted-foreground mt-1">
+                   Upload a document example of your writing style for AI to mimic (optional)
+                 </p>
+                 {formData.writingStyleFile && (
+                   <p className="text-sm text-green-600 mt-1">
+                     ✓ File selected: {formData.writingStyleFile.name}
+                   </p>
+                 )}
+               </div>
+             </div>
+           </div>
+         );
 
       case 4:
         return (
@@ -543,19 +563,6 @@ export const SprintCreationForm: React.FC = () => {
                 </p>
               </div>
 
-              <div>
-                <Label htmlFor="webhookUrl">N8N Webhook URL (Optional)</Label>
-                <Input
-                  id="webhookUrl"
-                  placeholder="https://your-n8n-instance.com/webhook/sprint-creation"
-                  value={formData.webhookUrl}
-                  onChange={(e) => handleInputChange('webhookUrl', e.target.value)}
-                  className="mt-1"
-                />
-                <p className="text-sm text-muted-foreground mt-1">
-                  Leave empty to use the default processing endpoint
-                </p>
-              </div>
 
               <div className="bg-gradient-card p-6 rounded-lg border border-primary/20">
                 <h3 className="font-semibold text-lg mb-3">Sprint Summary</h3>
@@ -567,7 +574,8 @@ export const SprintCreationForm: React.FC = () => {
                   <div><strong>Content Types:</strong> {formData.contentTypes.join(', ') || 'None selected'}</div>
                   <div><strong>Tone:</strong> {formData.toneStyle}</div>
                   <div><strong>Participants:</strong> {formData.participantEmails ? formData.participantEmails.split(',').length : 0} people</div>
-                  <div><strong>Voice Sample:</strong> {formData.voiceSampleFile ? 'Uploaded' : 'None'}</div>
+                   <div><strong>Voice Sample:</strong> {formData.voiceSampleFile ? 'Uploaded' : 'None'}</div>
+                   <div><strong>Writing Style:</strong> {formData.writingStyleFile ? 'Uploaded' : 'None'}</div>
                 </div>
               </div>
             </div>

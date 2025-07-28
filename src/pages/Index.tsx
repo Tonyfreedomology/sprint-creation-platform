@@ -41,7 +41,7 @@ const Index = () => {
     {
       icon: <Zap className="w-6 h-6" />,
       title: "Automated Delivery",
-      description: "N8N automation handles emails, reminders, and content delivery"
+      description: "Smart automation handles emails, reminders, and content delivery"
     },
     {
       icon: <Star className="w-6 h-6" />,

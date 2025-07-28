@@ -9,14 +9,21 @@ const corsHeaders = {
 interface SprintFormData {
   creatorName: string;
   creatorEmail: string;
+  creatorBio: string;
   sprintTitle: string;
-  sprintDuration: number;
-  contentType: string;
+  sprintDescription: string;
+  sprintDuration: string;
+  sprintCategory: string;
   targetAudience: string;
-  voiceStyle: string;
-  emailStyle: string;
-  personalizationData: string;
-  teachingGoals: string;
+  contentGeneration: string;
+  contentTypes: string[];
+  toneStyle: string;
+  experience: string;
+  goals: string;
+  specialRequirements: string;
+  voiceSampleFile: File | null;
+  writingStyleFile: File | null;
+  participantEmails: string;
 }
 
 interface OpenAIResponse {
@@ -166,33 +173,35 @@ serve(async (req) => {
     }
 
     const sprintData = formData as SprintFormData
+    const sprintId = `sprint_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
     const generatedContent: any = {
-      sprint: {
-        title: sprintData.sprintTitle,
-        duration: sprintData.sprintDuration,
-        description: `A ${sprintData.sprintDuration}-day transformative journey focused on ${sprintData.sprintTitle}`,
-        target_audience: sprintData.targetAudience,
-        content_type: sprintData.contentType
-      },
-      creator: {
+      sprintId,
+      sprintTitle: sprintData.sprintTitle,
+      sprintDescription: sprintData.sprintDescription,
+      sprintDuration: sprintData.sprintDuration,
+      sprintCategory: sprintData.sprintCategory,
+      creatorInfo: {
         name: sprintData.creatorName,
         email: sprintData.creatorEmail,
-        voice_style: sprintData.voiceStyle,
-        email_style: sprintData.emailStyle
+        bio: sprintData.creatorBio
       },
       dailyLessons: [],
-      emailSequences: []
+      emailSequence: []
     }
 
+    const duration = parseInt(sprintData.sprintDuration)
+    const personalizationData = `Target Audience: ${sprintData.targetAudience}. Experience Level: ${sprintData.experience}. Content Types: ${sprintData.contentTypes.join(', ')}. Special Requirements: ${sprintData.specialRequirements}`
+
     // Generate content for each day
-    for (let day = 1; day <= sprintData.sprintDuration; day++) {
+    for (let day = 1; day <= duration; day++) {
       // Generate daily script
       const dailyScript = await generateDailyScript(
         sprintData.sprintTitle,
         day,
-        sprintData.sprintDuration,
-        sprintData.personalizationData,
-        sprintData.teachingGoals,
+        duration,
+        personalizationData,
+        sprintData.goals,
         openaiApiKey
       )
 
@@ -201,13 +210,25 @@ serve(async (req) => {
         sprintData.sprintTitle,
         day,
         dailyScript,
-        sprintData.emailStyle,
+        sprintData.toneStyle,
         sprintData.creatorName,
         openaiApiKey
       )
 
       generatedContent.dailyLessons.push(dailyScript)
-      generatedContent.emailSequences.push(emailSequence)
+      
+      // Transform email sequence to match expected format
+      if (emailSequence.emails) {
+        emailSequence.emails.forEach((email: any) => {
+          generatedContent.emailSequence.push({
+            day: day,
+            subject: email.subject,
+            content: email.content,
+            type: email.type,
+            send_time: email.send_time
+          });
+        });
+      }
     }
 
     return new Response(
