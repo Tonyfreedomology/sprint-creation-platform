@@ -37,9 +37,10 @@ serve(async (req) => {
       body: JSON.stringify({
         text: text,
         model_id: 'eleven_multilingual_v2',
+        output_format: 'mp3_22050_32', // Lower bitrate for faster processing
         voice_settings: {
           stability: 0.5,
-          similarity_boost: 0.5,
+          similarity_boost: 0.75,
           style: 0.0,
           use_speaker_boost: true
         }
@@ -52,11 +53,23 @@ serve(async (req) => {
       throw new Error(`ElevenLabs API error: ${response.status} ${response.statusText}`);
     }
 
-    // Convert audio to base64
+    // Get audio as array buffer and convert to base64 safely
     const audioBuffer = await response.arrayBuffer();
-    const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
-
     console.log('Audio generated successfully, size:', audioBuffer.byteLength, 'bytes');
+
+    // Convert to base64 in chunks to avoid stack overflow
+    const uint8Array = new Uint8Array(audioBuffer);
+    let binaryString = '';
+    const chunkSize = 8192; // Process in smaller chunks
+    
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+      const chunk = uint8Array.slice(i, i + chunkSize);
+      binaryString += String.fromCharCode.apply(null, Array.from(chunk));
+    }
+    
+    const audioBase64 = btoa(binaryString);
+
+    console.log('Base64 conversion completed, length:', audioBase64.length);
 
     return new Response(
       JSON.stringify({ 
