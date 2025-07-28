@@ -82,6 +82,8 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
     setIsGenerating(true);
     
     try {
+      console.log('Starting content generation with:', { sprintId, channelName, phase: 'content-generation' });
+      
       const response = await supabase.functions.invoke('generate-sprint-structured', {
         body: {
           formData,
@@ -92,20 +94,23 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
         }
       });
 
+      console.log('Function response:', response);
+
       if (response.error) {
-        throw new Error(response.error.message);
+        console.error('Function returned error:', response.error);
+        throw new Error(response.error.message || 'Unknown error from function');
       }
 
       toast.success('Content generation started! Redirecting to preview...');
       
-      // Redirect to preview page after a short delay
-      setTimeout(() => {
-        navigate(`/sprint-preview?id=${sprintId}&channel=${channelName}`);
-      }, 1500);
+      // Navigate immediately to the preview page
+      console.log('Navigating to sprint preview...');
+      navigate(`/sprint-preview?id=${sprintId}&channel=${channelName}`);
 
     } catch (error) {
       console.error('Error starting content generation:', error);
-      toast.error('Failed to start content generation');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Failed to start content generation: ${errorMessage}`);
       setIsGenerating(false);
     }
   };
