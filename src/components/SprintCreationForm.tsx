@@ -148,13 +148,32 @@ export const SprintCreationForm: React.FC = () => {
 
   const generateSprintWithApiKey = async () => {
     setIsSubmitting(true);
+    setIsGenerating(true);
+    setGenerationProgress(0);
+    setGenerationStep('Starting generation...');
     
     try {
-      // Navigate to generation page instead of directly generating
-      navigate('/sprint-generation', { 
-        state: { formData },
-        replace: true 
+      // Start with initial batch to get first few lessons quickly
+      const { data, error } = await supabase.functions.invoke('generate-sprint', {
+        body: { formData }
       });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to generate sprint');
+      }
+
+      const { generatedContent } = data;
+      
+      // Navigate to preview page immediately with initial content
+      navigate('/sprint-preview', { 
+        state: { 
+          generatedContent,
+          formData,
+          isGenerating: true,
+          totalDays: parseInt(formData.sprintDuration)
+        }
+      });
+      
     } catch (error) {
       console.error('Navigation error:', error);
       toast({

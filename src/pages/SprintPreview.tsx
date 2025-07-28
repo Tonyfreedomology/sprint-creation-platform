@@ -58,6 +58,9 @@ export const SprintPreview: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [sprintData, setSprintData] = useState<GeneratedContent | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [totalDays, setTotalDays] = useState(0);
+  const [generationProgress, setGenerationProgress] = useState(0);
   const [editingLesson, setEditingLesson] = useState<number | null>(null);
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
   const [audioUrls, setAudioUrls] = useState<Record<number, string>>({});
@@ -68,6 +71,13 @@ export const SprintPreview: React.FC = () => {
   useEffect(() => {
     if (location.state?.generatedContent) {
       setSprintData(location.state.generatedContent);
+      setIsGenerating(location.state.isGenerating || false);
+      setTotalDays(location.state.totalDays || 0);
+      
+      // If still generating, start background generation for remaining content
+      if (location.state.isGenerating) {
+        continueGeneration(location.state.generatedContent);
+      }
     } else {
       // Redirect back if no data
       navigate('/');
@@ -94,6 +104,100 @@ export const SprintPreview: React.FC = () => {
       [field]: value
     };
     setSprintData(updatedData);
+  };
+
+  const continueGeneration = async (initialContent: GeneratedContent) => {
+    if (!initialContent) return;
+    
+    const currentLessons = initialContent.dailyLessons.length;
+    const remainingDays = totalDays - currentLessons;
+    
+    if (remainingDays <= 0) {
+      setIsGenerating(false);
+      return;
+    }
+
+    // Generate remaining content in background
+    for (let batch = 1; batch <= Math.ceil(remainingDays / 5); batch++) {
+      const startDay = currentLessons + ((batch - 1) * 5) + 1;
+      const endDay = Math.min(currentLessons + (batch * 5), totalDays);
+      const batchDays = Array.from({ length: endDay - startDay + 1 }, (_, i) => startDay + i);
+      
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-sprint-batch', {
+          body: {
+            formData: location.state?.formData || {},
+            batchDays,
+            sprintId: initialContent.sprintId
+          }
+        });
+
+        if (error) {
+          console.error('Batch generation error:', error);
+          continue;
+        }
+
+        const { batchLessons, batchEmails } = data;
+        
+        // Update sprint data with new content
+        setSprintData(prev => {
+          if (!prev) return prev;
+          
+          const updatedLessons = [...prev.dailyLessons];
+          const updatedEmails = [...prev.emailSequence];
+          
+          // Replace placeholder content with generated content
+          batchLessons.forEach((lesson: any) => {
+            const existingIndex = updatedLessons.findIndex(l => l.day === lesson.day);
+            if (existingIndex >= 0) {
+              updatedLessons[existingIndex] = lesson;
+            } else {
+              updatedLessons.push(lesson);
+            }
+          });
+          
+          batchEmails.forEach((email: any) => {
+            const existingIndex = updatedEmails.findIndex(e => e.day === email.day);
+            if (existingIndex >= 0) {
+              updatedEmails[existingIndex] = email;
+            } else {
+              updatedEmails.push(email);
+            }
+          });
+          
+          // Sort by day
+          updatedLessons.sort((a, b) => a.day - b.day);
+          updatedEmails.sort((a, b) => a.day - b.day);
+          
+          return {
+            ...prev,
+            dailyLessons: updatedLessons,
+            emailSequence: updatedEmails
+          };
+        });
+        
+        // Update progress
+        const newProgress = (endDay / totalDays) * 100;
+        setGenerationProgress(newProgress);
+        
+        // Show toast for completed batch
+        toast({
+          title: `Days ${startDay}-${endDay} Generated`,
+          description: "New content has been added to your sprint!",
+        });
+        
+      } catch (error) {
+        console.error('Background generation error:', error);
+      }
+    }
+    
+    setIsGenerating(false);
+    setGenerationProgress(100);
+    
+    toast({
+      title: "Generation Complete! 🎉",
+      description: "All sprint content has been generated.",
+    });
   };
 
   const generateAudio = async (text: string, lessonDay: number) => {
@@ -209,7 +313,7 @@ export const SprintPreview: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header with Generation Progress */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button variant="outline" onClick={() => navigate('/')}>
@@ -223,6 +327,14 @@ export const SprintPreview: React.FC = () => {
               <p className="text-muted-foreground">
                 {sprintData.sprintDuration}-day sprint • Created by {sprintData.creatorInfo.name}
               </p>
+              {isGenerating && (
+                <div className="flex items-center gap-2 mt-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm text-muted-foreground">
+                    Generating remaining content... {Math.round(generationProgress)}%
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex gap-2">
@@ -282,6 +394,28 @@ export const SprintPreview: React.FC = () => {
           </TabsList>
 
           <TabsContent value="lessons" className="space-y-6">
+            {/* Generation Progress Indicator */}
+            {isGenerating && (
+              <Card className="border-blue-200 bg-blue-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-900">
+                        Generating remaining lessons...
+                      </p>
+                      <p className="text-xs text-blue-700">
+                        You can start reviewing and editing the content below while we create the rest!
+                      </p>
+                    </div>
+                    <div className="text-sm font-medium text-blue-600">
+                      {Math.round(generationProgress)}%
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
             {sprintData.dailyLessons.map((lesson, index) => (
               <Card key={lesson.day} className="border-primary/20 shadow-card">
                 <CardHeader>
