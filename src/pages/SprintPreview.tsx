@@ -348,21 +348,33 @@ export const SprintPreview: React.FC = () => {
       
       toast({
         title: "Generating Audio",
-        description: "Creating audio version with ElevenLabs...",
+        description: "Creating expressive audio with Hume AI...",
       });
       
-      const { data, error } = await supabase.functions.invoke('generate-audio', {
-        body: { text, voiceId: sprintData?.voiceId || 'EXAVITQu4vr4xnSDxMaL' } // Use selected voice or default to Sarah
+      // Determine content type based on text content
+      let contentType = 'lesson';
+      if (text.includes('exercise') || text.includes('practice')) {
+        contentType = 'exercise';
+      } else if (text.includes('affirmation') || text.includes('Today, I')) {
+        contentType = 'affirmation';
+      }
+      
+      const { data, error } = await supabase.functions.invoke('generate-audio-hume', {
+        body: { 
+          text, 
+          day: lessonDay,
+          contentType: contentType
+        }
       });
 
       if (error) {
         throw new Error(error.message);
       }
 
-      // Convert base64 audio to blob URL
+      // Convert base64 audio to blob URL (Hume returns WAV format)
       const audioBlob = new Blob(
         [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))], 
-        { type: 'audio/mpeg' }
+        { type: 'audio/wav' }
       );
       const audioUrl = URL.createObjectURL(audioBlob);
       
@@ -377,7 +389,7 @@ export const SprintPreview: React.FC = () => {
       
       toast({
         title: "Audio Generated",
-        description: "Audio version is ready to play!",
+        description: `Expressive voice created using: ${data.voiceUsed}`,
       });
       
     } catch (error) {
