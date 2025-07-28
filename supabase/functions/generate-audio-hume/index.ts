@@ -70,6 +70,19 @@ serve(async (req) => {
   }
 
   try {
+    console.log('=== HUME AUDIO GENERATION START ===');
+    console.log('Request method:', req.method);
+    console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+    
+    let requestBody;
+    try {
+      requestBody = await req.json();
+      console.log('Request body received:', JSON.stringify(requestBody, null, 2));
+    } catch (jsonError) {
+      console.error('Failed to parse request JSON:', jsonError);
+      throw new Error('Invalid JSON in request body');
+    }
+
     const { 
       text, 
       voiceDescription, 
@@ -79,15 +92,29 @@ serve(async (req) => {
       streaming = false,
       voiceStyle = 'warm-coach',
       contentType = 'lesson'
-    }: HumeAudioRequest & { voiceStyle?: string; contentType?: string } = await req.json();
+    } = requestBody;
+    
+    console.log('Extracted parameters:', {
+      textLength: text?.length || 0,
+      voiceDescription: voiceDescription || 'undefined',
+      actingInstructions: actingInstructions || 'undefined', 
+      voiceStyle,
+      contentType,
+      context: context || 'undefined',
+      numGenerations,
+      streaming
+    });
     
     if (!text) {
+      console.error('No text provided in request');
       throw new Error('Text is required for audio generation');
     }
 
     // Get the Hume API key from Supabase secrets
     const humeApiKey = Deno.env.get('HUME_API_KEY');
+    console.log('Hume API key status:', humeApiKey ? 'PRESENT' : 'MISSING');
     if (!humeApiKey) {
+      console.error('HUME_API_KEY environment variable not found');
       throw new Error('Hume API key not configured');
     }
 
@@ -108,7 +135,7 @@ serve(async (req) => {
     }
 
     // Prepare the request body for Hume API
-    const requestBody = {
+    const humeRequestBody = {
       utterances: [{
         text: text,
         description: finalVoiceDescription || "Warm, professional coach with encouraging confidence"
@@ -118,7 +145,7 @@ serve(async (req) => {
       format: 'wav' // Default to WAV format
     };
 
-    console.log('Hume request body:', JSON.stringify(requestBody, null, 2));
+    console.log('Hume request body:', JSON.stringify(humeRequestBody, null, 2));
 
     // Call Hume TTS API
     const response = await fetch('https://api.hume.ai/v1/tts/synthesize/json', {
@@ -128,7 +155,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
         'X-Hume-Api-Key': humeApiKey,
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(humeRequestBody),
     });
 
     if (!response.ok) {
@@ -144,7 +171,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
           'X-Hume-Api-Key': humeApiKey ? '[PRESENT]' : '[MISSING]',
         },
-        requestBody: requestBody
+        requestBody: humeRequestBody
       });
       
       let errorMessage = `Hume API error: ${response.status} ${response.statusText}`;
