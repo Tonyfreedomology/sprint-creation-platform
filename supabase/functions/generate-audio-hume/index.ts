@@ -15,17 +15,36 @@ interface HumeAudioRequest {
   streaming?: boolean;
 }
 
-interface HumeVoicePersonality {
-  foundation: string;        // Days 1-7
-  leadership: string;        // Days 8-14
-  mastery: string;          // Days 15-21
-}
-
-// Define voice personalities for different phases of the coaching journey
-const VOICE_PERSONALITIES: HumeVoicePersonality = {
-  foundation: "Warm, encouraging coach with steady confidence and patience. Speaks with gentle authority and supportive energy.",
-  leadership: "Strong, assertive mentor with deep conviction and quiet strength. Delivers wisdom with confident presence.",
-  mastery: "Wise, experienced guide with calm authority and profound understanding. Speaks with grounded confidence and transformational power."
+// Define available voice personalities that users can choose from
+const VOICE_STYLES = {
+  'warm-coach': {
+    description: "Warm, encouraging coach with steady confidence and patience. Speaks with gentle authority and supportive energy.",
+    name: "Warm Coach"
+  },
+  'strong-mentor': {
+    description: "Strong, assertive mentor with deep conviction and quiet strength. Delivers wisdom with confident presence.",
+    name: "Strong Mentor"
+  },
+  'wise-guide': {
+    description: "Wise, experienced guide with calm authority and profound understanding. Speaks with grounded confidence and transformational power.",
+    name: "Wise Guide"
+  },
+  'motivational-speaker': {
+    description: "Dynamic, motivational speaker with inspiring energy and passionate conviction. Speaks with enthusiasm and drive.",
+    name: "Motivational Speaker"
+  },
+  'trusted-friend': {
+    description: "Supportive, trusted friend with authentic warmth and understanding. Speaks with genuine care and relatability.",
+    name: "Trusted Friend"
+  },
+  'professional-trainer': {
+    description: "Professional, knowledgeable trainer with clear authority and practical wisdom. Speaks with competence and clarity.",
+    name: "Professional Trainer"
+  },
+  'compassionate-counselor': {
+    description: "Compassionate, empathetic counselor with gentle strength and healing presence. Speaks with deep understanding and safety.",
+    name: "Compassionate Counselor"
+  }
 };
 
 // Define acting instructions for different content types
@@ -37,10 +56,8 @@ const ACTING_INSTRUCTIONS = {
   challenge: "Motivational with gentle intensity, inspiring courage and growth"
 };
 
-function getVoiceForDay(day: number): string {
-  if (day <= 7) return VOICE_PERSONALITIES.foundation;
-  if (day <= 14) return VOICE_PERSONALITIES.leadership;
-  return VOICE_PERSONALITIES.mastery;
+function getVoiceStyle(styleKey: string): string {
+  return VOICE_STYLES[styleKey as keyof typeof VOICE_STYLES]?.description || VOICE_STYLES['warm-coach'].description;
 }
 
 function getActingInstructions(contentType: string): string {
@@ -60,9 +77,9 @@ serve(async (req) => {
       context, 
       numGenerations = 1,
       streaming = false,
-      day,
+      voiceStyle = 'warm-coach',
       contentType = 'lesson'
-    }: HumeAudioRequest & { day?: number; contentType?: string } = await req.json();
+    }: HumeAudioRequest & { voiceStyle?: string; contentType?: string } = await req.json();
     
     if (!text) {
       throw new Error('Text is required for audio generation');
@@ -78,10 +95,10 @@ serve(async (req) => {
     console.log('Voice description:', voiceDescription);
     console.log('Acting instructions:', actingInstructions);
 
-    // Determine voice personality based on day or use custom description
+    // Use consistent voice style for the entire sprint
     let finalVoiceDescription = voiceDescription;
-    if (!finalVoiceDescription && day) {
-      finalVoiceDescription = getVoiceForDay(day);
+    if (!finalVoiceDescription) {
+      finalVoiceDescription = getVoiceStyle(voiceStyle);
     }
 
     // Determine acting instructions based on content type or use custom

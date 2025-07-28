@@ -31,7 +31,7 @@ interface GeneratedContent {
   sprintDescription: string;
   sprintDuration: string;
   sprintCategory: string;
-  voiceId?: string;
+  voiceStyle?: string;
   creatorInfo: {
     name: string;
     email: string;
@@ -362,7 +362,7 @@ export const SprintPreview: React.FC = () => {
       const { data, error } = await supabase.functions.invoke('generate-audio-hume', {
         body: { 
           text, 
-          day: lessonDay,
+          voiceStyle: sprintData?.voiceStyle || 'warm-coach', // Use sprint voice style
           contentType: contentType
         }
       });

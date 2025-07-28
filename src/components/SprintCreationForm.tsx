@@ -41,7 +41,7 @@ interface SprintFormData {
   specialRequirements: string;
   
   // Voice and delivery options
-  voiceId: string;
+  voiceStyle: string;
   voiceSampleFile: File | null;
   writingStyleFile: File | null;
   participantEmails: string;
@@ -87,7 +87,7 @@ const initialFormData: SprintFormData = {
   experience: 'intermediate',
   goals: '• Build strong masculine frame\n• Lead sexually with clarity and confidence\n• Increase intimacy and sexual frequency\n• Rewire approval-seeking habits\n• Establish daily habits of touch, eye contact, and pursuit',
   specialRequirements: '',
-  voiceId: 'EXAVITQu4vr4xnSDxMaL', // Default to Sarah
+  voiceStyle: 'warm-coach', // Default voice style
   voiceSampleFile: null,
   writingStyleFile: null,
   participantEmails: '',
@@ -513,24 +513,23 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="voiceId">Voice Selection for Audio Generation</Label>
-                <Select value={formData.voiceId} onValueChange={(value) => handleInputChange('voiceId', value)}>
+                <Label htmlFor="voiceStyle">Voice Style for Audio Generation</Label>
+                <Select value={formData.voiceStyle} onValueChange={(value) => handleInputChange('voiceStyle', value)}>
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="EXAVITQu4vr4xnSDxMaL">Sarah - Professional & Clear</SelectItem>
-                    <SelectItem value="9BWtsMINqrJLrRacOk9x">Aria - Warm & Engaging</SelectItem>
-                    <SelectItem value="CwhRBWXzGAHq8TQ4Fs17">Roger - Strong & Confident</SelectItem>
-                    <SelectItem value="FGY2WhTYpPnrIDTdsKH5">Laura - Friendly & Approachable</SelectItem>
-                    <SelectItem value="IKne3meq5aSn9XLyUdCD">Charlie - Energetic & Motivational</SelectItem>
-                    <SelectItem value="JBFqnCBsd6RMkjVDRZzb">George - Authoritative & Deep</SelectItem>
-                    <SelectItem value="N2lVS1w4EtoT3dr4eOWO">Callum - Calm & Reassuring</SelectItem>
-                    <SelectItem value="SAz9YHcvj6GT2YYXdXww">River - Gentle & Soothing</SelectItem>
+                  <SelectContent className="bg-background border border-border z-50">
+                    <SelectItem value="warm-coach">Warm Coach - Encouraging & Patient</SelectItem>
+                    <SelectItem value="strong-mentor">Strong Mentor - Confident & Wise</SelectItem>
+                    <SelectItem value="wise-guide">Wise Guide - Calm & Transformational</SelectItem>
+                    <SelectItem value="motivational-speaker">Motivational Speaker - Dynamic & Inspiring</SelectItem>
+                    <SelectItem value="trusted-friend">Trusted Friend - Warm & Relatable</SelectItem>
+                    <SelectItem value="professional-trainer">Professional Trainer - Clear & Competent</SelectItem>
+                    <SelectItem value="compassionate-counselor">Compassionate Counselor - Gentle & Safe</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Choose the voice that will narrate your audio lessons
+                  Choose the voice personality that will narrate your entire sprint consistently
                 </p>
               </div>
 
