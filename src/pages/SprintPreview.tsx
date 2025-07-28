@@ -18,9 +18,12 @@ import {
   Mail,
   FileText,
   Volume2,
-  Users
+  Users,
+  Loader2,
+  Pause
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GeneratedContent {
   sprintId: string;
@@ -56,6 +59,10 @@ export const SprintPreview: React.FC = () => {
   const [sprintData, setSprintData] = useState<GeneratedContent | null>(null);
   const [editingLesson, setEditingLesson] = useState<number | null>(null);
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
+  const [audioUrls, setAudioUrls] = useState<Record<number, string>>({});
+  const [generatingAudio, setGeneratingAudio] = useState<Record<number, boolean>>({});
+  const [playingAudio, setPlayingAudio] = useState<Record<number, boolean>>({});
+  const [audioElements, setAudioElements] = useState<Record<number, HTMLAudioElement>>({});
 
   useEffect(() => {
     if (location.state?.generatedContent) {
@@ -90,24 +97,76 @@ export const SprintPreview: React.FC = () => {
 
   const generateAudio = async (text: string, lessonDay: number) => {
     try {
+      setGeneratingAudio(prev => ({ ...prev, [lessonDay]: true }));
+      
       toast({
         title: "Generating Audio",
-        description: "Creating audio version of the lesson...",
+        description: "Creating audio version with ElevenLabs...",
       });
       
-      // TODO: Implement ElevenLabs audio generation
-      console.log('Generating audio for lesson:', lessonDay, text);
+      const { data, error } = await supabase.functions.invoke('generate-audio', {
+        body: { text, voiceId: 'EXAVITQu4vr4xnSDxMaL' } // Sarah voice
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // Convert base64 audio to blob URL
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))], 
+        { type: 'audio/mpeg' }
+      );
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // Create audio element
+      const audio = new Audio(audioUrl);
+      audio.onended = () => {
+        setPlayingAudio(prev => ({ ...prev, [lessonDay]: false }));
+      };
+      
+      setAudioUrls(prev => ({ ...prev, [lessonDay]: audioUrl }));
+      setAudioElements(prev => ({ ...prev, [lessonDay]: audio }));
       
       toast({
         title: "Audio Generated",
-        description: "Audio version is ready!",
+        description: "Audio version is ready to play!",
       });
+      
     } catch (error) {
+      console.error('Audio generation error:', error);
       toast({
         title: "Audio Generation Failed",
-        description: "There was an error generating the audio.",
+        description: error instanceof Error ? error.message : "There was an error generating the audio.",
         variant: "destructive",
       });
+    } finally {
+      setGeneratingAudio(prev => ({ ...prev, [lessonDay]: false }));
+    }
+  };
+
+  const toggleAudio = (lessonDay: number) => {
+    const audio = audioElements[lessonDay];
+    const isPlaying = playingAudio[lessonDay];
+
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+      setPlayingAudio(prev => ({ ...prev, [lessonDay]: false }));
+    } else {
+      // Pause all other audio
+      Object.entries(audioElements).forEach(([day, audioEl]) => {
+        if (parseInt(day) !== lessonDay) {
+          audioEl.pause();
+        }
+      });
+      setPlayingAudio(prev => 
+        Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: parseInt(key) === lessonDay }), {})
+      );
+      
+      audio.play();
+      setPlayingAudio(prev => ({ ...prev, [lessonDay]: true }));
     }
   };
 
@@ -231,13 +290,33 @@ export const SprintPreview: React.FC = () => {
                       {lesson.title}
                     </CardTitle>
                     <div className="flex gap-2">
+                      {audioUrls[lesson.day] && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => toggleAudio(lesson.day)}
+                          disabled={generatingAudio[lesson.day]}
+                        >
+                          {playingAudio[lesson.day] ? (
+                            <Pause className="w-4 h-4 mr-2" />
+                          ) : (
+                            <Play className="w-4 h-4 mr-2" />
+                          )}
+                          {playingAudio[lesson.day] ? 'Pause' : 'Play'} Audio
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => generateAudio(lesson.content, lesson.day)}
+                        disabled={generatingAudio[lesson.day]}
                       >
-                        <Volume2 className="w-4 h-4 mr-2" />
-                        Generate Audio
+                        {generatingAudio[lesson.day] ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Volume2 className="w-4 h-4 mr-2" />
+                        )}
+                        {generatingAudio[lesson.day] ? 'Generating...' : 'Generate Audio'}
                       </Button>
                       <Button
                         variant="outline"
