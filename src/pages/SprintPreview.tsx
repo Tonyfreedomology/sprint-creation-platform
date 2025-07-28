@@ -82,10 +82,39 @@ export const SprintPreview: React.FC = () => {
         setupRealtimeChannel(location.state.channelName, contentData);
       }
     } else {
-      // Redirect back if no data
-      navigate('/');
+      // Check URL parameters for sprint ID and channel name
+      const searchParams = new URLSearchParams(location.search);
+      const sprintId = searchParams.get('id');
+      const channelName = searchParams.get('channel');
+      
+      if (sprintId && channelName) {
+        console.log('Setting up sprint preview from URL params:', { sprintId, channelName });
+        
+        // Create initial sprint data structure
+        const initialData: GeneratedContent = {
+          sprintId,
+          sprintTitle: 'Loading Sprint...',
+          sprintDescription: '',
+          sprintDuration: '21',
+          sprintCategory: '',
+          creatorInfo: {
+            name: '',
+            email: '',
+            bio: ''
+          },
+          dailyLessons: [],
+          emailSequence: []
+        };
+        
+        setSprintData(initialData);
+        setIsGenerating(true);
+        setupRealtimeChannel(channelName, initialData);
+      } else {
+        // Redirect back if no data and no URL params
+        navigate('/');
+      }
     }
-  }, [location.state, navigate]);
+  }, [location.state, location.search, navigate]);
 
   const setupRealtimeChannel = (channelName: string, contentData: GeneratedContent) => {
     console.log('Setting up real-time channel:', channelName);
