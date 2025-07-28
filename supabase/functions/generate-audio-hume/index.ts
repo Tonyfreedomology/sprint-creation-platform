@@ -148,7 +148,7 @@ serve(async (req) => {
     console.log('Hume request body:', JSON.stringify(humeRequestBody, null, 2));
 
     // Call Hume TTS API
-    const response = await fetch('https://api.hume.ai/v1/tts/synthesize/json', {
+    const response = await fetch('https://api.hume.ai/v0/tts/synthesize', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -165,7 +165,7 @@ serve(async (req) => {
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
         errorBody: errorText,
-        requestUrl: 'https://api.hume.ai/v1/tts/synthesize/json',
+        requestUrl: 'https://api.hume.ai/v0/tts/synthesize',
         requestHeaders: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
