@@ -526,7 +526,7 @@ export const SprintPreview: React.FC = () => {
               </Card>
             )}
             
-            {sprintData.dailyLessons.map((lesson, index) => (
+            {sprintData.dailyLessons.filter(lesson => lesson && lesson.title).map((lesson, index) => (
               <Card key={lesson.day} className="border-primary/20 shadow-card">
                 <CardHeader>
                   <div className="flex items-center justify-between">
