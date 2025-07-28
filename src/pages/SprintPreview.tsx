@@ -501,9 +501,6 @@ export const SprintPreview: React.FC = () => {
                         You can start reviewing and editing the content below while we create the rest!
                       </p>
                     </div>
-                    <div className="text-sm font-medium text-blue-600">
-                      {Math.round(generationProgress)}%
-                    </div>
                   </div>
                 </CardContent>
               </Card>
