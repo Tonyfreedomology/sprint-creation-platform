@@ -134,20 +134,23 @@ serve(async (req) => {
       finalActingInstructions = getActingInstructions(contentType);
     }
 
-    // Prepare the request body for Hume API
+    // Combine voice description with acting instructions for better results
+    const combinedDescription = `${finalVoiceDescription}. ${finalActingInstructions}`;
+    
+    console.log('Final voice description:', combinedDescription);
+
+    // Prepare the request body for Hume API - correct format based on documentation
     const humeRequestBody = {
       utterances: [{
         text: text,
-        description: finalVoiceDescription || "Warm, professional coach with encouraging confidence"
-      }],
-      ...(context && { context: { generationId: context } }),
-      numGenerations: Math.min(numGenerations, 5), // Hume allows max 5 generations
-      format: 'wav' // Default to WAV format
+        description: combinedDescription
+      }]
+      // Remove unsupported parameters: numGenerations, format, context
     };
 
     console.log('Hume request body:', JSON.stringify(humeRequestBody, null, 2));
 
-    // Call Hume TTS API using file endpoint
+    // Call Hume TTS API using file endpoint for raw audio response
     const response = await fetch('https://api.hume.ai/v0/tts/file', {
       method: 'POST',
       headers: {
