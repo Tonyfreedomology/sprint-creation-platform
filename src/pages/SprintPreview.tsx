@@ -795,7 +795,7 @@ export const SprintPreview: React.FC = () => {
                 <Package className="w-4 h-4 mr-2" />
               )}
               {isGeneratingPackage 
-                ? `Publishing ${packageProgress}%` 
+                ? `Publishing ${Math.round(packageProgress)}%` 
                 : sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)
                   ? `Finalizing Sprint (${sprintData.dailyLessons.length}/${sprintData.sprintDuration})`
                   : 'Publish Sprint'

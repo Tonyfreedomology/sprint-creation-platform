@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Download, Copy, ExternalLink, QrCode, Mail, ArrowLeft } from 'lucide-react';
+import { Download, Copy, ExternalLink, QrCode, Mail, ArrowLeft, Volume2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function PackageResults() {
@@ -186,20 +186,37 @@ export default function PackageResults() {
               All audio files are hosted and ready for delivery. Links are embedded in the portal and email templates.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {Object.entries(audioFiles).map(([day, url]) => (
-                <div key={day} className="flex items-center justify-between p-3 bg-secondary/10 rounded">
-                  <span className="text-sm font-medium">Day {day} Audio</span>
-                  <Button 
-                    size="sm" 
-                    variant="ghost"
-                    onClick={() => window.open(url as string, '_blank')}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
+            {Object.keys(audioFiles).length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {Object.entries(audioFiles).map(([day, url]) => (
+                  <div key={day} className="flex items-center justify-between p-3 bg-secondary/10 rounded">
+                    <span className="text-sm font-medium">Day {day} Audio</span>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => window.open(url as string, '_blank')}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => copyToClipboard(url as string, `Day ${day} audio URL`)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Volume2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No audio files were generated for this sprint.</p>
+                <p className="text-sm">Audio generation may have failed or been skipped.</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

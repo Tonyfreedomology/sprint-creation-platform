@@ -197,7 +197,7 @@ Created with Sprint Creator Platform
 
       return {
         day: dayNumber,
-        subject: `Day ${dayNumber}: ${email.subject}`,
+        subject: `Magnetic: Day ${dayNumber}`,
         content: enhancedContent,
         ghlFormatted
       };
