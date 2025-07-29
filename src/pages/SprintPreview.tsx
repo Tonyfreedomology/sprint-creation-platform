@@ -131,13 +131,14 @@ export const SprintPreview: React.FC = () => {
         console.log('Received new lesson:', payload);
         
         if (payload.payload?.lesson && payload.payload?.email) {
+          const lesson = payload.payload.lesson;
+          const email = payload.payload.email;
+          const structure = payload.payload.structure;
+          
           setSprintData(prevData => {
             if (!prevData) return prevData;
             
             const updatedData = { ...prevData };
-            const lesson = payload.payload.lesson;
-            const email = payload.payload.email;
-            const structure = payload.payload.structure;
             
             // Add lesson to dailyLessons array
             const existingLessonIndex = updatedData.dailyLessons.findIndex(l => l.day === lesson.day);
@@ -157,23 +158,27 @@ export const SprintPreview: React.FC = () => {
               updatedData.emailSequence.sort((a, b) => a.day - b.day);
             }
             
-            // Update progress
-            const totalDays = parseInt(contentData.sprintDuration);
-            const completedDays = updatedData.dailyLessons.length;
-            const progress = Math.round((completedDays / totalDays) * 100);
-            setGenerationProgress(progress);
-            
-            // Only show toast for days beyond the initial 3 (since those were ready when page loaded)
-            if (lesson.day > 3) {
-              const theme = structure?.theme || lesson.title;
-              toast({
-                title: `Day ${lesson.day} Generated`,
-                description: theme,
-              });
-            }
-            
             return updatedData;
           });
+          
+          // Update progress and show toast AFTER state update
+          const totalDays = parseInt(contentData.sprintDuration);
+          setSprintData(prevData => {
+            if (!prevData) return prevData;
+            const completedDays = prevData.dailyLessons.length;
+            const progress = Math.round((completedDays / totalDays) * 100);
+            setGenerationProgress(progress);
+            return prevData;
+          });
+          
+          // Only show toast for days beyond the initial 3 (since those were ready when page loaded)
+          if (lesson.day > 3) {
+            const theme = structure?.theme || lesson.title;
+            toast({
+              title: `Day ${lesson.day} Generated`,
+              description: theme,
+            });
+          }
         }
       })
       .on('broadcast', { event: 'generation-complete' }, (payload) => {
