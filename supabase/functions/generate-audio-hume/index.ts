@@ -203,8 +203,19 @@ serve(async (req) => {
     const audioArrayBuffer = await response.arrayBuffer();
     console.log('Hume API response received, audio size:', audioArrayBuffer.byteLength);
 
-    // Convert audio to base64 for JSON response
-    const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioArrayBuffer)));
+    // Convert audio to base64 safely for large files
+    const uint8Array = new Uint8Array(audioArrayBuffer);
+    let binaryString = '';
+    
+    // Process in small chunks to avoid stack overflow
+    for (let i = 0; i < uint8Array.length; i += 1024) {
+      const chunk = uint8Array.slice(i, i + 1024);
+      for (let j = 0; j < chunk.length; j++) {
+        binaryString += String.fromCharCode(chunk[j]);
+      }
+    }
+    
+    const audioBase64 = btoa(binaryString);
     
     console.log('Audio generation successful, converted to base64');
 
