@@ -90,7 +90,7 @@ export const SprintPreview: React.FC = () => {
       }
       
       // Start batch generation if flagged
-      if (location.state.startGeneration && !location.state.isGenerating) {
+      if (location.state.startGeneration) {
         startBatchGeneration(contentData, location.state.channelName);
       }
     } else {
