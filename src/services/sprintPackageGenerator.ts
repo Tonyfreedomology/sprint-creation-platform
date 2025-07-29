@@ -97,7 +97,8 @@ export class SprintPackageGenerator {
             text: lesson.content,
             sprintId: sprintData.sprintId,
             savedVoiceId: sprintVoiceId,
-            contentType: 'lesson'
+            contentType: 'lesson',
+            voiceStyle: 'warm-coach' // Default voice style
           }
         });
 
