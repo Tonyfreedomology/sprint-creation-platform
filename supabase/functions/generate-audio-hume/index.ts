@@ -220,13 +220,30 @@ serve(async (req) => {
     // JSON endpoint returns structured data with generation info
     const responseData = await response.json();
     console.log('Hume API response received:', Object.keys(responseData));
+    console.log('Full response structure:', JSON.stringify(responseData, null, 2));
 
-    // Extract generation ID and audio URL
-    const generation_id = responseData.generation_id;
-    const audioUrl = responseData.audio_url;
+    // Extract generation ID and audio URL from the correct structure
+    let generation_id = null;
+    let audioUrl = null;
+    
+    // Check the actual response structure
+    if (responseData.generations && Array.isArray(responseData.generations) && responseData.generations.length > 0) {
+      const firstGeneration = responseData.generations[0];
+      generation_id = firstGeneration.generation_id || firstGeneration.id;
+      audioUrl = firstGeneration.audio_url || firstGeneration.url;
+    } else {
+      // Fallback for different response structures
+      generation_id = responseData.generation_id || responseData.id;
+      audioUrl = responseData.audio_url || responseData.url;
+    }
     
     console.log('Generation ID:', generation_id);
     console.log('Audio URL:', audioUrl);
+    
+    if (!audioUrl) {
+      console.error('No audio URL found in response:', responseData);
+      throw new Error('Audio URL not found in Hume API response');
+    }
 
     // Download the audio file
     const audioResponse = await fetch(audioUrl);
