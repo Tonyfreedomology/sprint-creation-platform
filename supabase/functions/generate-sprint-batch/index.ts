@@ -73,8 +73,13 @@ async function generateDailyScript(
   duration: number,
   personalizationData: string,
   teachingGoals: string,
-  apiKey: string
+  apiKey: string,
+  masterPlan?: any
 ): Promise<any> {
+  const dayPlan = masterPlan?.dailyPlans?.find((plan: any) => plan.day === day);
+  const previousDayPlan = masterPlan?.dailyPlans?.find((plan: any) => plan.day === day - 1);
+  const nextDayPlan = masterPlan?.dailyPlans?.find((plan: any) => plan.day === day + 1);
+
   const prompt = `You are an expert life coach and content creator. Generate a comprehensive, flowing audio lesson script for day ${day} of ${duration} of a sprint called "${sprintTheme}".
 
 Context:
@@ -82,19 +87,26 @@ Context:
 - Day: ${day} of ${duration}
 - Teaching Goals: ${teachingGoals}
 - Personalization: ${personalizationData}
+${dayPlan ? `- Today's Theme: ${dayPlan.theme}
+- Learning Objective: ${dayPlan.learningObjective}
+- Key Takeaways: ${dayPlan.keyTakeaways?.join(', ')}
+- Connection to Previous Day: ${dayPlan.connectionToPrevious}
+- Connection to Next Day: ${dayPlan.connectionToNext}` : ''}
+
+CRITICAL: Ensure this lesson is completely unique and non-repetitive. Each day must offer distinctly different insights, examples, and exercises. Reference the connections to other days to maintain flow while ensuring content uniqueness.
 
 Create a cohesive 4-5 minute audio script that naturally weaves together:
-- Opening welcome and context setting for the day
-- Core lesson content with stories, examples, and practical insights (4-5 detailed paragraphs)
+- Opening welcome and context setting for the day (reference where this fits in the journey)
+- Core lesson content with fresh stories, unique examples, and specific practical insights (4-5 detailed paragraphs)
 - Seamlessly introduce the daily challenge: "Your exercise for today is..."
 - Naturally conclude with the affirmation: "I want you to repeat this powerful affirmation..." or "Today's affirmation is..."
 
-The script should flow as one continuous narrative for audio delivery, not separate sections. Make it conversational, engaging, and actionable. Include specific real-world examples and practical steps.
+The script should flow as one continuous narrative for audio delivery, not separate sections. Make it conversational, engaging, and actionable. Include specific real-world examples and practical steps that are unique to this day's theme.
 
 Output as JSON in this exact format:
 {
   "day": ${day},
-  "title": "Day ${day}: [Compelling Title]",
+  "title": "Day ${day}: [Compelling Title based on today's unique theme]",
   "content": "[Complete flowing audio script that includes lesson, exercise introduction, and affirmation guidance - all woven together naturally for audio delivery]",
   "exercise": "[The specific exercise/challenge mentioned in the script]",
   "affirmation": "[The affirmation statement mentioned in the script]"
@@ -121,28 +133,38 @@ async function generateDailyEmail(
   creatorName: string,
   apiKey: string
 ): Promise<any> {
-  const prompt = `You are an expert email marketing specialist. Create a single engaging email for day ${day} of the "${sprintTheme}" sprint.
+  const prompt = `You are an expert email copywriter in the style of Jeff Walker - personal, casual, and compelling. Create a short, engaging email for day ${day} of the "${sprintTheme}" sprint.
 
 Context:
 - Sprint Theme: ${sprintTheme}
 - Day: ${day}
-- Email Style: ${emailStyle}
 - Creator Name: ${creatorName}
 - Daily Lesson: ${JSON.stringify(dailyScript)}
 
-Create one comprehensive email that:
-- Welcomes them to the day with enthusiasm
-- Delivers the key lesson insights and takeaways
-- Guides them through the exercise with clear instructions
-- Includes the affirmation in a meaningful way
-- Motivates them for action and reflection
+Email Requirements:
+- Start with "Hey {{contact.firstname}}," 
+- Keep it SHORT - like a mini version of today's lesson
+- Write in Jeff Walker style: personal, casual, story-driven copywriting
+- Create a subject line optimized for high open rates (curious, benefit-driven, not sensational)
+- First sentence must be compelling enough to keep them reading (without being sensational)
+- Include today's key insight in a conversational way
+- Include today's challenge/exercise
+- Include today's affirmation
+- End with a clear call-to-action: "Click here to listen to today's lesson" with a link placeholder
+- Use proper markdown formatting (**bold** for emphasis, not asterisks)
+- Keep total length under 150 words
 
-The email should feel personal, engaging, and actionable.
+Subject Line Guidelines:
+- Curiosity-driven without being clickbait
+- Benefit-focused
+- Personal and conversational
+- 6-8 words max
+- Examples: "The thing nobody tells you...", "Your Day ${day} breakthrough", "This changes everything..."
 
 Output as JSON in this exact format:
 {
-  "subject": "Day ${day}: [Compelling subject line]",
-  "content": "[Full email content with lesson insights, exercise guidance, and affirmation woven together naturally]"
+  "subject": "[Compelling subject line optimized for CTR - 6-8 words max]",
+  "content": "[Short, personal email starting with Hey {{contact.firstname}}, including key insight, exercise, affirmation, and CTA link - under 150 words total with proper markdown formatting]"
 }`;
 
   console.log(`Generating daily email for day ${day}`);
@@ -234,7 +256,8 @@ serve(async (req) => {
           duration,
           personalizationData,
           sprintData.goals,
-          openaiApiKey
+          openaiApiKey,
+          progress.master_plan
         );
 
         // Small delay to prevent rate limiting

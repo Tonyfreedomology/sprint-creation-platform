@@ -77,8 +77,15 @@ export const SprintPreview: React.FC = () => {
   const [packageProgress, setPackageProgress] = useState(0);
   const [regeneratingLessons, setRegeneratingLessons] = useState<Set<number>>(new Set());
 
+  // Simple markdown renderer for emails
+  const renderMarkdown = (text: string) => {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+  };
+
   useEffect(() => {
-    // Check for either sprintData or generatedContent (legacy)
     const contentData = location.state?.sprintData || location.state?.generatedContent;
     
     if (contentData) {
@@ -1060,9 +1067,10 @@ export const SprintPreview: React.FC = () => {
                             ) : (
                               <>
                                 <h5 className="font-semibold mb-2">Subject: {email.subject}</h5>
-                                <p className="text-foreground leading-relaxed whitespace-pre-wrap">
-                                  {email.content}
-                                </p>
+                                <div 
+                                  className="text-foreground leading-relaxed whitespace-pre-wrap"
+                                  dangerouslySetInnerHTML={{ __html: renderMarkdown(email.content) }}
+                                />
                               </>
                             )}
                           </div>
