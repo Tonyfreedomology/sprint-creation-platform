@@ -292,6 +292,58 @@ export const SprintPreview: React.FC = () => {
     }
   };
 
+  const regenerateLesson = async (dayIndex: number) => {
+    if (!sprintData) return;
+    
+    const day = dayIndex + 1;
+    console.log(`Regenerating lesson for day ${day}`);
+    
+    try {
+      const response = await supabase.functions.invoke('generate-sprint-batch', {
+        body: {
+          formData: {
+            creatorName: sprintData.creatorInfo.name,
+            creatorEmail: sprintData.creatorInfo.email,
+            creatorBio: sprintData.creatorInfo.bio,
+            sprintTitle: sprintData.sprintTitle,
+            sprintDescription: sprintData.sprintDescription,
+            sprintDuration: sprintData.sprintDuration,
+            sprintCategory: sprintData.sprintCategory,
+            targetAudience: 'Married men, Christian husbands, dads in their 30s and 40s, recovering nice guys',
+            contentGeneration: 'ai',
+            contentTypes: ['text', 'affirmations', 'exercises', 'challenges'],
+            toneStyle: 'encouraging',
+            experience: 'intermediate',
+            goals: '• Build strong masculine frame\n• Lead sexually with clarity and confidence\n• Increase intimacy and sexual frequency\n• Rewire approval-seeking habits\n• Establish daily habits of touch, eye contact, and pursuit',
+            specialRequirements: '',
+            voiceStyle: 'warm-coach',
+            participantEmails: sprintData.creatorInfo.email
+          },
+          masterPlan: sprintData.masterPlan,
+          regenerateDay: day,
+          channelName: location.state?.channelName || `sprint-generation-${sprintData.sprintId}`
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      toast({
+        title: "Regenerating Lesson",
+        description: `Regenerating content for Day ${day}...`,
+      });
+      
+    } catch (error) {
+      console.error(`Error regenerating day ${day}:`, error);
+      toast({
+        title: "Regeneration Failed",
+        description: error instanceof Error ? error.message : "Failed to regenerate lesson",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleLessonEdit = (dayIndex: number, field: string, value: string) => {
     if (!sprintData) return;
     
@@ -839,6 +891,15 @@ export const SprintPreview: React.FC = () => {
                           <Volume2 className="w-4 h-4 mr-2" />
                         )}
                         {generatingAudio[lesson.day] ? 'Generating...' : 'Generate Audio'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => regenerateLesson(index)}
+                        disabled={isGenerating}
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Regenerate
                       </Button>
                       <Button
                         variant="outline"
