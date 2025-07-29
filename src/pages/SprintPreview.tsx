@@ -20,10 +20,12 @@ import {
   Volume2,
   Users,
   Loader2,
-  Pause
+  Pause,
+  Package
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { SprintPackageGenerator } from '@/services/sprintPackageGenerator';
 
 interface GeneratedContent {
   sprintId: string;
@@ -69,6 +71,8 @@ export const SprintPreview: React.FC = () => {
   const [audioElements, setAudioElements] = useState<Record<number, HTMLAudioElement>>({});
   const [realtimeChannel, setRealtimeChannel] = useState<any>(null);
   const [sprintVoiceId, setSprintVoiceId] = useState<string | null>(null);
+  const [isGeneratingPackage, setIsGeneratingPackage] = useState(false);
+  const [packageProgress, setPackageProgress] = useState(0);
 
   useEffect(() => {
     // Check for either sprintData or generatedContent (legacy)
@@ -526,6 +530,49 @@ export const SprintPreview: React.FC = () => {
     });
   };
 
+  const generatePackage = async () => {
+    if (!sprintData) return;
+
+    setIsGeneratingPackage(true);
+    setPackageProgress(0);
+
+    try {
+      const packageGenerator = new SprintPackageGenerator();
+      
+      // Convert sprintData to the expected format
+      const convertedData = {
+        ...sprintData,
+        voiceId: sprintVoiceId
+      };
+
+      const sprintPackage = await packageGenerator.generatePackage(
+        convertedData,
+        (step: string, progress: number) => {
+          setPackageProgress(progress);
+          toast({
+            title: "Package Generation",
+            description: step,
+          });
+        }
+      );
+
+      // Navigate to results page with package data
+      const packageDataParam = encodeURIComponent(JSON.stringify(sprintPackage));
+      navigate(`/package-results?packageData=${packageDataParam}`);
+
+    } catch (error) {
+      console.error('Package generation error:', error);
+      toast({
+        title: "Package Generation Failed",
+        description: error instanceof Error ? error.message : "There was an error generating the package.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingPackage(false);
+      setPackageProgress(0);
+    }
+  };
+
   if (!sprintData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center">
@@ -564,6 +611,18 @@ export const SprintPreview: React.FC = () => {
             </div>
           </div>
           <div className="flex gap-2">
+            <Button 
+              onClick={generatePackage} 
+              disabled={isGeneratingPackage}
+              className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary"
+            >
+              {isGeneratingPackage ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Package className="w-4 h-4 mr-2" />
+              )}
+              {isGeneratingPackage ? `Generating ${packageProgress}%` : 'Generate Package'}
+            </Button>
             <Button variant="outline" onClick={saveSprint}>
               <Save className="w-4 h-4 mr-2" />
               Save as Document

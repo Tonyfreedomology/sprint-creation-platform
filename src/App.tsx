@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { SprintPreview } from "./pages/SprintPreview";
 import MasterPlanReviewPage from "./pages/MasterPlanReviewPage";
+import SprintPortal from "./pages/SprintPortal";
+import PackageResults from "./pages/PackageResults";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +22,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/sprint-preview" element={<SprintPreview />} />
           <Route path="/master-plan-review" element={<MasterPlanReviewPage />} />
+          <Route path="/sprint/:sprintId" element={<SprintPortal />} />
+          <Route path="/package-results" element={<PackageResults />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
