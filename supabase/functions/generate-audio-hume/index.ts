@@ -147,11 +147,11 @@ serve(async (req) => {
 
     console.log('Hume request body:', JSON.stringify(humeRequestBody, null, 2));
 
-    // Call Hume TTS API
-    const response = await fetch('https://api.hume.ai/v0/tts', {
+    // Call Hume TTS API using file endpoint
+    const response = await fetch('https://api.hume.ai/v0/tts/file', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        'Accept': 'audio/wav',
         'Content-Type': 'application/json',
         'X-Hume-Api-Key': humeApiKey,
       },
@@ -165,9 +165,9 @@ serve(async (req) => {
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
         errorBody: errorText,
-        requestUrl: 'https://api.hume.ai/v0/tts',
+        requestUrl: 'https://api.hume.ai/v0/tts/file',
         requestHeaders: {
-          'Accept': 'application/json',
+          'Accept': 'audio/wav',
           'Content-Type': 'application/json',
           'X-Hume-Api-Key': humeApiKey ? '[PRESENT]' : '[MISSING]',
         },
@@ -196,27 +196,21 @@ serve(async (req) => {
       throw new Error(errorMessage);
     }
 
-    const result = await response.json();
-    console.log('Hume API response received');
+    // File endpoint returns raw audio data, not JSON
+    const audioArrayBuffer = await response.arrayBuffer();
+    console.log('Hume API response received, audio size:', audioArrayBuffer.byteLength);
 
-    // Extract the first generation's audio (base64 encoded)
-    if (!result.generations || result.generations.length === 0) {
-      throw new Error('No audio generations returned from Hume API');
-    }
-
-    const audioContent = result.generations[0].audio;
-    const generationId = result.generations[0].generationId;
-
-    console.log('Audio generation successful, generation ID:', generationId);
+    // Convert audio to base64 for JSON response
+    const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioArrayBuffer)));
+    
+    console.log('Audio generation successful, converted to base64');
 
     return new Response(
       JSON.stringify({ 
-        audioContent: audioContent,
-        generationId: generationId,
+        audioContent: audioBase64,
         contentType: 'audio/wav',
         voiceUsed: finalVoiceDescription,
-        actingInstructions: finalActingInstructions,
-        generations: result.generations.length
+        actingInstructions: finalActingInstructions
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
