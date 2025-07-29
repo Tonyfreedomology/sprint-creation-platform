@@ -34,6 +34,56 @@ interface OpenAIResponse {
   }>;
 }
 
+function cleanAndParseJSON(response: string): any {
+  // Strategy 1: Try direct parsing first
+  try {
+    return JSON.parse(response);
+  } catch (e) {
+    console.log('Direct JSON parse failed, trying cleanup strategies');
+  }
+
+  // Strategy 2: Remove markdown code blocks and extra formatting
+  let cleaned = response
+    .replace(/```json\s*/gi, '')
+    .replace(/```\s*/gi, '')
+    .replace(/^\s*[\r\n]/gm, '') // Remove empty lines
+    .trim();
+
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.log('Cleaned JSON parse failed, trying regex extraction');
+  }
+
+  // Strategy 3: Extract JSON using regex
+  const jsonMatch = response.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch (e) {
+      console.log('Regex extracted JSON parse failed');
+    }
+  }
+
+  // Strategy 4: More aggressive cleaning
+  const aggressiveCleaned = response
+    .replace(/[^\x20-\x7E\s]/g, '') // Remove non-printable chars
+    .replace(/\\n/g, '\n')
+    .replace(/\\"/g, '"')
+    .trim();
+    
+  const aggressiveMatch = aggressiveCleaned.match(/\{[\s\S]*\}/);
+  if (aggressiveMatch) {
+    try {
+      return JSON.parse(aggressiveMatch[0]);
+    } catch (e) {
+      console.log('Aggressive cleaning failed');
+    }
+  }
+
+  throw new Error(`Failed to parse JSON after all strategies. Response: ${response.substring(0, 500)}...`);
+}
+
 async function generateCompletion(prompt: string, apiKey: string, maxTokens: number = 2000): Promise<string> {
   console.log('Making OpenAI request with prompt length:', prompt.length);
   
@@ -46,6 +96,10 @@ async function generateCompletion(prompt: string, apiKey: string, maxTokens: num
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [
+        {
+          role: 'system',
+          content: 'You are a content generation expert. CRITICAL: Your response must be valid JSON only, no markdown formatting, no code blocks, no extra text. Return only the JSON object exactly as specified.'
+        },
         {
           role: 'user',
           content: prompt
@@ -117,7 +171,7 @@ Output as JSON in this exact format:
   console.log('Raw OpenAI response for daily script:', response);
   
   try {
-    return JSON.parse(response);
+    return cleanAndParseJSON(response);
   } catch (error) {
     console.error('Failed to parse OpenAI response for daily script:', response);
     console.error('Parse error:', error);
@@ -172,7 +226,7 @@ Output as JSON in this exact format:
   console.log('Raw OpenAI response for daily email:', response);
   
   try {
-    return JSON.parse(response);
+    return cleanAndParseJSON(response);
   } catch (error) {
     console.error('Failed to parse OpenAI response for daily email:', response);
     console.error('Parse error:', error);
