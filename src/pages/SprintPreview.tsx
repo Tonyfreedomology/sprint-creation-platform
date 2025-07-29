@@ -24,6 +24,7 @@ import {
   Package
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { orchestrateBatchGeneration, type BatchGenerationProgress } from "@/services/batchSprintGeneration";
 import { supabase } from '@/integrations/supabase/client';
 import { SprintPackageGenerator } from '@/services/sprintPackageGenerator';
 
@@ -34,6 +35,7 @@ interface GeneratedContent {
   sprintDuration: string;
   sprintCategory: string;
   voiceStyle?: string;
+  masterPlan?: any; // Add masterPlan property
   creatorInfo: {
     name: string;
     email: string;
@@ -248,106 +250,120 @@ export const SprintPreview: React.FC = () => {
       return;
     }
 
-    // Start real-time generation process
-    const channelName = `sprint-generation-${initialContent.sprintId}`;
-    const channel = supabase.channel(channelName);
-
-    // Listen for lesson updates
-    channel.on('broadcast', { event: 'lesson-generated' }, (payload) => {
-      console.log('Received lesson update:', payload);
-      const { lesson, email } = payload.payload;
-      
-      setSprintData(prev => {
-        if (!prev) return prev;
-        
-        const updatedLessons = [...prev.dailyLessons];
-        const updatedEmails = [...prev.emailSequence];
-        
-        // Replace placeholder with generated content
-        const lessonIndex = updatedLessons.findIndex(l => l.day === lesson.day);
-        if (lessonIndex >= 0) {
-          updatedLessons[lessonIndex] = lesson;
-        } else {
-          updatedLessons.push(lesson);
-          updatedLessons.sort((a, b) => a.day - b.day);
-        }
-        
-        if (email) {
-          const emailIndex = updatedEmails.findIndex(e => e.day === email.day);
-          if (emailIndex >= 0) {
-            updatedEmails[emailIndex] = email;
-          } else {
-            updatedEmails.push(email);
-            updatedEmails.sort((a, b) => a.day - b.day);
-          }
-        }
-        
-        return {
-          ...prev,
-          dailyLessons: updatedLessons,
-          emailSequence: updatedEmails
-        };
-      });
-      
-      // Update progress
-      const newProgress = (lesson.day / totalDays) * 100;
-      setGenerationProgress(newProgress);
-      
-      // Show toast for completed lesson
-      toast({
-        title: `Day ${lesson.day} Generated`,
-        description: lesson.title,
-      });
+    setIsGenerating(true);
+    setGenerationProgress(0);
+    
+    const toastRef = toast({
+      title: "Generating Sprint Content",
+      description: "Starting robust batch generation process...",
+      duration: 0,
     });
 
-    // Listen for completion
-    channel.on('broadcast', { event: 'generation-complete' }, () => {
-      console.log('Generation complete');
-      setIsGenerating(false);
-      setGenerationProgress(100);
-      
-      toast({
-        title: "Generation Complete! 🎉",
-        description: "All sprint content has been generated.",
-      });
-      
-      // Clean up channel
-      supabase.removeChannel(channel);
-    });
-
-    // Subscribe to channel
-    await channel.subscribe();
-    setRealtimeChannel(channel);
-
-    // Start the generation process
     try {
-      const { error } = await supabase.functions.invoke('generate-sprint-realtime', {
-        body: {
-          formData: location.state?.formData || {},
-          sprintId: initialContent.sprintId,
-          startDay: currentLessons + 1,
-          totalDays: totalDays,
-          channelName: channelName
-        }
+      console.log("Starting batch content generation");
+      console.log("Current lessons:", currentLessons, "Remaining days:", remainingDays);
+      
+      // Set up real-time channel for progress updates
+      const channelName = `sprint-generation-${initialContent.sprintId}`;
+      const channel = supabase.channel(channelName);
+
+      // Listen for lesson updates
+      channel.on('broadcast', { event: 'lesson-generated' }, (payload) => {
+        console.log('Received lesson update:', payload);
+        const { lesson, email } = payload.payload;
+        
+        setSprintData(prev => {
+          if (!prev) return prev;
+          
+          const updatedLessons = [...prev.dailyLessons];
+          const updatedEmails = [...prev.emailSequence];
+          
+          // Replace placeholder with generated content
+          const lessonIndex = updatedLessons.findIndex(l => l.day === lesson.day);
+          if (lessonIndex >= 0) {
+            updatedLessons[lessonIndex] = lesson;
+          } else {
+            updatedLessons.push(lesson);
+            updatedLessons.sort((a, b) => a.day - b.day);
+          }
+          
+          if (email) {
+            const emailIndex = updatedEmails.findIndex(e => e.day === email.day);
+            if (emailIndex >= 0) {
+              updatedEmails[emailIndex] = email;
+            } else {
+              updatedEmails.push(email);
+              updatedEmails.sort((a, b) => a.day - b.day);
+            }
+          }
+          
+          return {
+            ...prev,
+            dailyLessons: updatedLessons,
+            emailSequence: updatedEmails
+          };
+        });
+        
+        // Update progress
+        const newProgress = (lesson.day / totalDays) * 100;
+        setGenerationProgress(newProgress);
+        
+        // Update toast for progress
+        toast({
+          title: "Generating Sprint Content",
+          description: `Generated Day ${lesson.day}: ${lesson.title}`,
+        });
       });
 
-      if (error) {
-        console.error('Failed to start real-time generation:', error);
-        // Fallback to basic batch approach
+      // Listen for completion
+      channel.on('broadcast', { event: 'generation-complete' }, () => {
+        console.log('Generation complete');
         setIsGenerating(false);
+        setGenerationProgress(100);
+        
         toast({
-          title: "Generation Error",
-          description: "Failed to start background generation. Please try again.",
-          variant: "destructive"
+          title: "Generation Complete! 🎉",
+          description: "All sprint content has been generated successfully!",
+        });
+        
+        // Clean up channel
+        supabase.removeChannel(channel);
+      });
+
+      // Subscribe to channel
+      await channel.subscribe();
+      setRealtimeChannel(channel);
+
+      const result = await orchestrateBatchGeneration({
+        formData: location.state?.formData || {},
+        masterPlan: initialContent.masterPlan,
+        sprintId: initialContent.sprintId,
+        channelName: channelName,
+        batchSize: 4 // Generate 4 days at a time for optimal performance
+      }, (progress: BatchGenerationProgress) => {
+        console.log('Batch generation progress:', progress);
+        const progressPercent = Math.round((progress.currentDay / progress.totalDays) * 100);
+        setGenerationProgress(progressPercent);
+      });
+
+      if (!result.success) {
+        console.error("Batch generation failed:", result.error);
+        setIsGenerating(false);
+        
+        toast({
+          title: "Generation Failed",
+          description: result.error || "An error occurred during content generation.",
+          variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Real-time generation error:', error);
+      console.error("Error in batch generation:", error);
       setIsGenerating(false);
+      
       toast({
-        title: "Generation Error", 
-        description: "Failed to start background generation. Please try again.",
-        variant: "destructive"
+        title: "Generation Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
       });
     }
   };

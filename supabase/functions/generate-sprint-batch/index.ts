@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -43,7 +44,7 @@ async function generateCompletion(prompt: string, apiKey: string, maxTokens: num
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4.1-2025-04-14',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'user',
@@ -158,7 +159,7 @@ Output as JSON in this exact format:
 }
 
 serve(async (req) => {
-  console.log('Sprint batch generation function called with method:', req.method);
+  console.log('Batch sprint generation function called with method:', req.method);
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -167,29 +168,63 @@ serve(async (req) => {
   try {
     const requestBody = await req.json();
     console.log('Request body received');
-    const { formData, batchDays, sprintId } = requestBody;
+    const { progressId, batchSize = 4 } = requestBody;
     
-    // Get the OpenAI API key from Supabase secrets
+    // Get API keys from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    console.log('OpenAI API key available:', !!openaiApiKey);
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     
-    if (!openaiApiKey) {
-      console.error('OpenAI API key not configured');
-      throw new Error('OpenAI API key not configured');
+    console.log('API keys available:', {
+      openai: !!openaiApiKey,
+      supabase: !!supabaseUrl && !!supabaseServiceKey
+    });
+    
+    if (!openaiApiKey || !supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Required API keys not configured');
     }
 
-    const sprintData = formData as SprintFormData;
-    console.log('Processing batch for days:', batchDays, 'of sprint:', sprintData.sprintTitle);
-    
-    const duration = parseInt(sprintData.sprintDuration);
-    const batchLessons: any[] = [];
-    const batchEmails: any[] = [];
+    // Create Supabase client
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Get generation progress from database
+    const { data: progress, error: progressError } = await supabase
+      .from('sprint_generation_progress')
+      .select('*')
+      .eq('id', progressId)
+      .single();
+
+    if (progressError) {
+      console.error('Error fetching progress:', progressError);
+      throw new Error(`Failed to fetch progress: ${progressError.message}`);
+    }
+
+    if (!progress) {
+      throw new Error('Progress record not found');
+    }
+
+    console.log(`Processing batch generation for sprint: ${progress.sprint_id}, starting from day ${progress.current_day}`);
+
+    const sprintData = progress.form_data as SprintFormData;
+    const duration = parseInt(sprintData.sprintDuration);
     const personalizationData = `Target Audience: ${sprintData.targetAudience}. Experience Level: ${sprintData.experience}. Content Types: ${sprintData.contentTypes.join(', ')}. Special Requirements: ${sprintData.specialRequirements}`;
 
-    // Generate content for each day in the batch
-    for (const day of batchDays) {
-      console.log(`Starting generation for day ${day}`);
+    // Update status to generating
+    await supabase
+      .from('sprint_generation_progress')
+      .update({ status: 'generating' })
+      .eq('id', progressId);
+
+    // Calculate batch range
+    const startDay = progress.current_day;
+    const endDay = Math.min(startDay + batchSize - 1, progress.total_days);
+    const generatedLessons = [];
+
+    console.log(`Generating batch: days ${startDay} to ${endDay}`);
+
+    // Generate content for this batch
+    for (let day = startDay; day <= endDay; day++) {
+      console.log(`Starting generation for day ${day} at ${new Date().toISOString()}`);
       
       try {
         // Generate daily script
@@ -202,12 +237,10 @@ serve(async (req) => {
           openaiApiKey
         );
 
-        batchLessons.push(dailyScript);
-
         // Small delay to prevent rate limiting
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Generate single daily email
+        // Generate daily email
         const dailyEmail = await generateDailyEmail(
           sprintData.sprintTitle,
           day,
@@ -217,51 +250,103 @@ serve(async (req) => {
           openaiApiKey
         );
 
-        batchEmails.push({
+        const email = {
           day: day,
           subject: dailyEmail.subject,
           content: dailyEmail.content
+        };
+
+        generatedLessons.push({
+          lesson: dailyScript,
+          email: email
         });
 
-        console.log(`Completed generation for day ${day}`);
+        // Broadcast the lesson update in real-time
+        const channel = supabase.channel(progress.channel_name);
+        await channel.send({
+          type: 'broadcast',
+          event: 'lesson-generated',
+          payload: {
+            lesson: dailyScript,
+            email: email
+          }
+        });
 
-        // Small delay to prevent rate limiting
-        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log(`Completed and broadcasted day ${day} at ${new Date().toISOString()}`);
+
+        // Small delay between generations within batch
+        if (day < endDay) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
       } catch (error) {
-        console.error(`Error generating content for day ${day}:`, error);
-        // Add placeholder content for failed days
-        batchLessons.push({
-          day: day,
-          title: `Day ${day}: Content Generation Failed`,
-          content: `There was an error generating content for day ${day}. Please try regenerating this lesson.`,
-          exercise: `Exercise for day ${day} will be available after regeneration.`,
-          affirmation: `Affirmation for day ${day} will be available after regeneration.`
-        });
-
-        batchEmails.push({
-          day: day,
-          subject: `Day ${day}: Content Generation Failed`,
-          content: `There was an error generating the email for day ${day}. Please try regenerating this content.`
+        console.error(`CRITICAL ERROR generating content for day ${day} at ${new Date().toISOString()}:`, error);
+        
+        // Still broadcast a placeholder so the UI updates
+        const channel = supabase.channel(progress.channel_name);
+        await channel.send({
+          type: 'broadcast',
+          event: 'lesson-generated',
+          payload: {
+            lesson: {
+              day: day,
+              title: `Day ${day}: Content Generation Failed`,
+              content: `There was an error generating content for day ${day}. Error: ${error.message}. Please try regenerating this lesson.`,
+              exercise: `Exercise for day ${day} will be available after regeneration.`,
+              affirmation: `Affirmation for day ${day} will be available after regeneration.`
+            },
+            email: {
+              day: day,
+              subject: `Day ${day}: Content Generation Failed`,
+              content: `There was an error generating the email for day ${day}. Please try regenerating this content.`
+            }
+          }
         });
       }
     }
-    
-    console.log(`Batch generation completed. Generated ${batchLessons.length} lessons and ${batchEmails.length} emails.`);
 
+    // Update progress in database
+    const nextDay = endDay + 1;
+    const isComplete = endDay >= progress.total_days;
+    
+    await supabase
+      .from('sprint_generation_progress')
+      .update({ 
+        current_day: nextDay,
+        status: isComplete ? 'completed' : 'pending'
+      })
+      .eq('id', progressId);
+
+    if (isComplete) {
+      // Broadcast completion
+      const channel = supabase.channel(progress.channel_name);
+      await channel.send({
+        type: 'broadcast',
+        event: 'generation-complete',
+        payload: { sprintId: progress.sprint_id }
+      });
+      console.log(`All content generation completed at ${new Date().toISOString()}`);
+    }
+
+    // Return batch results
     return new Response(
       JSON.stringify({ 
-        batchLessons,
-        batchEmails,
-        sprintId
+        message: 'Batch generation completed',
+        batchCompleted: true,
+        daysGenerated: `${startDay}-${endDay}`,
+        nextDay: isComplete ? null : nextDay,
+        isComplete,
+        generatedCount: generatedLessons.length
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Sprint batch generation error details:', {
+    console.error('Batch sprint generation error details:', {
       name: error.name,
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
+      timestamp: new Date().toISOString()
     });
     
     return new Response(

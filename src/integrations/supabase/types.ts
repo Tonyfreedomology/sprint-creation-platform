@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      sprint_generation_progress: {
+        Row: {
+          channel_name: string
+          created_at: string
+          current_day: number | null
+          form_data: Json
+          id: string
+          master_plan: Json | null
+          sprint_id: string
+          status: string | null
+          total_days: number
+          updated_at: string
+        }
+        Insert: {
+          channel_name: string
+          created_at?: string
+          current_day?: number | null
+          form_data: Json
+          id?: string
+          master_plan?: Json | null
+          sprint_id: string
+          status?: string | null
+          total_days: number
+          updated_at?: string
+        }
+        Update: {
+          channel_name?: string
+          created_at?: string
+          current_day?: number | null
+          form_data?: Json
+          id?: string
+          master_plan?: Json | null
+          sprint_id?: string
+          status?: string | null
+          total_days?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sprints: {
         Row: {
           audio_files: Json | null
