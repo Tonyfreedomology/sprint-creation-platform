@@ -91,15 +91,24 @@ export class SprintPackageGenerator {
       onProgress?.(`Generating audio for Day ${dayNumber}...`, baseProgress + stepProgress);
 
       try {
+        // Prepare the request body - only include savedVoiceId if it exists
+        const requestBody: any = {
+          text: lesson.content,
+          sprintId: sprintData.sprintId,
+          contentType: 'lesson',
+          voiceStyle: 'warm-coach'
+        };
+
+        // Only add savedVoiceId if it's defined
+        if (sprintVoiceId) {
+          requestBody.savedVoiceId = sprintVoiceId;
+        }
+
+        console.log(`Generating audio for Day ${dayNumber} with request:`, requestBody);
+
         // Generate audio using Hume
         const audioResponse = await supabase.functions.invoke('generate-audio-hume', {
-          body: {
-            text: lesson.content,
-            sprintId: sprintData.sprintId,
-            savedVoiceId: sprintVoiceId,
-            contentType: 'lesson',
-            voiceStyle: 'warm-coach' // Default voice style
-          }
+          body: requestBody
         });
 
         if (audioResponse.error) {
