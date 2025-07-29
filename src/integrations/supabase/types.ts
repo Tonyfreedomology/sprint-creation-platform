@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      sprints: {
+        Row: {
+          audio_files: Json | null
+          category: string | null
+          created_at: string | null
+          creator_info: Json
+          daily_lessons: Json
+          description: string | null
+          duration: number
+          email_sequence: Json
+          id: string
+          master_plan: Json | null
+          portal_url: string | null
+          sprint_id: string
+          title: string
+          updated_at: string | null
+          voice_id: string | null
+        }
+        Insert: {
+          audio_files?: Json | null
+          category?: string | null
+          created_at?: string | null
+          creator_info: Json
+          daily_lessons: Json
+          description?: string | null
+          duration: number
+          email_sequence: Json
+          id?: string
+          master_plan?: Json | null
+          portal_url?: string | null
+          sprint_id: string
+          title: string
+          updated_at?: string | null
+          voice_id?: string | null
+        }
+        Update: {
+          audio_files?: Json | null
+          category?: string | null
+          created_at?: string | null
+          creator_info?: Json
+          daily_lessons?: Json
+          description?: string | null
+          duration?: number
+          email_sequence?: Json
+          id?: string
+          master_plan?: Json | null
+          portal_url?: string | null
+          sprint_id?: string
+          title?: string
+          updated_at?: string | null
+          voice_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
