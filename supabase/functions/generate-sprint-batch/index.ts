@@ -35,6 +35,13 @@ interface OpenAIResponse {
 }
 
 function cleanAndParseJSON(response: string): any {
+  // Check for truncation first - if response doesn't end with } it's likely truncated
+  const trimmed = response.trim();
+  if (!trimmed.endsWith('}')) {
+    console.log('Response appears truncated, does not end with }');
+    throw new Error(`Response appears truncated: ${trimmed.substring(trimmed.length - 100)}`);
+  }
+
   // Strategy 1: Try direct parsing first
   try {
     return JSON.parse(response);
@@ -167,7 +174,7 @@ Output as JSON in this exact format:
 }`;
 
   console.log(`Generating daily script for day ${day}`);
-  const response = await generateCompletion(prompt, apiKey, 3000);
+  const response = await generateCompletion(prompt, apiKey, 4000);
   console.log('Raw OpenAI response for daily script:', response);
   
   try {
