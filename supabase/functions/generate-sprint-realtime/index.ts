@@ -194,11 +194,18 @@ serve(async (req) => {
     const duration = parseInt(sprintData.sprintDuration);
     const personalizationData = `Target Audience: ${sprintData.targetAudience}. Experience Level: ${sprintData.experience}. Content Types: ${sprintData.contentTypes.join(', ')}. Special Requirements: ${sprintData.specialRequirements}`;
 
-    // Start background generation process
+    // Start background generation process with heartbeat
     EdgeRuntime.waitUntil((async () => {
       try {
+        console.log(`Starting generation batch: days ${startDay}-${totalDays}`);
+        
         for (let day = startDay; day <= totalDays; day++) {
-          console.log(`Starting generation for day ${day}`);
+          console.log(`Starting generation for day ${day} (${new Date().toISOString()})`);
+          
+          // Add heartbeat to prevent timeout
+          const heartbeatInterval = setInterval(() => {
+            console.log(`Heartbeat: Still generating day ${day}`);
+          }, 30000); // Every 30 seconds
           
           try {
             // Generate daily script
@@ -241,16 +248,21 @@ serve(async (req) => {
               }
             });
 
-            console.log(`Completed and broadcasted day ${day}`);
+            console.log(`Completed and broadcasted day ${day} at ${new Date().toISOString()}`);
+            clearInterval(heartbeatInterval);
 
-            // Small delay between generations
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Progressive delay to prevent rate limiting
+            const delay = day > 10 ? 3000 : 1500; // Longer delays after day 10
+            console.log(`Waiting ${delay}ms before next generation`);
+            await new Promise(resolve => setTimeout(resolve, delay));
           } catch (error) {
-            console.error(`Error generating content for day ${day}:`, error);
+            clearInterval(heartbeatInterval);
+            console.error(`CRITICAL ERROR generating content for day ${day} at ${new Date().toISOString()}:`, error);
             console.error(`Detailed error for day ${day}:`, {
               name: error.name,
               message: error.message,
-              stack: error.stack
+              stack: error.stack,
+              timestamp: new Date().toISOString()
             });
             
             // Still broadcast a placeholder so the UI updates
@@ -274,8 +286,9 @@ serve(async (req) => {
               }
             });
             
-            // Add a small delay before continuing to avoid overwhelming the API
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Add a longer delay after errors to prevent cascading failures
+            console.log(`Error recovery: waiting 5 seconds before continuing`);
+            await new Promise(resolve => setTimeout(resolve, 5000));
           }
         }
         
@@ -287,9 +300,15 @@ serve(async (req) => {
           payload: { sprintId }
         });
         
-        console.log('All content generation completed');
+        console.log(`All content generation completed at ${new Date().toISOString()}`);
       } catch (error) {
-        console.error('Background generation process failed:', error);
+        console.error(`FATAL: Background generation process failed at ${new Date().toISOString()}:`, error);
+        console.error('Fatal error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          timestamp: new Date().toISOString()
+        });
       }
     })());
 
