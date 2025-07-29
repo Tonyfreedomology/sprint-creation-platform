@@ -75,6 +75,7 @@ export const SprintPreview: React.FC = () => {
   const [sprintVoiceId, setSprintVoiceId] = useState<string | null>(null);
   const [isGeneratingPackage, setIsGeneratingPackage] = useState(false);
   const [packageProgress, setPackageProgress] = useState(0);
+  const [regeneratingLessons, setRegeneratingLessons] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     // Check for either sprintData or generatedContent (legacy)
@@ -176,6 +177,13 @@ export const SprintPreview: React.FC = () => {
             const progress = Math.round((completedDays / totalDays) * 100);
             setGenerationProgress(progress);
             return prevData;
+          });
+          
+          // Remove from regenerating set if it was being regenerated
+          setRegeneratingLessons(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(lesson.day - 1);
+            return newSet;
           });
           
           // Only show toast for days beyond the initial 3 (since those were ready when page loaded)
@@ -298,6 +306,9 @@ export const SprintPreview: React.FC = () => {
     const day = dayIndex + 1;
     console.log(`Regenerating lesson for day ${day}`);
     
+    // Add this lesson to the regenerating set
+    setRegeneratingLessons(prev => new Set([...prev, dayIndex]));
+    
     try {
       const response = await supabase.functions.invoke('generate-sprint-batch', {
         body: {
@@ -340,6 +351,13 @@ export const SprintPreview: React.FC = () => {
         title: "Regeneration Failed",
         description: error instanceof Error ? error.message : "Failed to regenerate lesson",
         variant: "destructive"
+      });
+    } finally {
+      // Remove this lesson from the regenerating set
+      setRegeneratingLessons(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(dayIndex);
+        return newSet;
       });
     }
   };
@@ -896,10 +914,14 @@ export const SprintPreview: React.FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => regenerateLesson(index)}
-                        disabled={isGenerating}
+                        disabled={regeneratingLessons.has(index)}
                       >
-                        <FileText className="w-4 h-4 mr-2" />
-                        Regenerate
+                        {regeneratingLessons.has(index) ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <FileText className="w-4 h-4 mr-2" />
+                        )}
+                        {regeneratingLessons.has(index) ? 'Regenerating...' : 'Regenerate'}
                       </Button>
                       <Button
                         variant="outline"
