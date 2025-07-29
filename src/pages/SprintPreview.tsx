@@ -68,6 +68,7 @@ export const SprintPreview: React.FC = () => {
   const [playingAudio, setPlayingAudio] = useState<Record<number, boolean>>({});
   const [audioElements, setAudioElements] = useState<Record<number, HTMLAudioElement>>({});
   const [realtimeChannel, setRealtimeChannel] = useState<any>(null);
+  const [sprintVoiceId, setSprintVoiceId] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for either sprintData or generatedContent (legacy)
@@ -363,12 +364,20 @@ export const SprintPreview: React.FC = () => {
         body: { 
           text, 
           voiceStyle: sprintData?.voiceStyle || 'warm-coach', // Use sprint voice style
-          contentType: contentType
+          contentType: contentType,
+          sprintId: sprintData?.sprintId, // For voice consistency
+          savedVoiceId: sprintVoiceId // Use existing voice if available
         }
       });
 
       if (error) {
         throw new Error(error.message);
+      }
+
+      // If this is a new voice, save the voice ID for consistency
+      if (data.isNewVoice && data.newVoiceId) {
+        setSprintVoiceId(data.newVoiceId);
+        console.log('Saved new voice ID for sprint:', data.newVoiceId);
       }
 
       // Convert base64 audio to blob URL (Hume returns WAV format)
@@ -387,9 +396,13 @@ export const SprintPreview: React.FC = () => {
       setAudioUrls(prev => ({ ...prev, [lessonDay]: audioUrl }));
       setAudioElements(prev => ({ ...prev, [lessonDay]: audio }));
       
+      const voiceMessage = data.isNewVoice ? 
+        `New voice created and will be reused for all lessons: ${data.voiceUsed}` :
+        `Using consistent sprint voice: ${data.voiceUsed}`;
+      
       toast({
         title: "Audio Generated",
-        description: `Expressive voice created using: ${data.voiceUsed}`,
+        description: voiceMessage,
       });
       
     } catch (error) {

@@ -13,6 +13,8 @@ interface HumeAudioRequest {
   context?: string;
   numGenerations?: number;
   streaming?: boolean;
+  sprintId?: string;
+  savedVoiceId?: string;
 }
 
 // Define available voice personalities that users can choose from
@@ -91,7 +93,9 @@ serve(async (req) => {
       numGenerations = 1,
       streaming = false,
       voiceStyle = 'warm-coach',
-      contentType = 'lesson'
+      contentType = 'lesson',
+      sprintId,
+      savedVoiceId
     } = requestBody;
     
     console.log('Extracted parameters:', {
@@ -121,6 +125,8 @@ serve(async (req) => {
     console.log('Generating audio with Hume Octave TTS for text length:', text.length);
     console.log('Voice description:', voiceDescription);
     console.log('Acting instructions:', actingInstructions);
+    console.log('Sprint ID:', sprintId);
+    console.log('Saved voice ID:', savedVoiceId);
 
     // Use consistent voice style for the entire sprint
     let finalVoiceDescription = voiceDescription;
@@ -139,22 +145,35 @@ serve(async (req) => {
     
     console.log('Final voice description:', combinedDescription);
 
-    // Prepare the request body for Hume API - correct format based on documentation
-    const humeRequestBody = {
-      utterances: [{
-        text: text,
-        description: combinedDescription
-      }]
-      // Remove unsupported parameters: numGenerations, format, context
-    };
+    let humeRequestBody: any;
+    let isUsingExistingVoice = false;
+
+    // Check if we have a saved voice ID for this sprint
+    if (savedVoiceId) {
+      console.log('Using existing saved voice:', savedVoiceId);
+      isUsingExistingVoice = true;
+      humeRequestBody = {
+        utterances: [{
+          text: text,
+          voice: { id: savedVoiceId }
+        }]
+      };
+    } else {
+      console.log('Creating new voice from description');
+      humeRequestBody = {
+        utterances: [{
+          text: text,
+          description: combinedDescription
+        }]
+      };
+    }
 
     console.log('Hume request body:', JSON.stringify(humeRequestBody, null, 2));
 
-    // Call Hume TTS API using file endpoint for raw audio response
-    const response = await fetch('https://api.hume.ai/v0/tts/file', {
+    // Use the JSON endpoint to get generation_id for voice saving
+    const response = await fetch('https://api.hume.ai/v0/tts', {
       method: 'POST',
       headers: {
-        'Accept': 'audio/wav',
         'Content-Type': 'application/json',
         'X-Hume-Api-Key': humeApiKey,
       },
@@ -168,9 +187,8 @@ serve(async (req) => {
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
         errorBody: errorText,
-        requestUrl: 'https://api.hume.ai/v0/tts/file',
+        requestUrl: 'https://api.hume.ai/v0/tts',
         requestHeaders: {
-          'Accept': 'audio/wav',
           'Content-Type': 'application/json',
           'X-Hume-Api-Key': humeApiKey ? '[PRESENT]' : '[MISSING]',
         },
@@ -199,9 +217,59 @@ serve(async (req) => {
       throw new Error(errorMessage);
     }
 
-    // File endpoint returns raw audio data, not JSON
-    const audioArrayBuffer = await response.arrayBuffer();
-    console.log('Hume API response received, audio size:', audioArrayBuffer.byteLength);
+    // JSON endpoint returns structured data with generation info
+    const responseData = await response.json();
+    console.log('Hume API response received:', Object.keys(responseData));
+
+    // Extract generation ID and audio URL
+    const generation_id = responseData.generation_id;
+    const audioUrl = responseData.audio_url;
+    
+    console.log('Generation ID:', generation_id);
+    console.log('Audio URL:', audioUrl);
+
+    // Download the audio file
+    const audioResponse = await fetch(audioUrl);
+    if (!audioResponse.ok) {
+      throw new Error(`Failed to download audio: ${audioResponse.status} ${audioResponse.statusText}`);
+    }
+
+    const audioArrayBuffer = await audioResponse.arrayBuffer();
+    console.log('Audio downloaded, size:', audioArrayBuffer.byteLength);
+
+    // If this is a new voice (not using savedVoiceId) and we have a sprintId, save the voice
+    let newVoiceId = null;
+    if (!isUsingExistingVoice && sprintId && generation_id) {
+      try {
+        console.log('Saving voice to library for sprint:', sprintId);
+        const voiceName = `Sprint-${sprintId}-Voice`;
+        
+        const saveVoiceResponse = await fetch('https://api.hume.ai/v0/tts/voices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Hume-Api-Key': humeApiKey,
+          },
+          body: JSON.stringify({
+            generation_id: generation_id,
+            name: voiceName
+          }),
+        });
+
+        if (saveVoiceResponse.ok) {
+          const savedVoice = await saveVoiceResponse.json();
+          newVoiceId = savedVoice.id;
+          console.log('Voice saved successfully with ID:', newVoiceId);
+        } else {
+          const saveError = await saveVoiceResponse.text();
+          console.warn('Failed to save voice:', saveError);
+          // Continue anyway, don't fail the whole request
+        }
+      } catch (saveError) {
+        console.warn('Error saving voice:', saveError);
+        // Continue anyway, don't fail the whole request
+      }
+    }
 
     // Convert audio to base64 safely for large files
     const uint8Array = new Uint8Array(audioArrayBuffer);
@@ -224,7 +292,10 @@ serve(async (req) => {
         audioContent: audioBase64,
         contentType: 'audio/wav',
         voiceUsed: finalVoiceDescription,
-        actingInstructions: finalActingInstructions
+        actingInstructions: finalActingInstructions,
+        generationId: generation_id,
+        newVoiceId: newVoiceId,
+        isNewVoice: !isUsingExistingVoice
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
