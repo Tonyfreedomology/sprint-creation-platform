@@ -241,6 +241,84 @@ Output as JSON in this exact format:
   }
 }
 
+async function handleRegeneration(regenerateDay: number, formData: SprintFormData, masterPlan: any, channelName: string) {
+  console.log(`Handling regeneration for day ${regenerateDay}`);
+  
+  // Get API keys from environment
+  const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  
+  if (!openaiApiKey || !supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Required API keys not configured');
+  }
+
+  // Create Supabase client
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  
+  const duration = parseInt(formData.sprintDuration);
+  const personalizationData = `Target Audience: ${formData.targetAudience}. Experience Level: ${formData.experience}. Content Types: ${formData.contentTypes.join(', ')}. Special Requirements: ${formData.specialRequirements}`;
+
+  try {
+    // Generate daily script
+    const dailyScript = await generateDailyScript(
+      formData.sprintTitle,
+      regenerateDay,
+      duration,
+      personalizationData,
+      formData.goals,
+      openaiApiKey,
+      masterPlan
+    );
+
+    // Small delay to prevent rate limiting
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Generate daily email
+    const dailyEmail = await generateDailyEmail(
+      formData.sprintTitle,
+      regenerateDay,
+      dailyScript,
+      formData.toneStyle,
+      formData.creatorName,
+      openaiApiKey
+    );
+
+    const email = {
+      day: regenerateDay,
+      subject: dailyEmail.subject,
+      content: dailyEmail.content
+    };
+
+    // Broadcast the regenerated lesson
+    const channel = supabase.channel(channelName);
+    await channel.send({
+      type: 'broadcast',
+      event: 'lesson-generated',
+      payload: {
+        lesson: dailyScript,
+        email: email
+      }
+    });
+
+    console.log(`Regenerated and broadcasted day ${regenerateDay} at ${new Date().toISOString()}`);
+
+    return new Response(
+      JSON.stringify({ 
+        message: 'Regeneration completed',
+        day: regenerateDay,
+        lesson: dailyScript,
+        email: email
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error(`CRITICAL ERROR regenerating content for day ${regenerateDay}:`, error);
+    throw error;
+  }
+}
+
 serve(async (req) => {
   console.log('Batch sprint generation function called with method:', req.method);
 
@@ -251,7 +329,12 @@ serve(async (req) => {
   try {
     const requestBody = await req.json();
     console.log('Request body received');
-    const { progressId, batchSize = 4 } = requestBody;
+    const { progressId, batchSize = 4, regenerateDay, formData, masterPlan, channelName } = requestBody;
+    
+    // Handle regeneration request differently
+    if (regenerateDay && formData && masterPlan) {
+      return await handleRegeneration(regenerateDay, formData, masterPlan, channelName);
+    }
     
     // Get API keys from environment
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
