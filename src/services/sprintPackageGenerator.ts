@@ -103,12 +103,14 @@ export class SprintPackageGenerator {
 
         if (audioResponse.error) {
           console.error(`Error generating audio for day ${dayNumber}:`, audioResponse.error);
+          onProgress?.(`⚠️ Audio generation failed for Day ${dayNumber}`, baseProgress + stepProgress);
           continue;
         }
 
         const audioData = audioResponse.data;
-        if (!audioData.audioContent) {
-          console.error(`No audio content received for day ${dayNumber}`);
+        if (!audioData || !audioData.audioContent) {
+          console.error(`No audio content received for day ${dayNumber}`, audioData);
+          onProgress?.(`⚠️ No audio content for Day ${dayNumber}`, baseProgress + stepProgress);
           continue;
         }
 
@@ -126,6 +128,7 @@ export class SprintPackageGenerator {
 
         if (uploadError) {
           console.error(`Error uploading audio for day ${dayNumber}:`, uploadError);
+          onProgress?.(`⚠️ Upload failed for Day ${dayNumber}`, baseProgress + stepProgress);
           continue;
         }
 
@@ -135,9 +138,11 @@ export class SprintPackageGenerator {
           .getPublicUrl(fileName);
 
         audioFiles[dayNumber.toString()] = urlData.publicUrl;
+        onProgress?.(`✅ Audio ready for Day ${dayNumber}`, baseProgress + stepProgress);
 
       } catch (error) {
         console.error(`Error processing audio for day ${dayNumber}:`, error);
+        onProgress?.(`❌ Audio failed for Day ${dayNumber}`, baseProgress + stepProgress);
       }
     }
 
@@ -158,10 +163,13 @@ export class SprintPackageGenerator {
       const dayNumber = index + 1;
       const portalDayUrl = `${window.location.origin}/sprint/${sprintData.sprintId}#day-${dayNumber}`;
       
+      // Clean up the subject line to remove redundancy and use clean format
+      const cleanSubject = email.subject.replace(/^Day \d+:\s*/, '').replace(/Your Day \d+ breakthrough/, 'breakthrough');
+      
       // Enhanced email content with mobile-friendly styling
       const enhancedContent = `
 <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-  <h2 style="color: #333; margin-bottom: 20px;">Day ${dayNumber}: ${email.subject}</h2>
+  <h2 style="color: #333; margin-bottom: 20px;">Magnetic: Day ${dayNumber}</h2>
   
   <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
     ${email.content}
@@ -182,7 +190,7 @@ export class SprintPackageGenerator {
 
       // GHL-compatible format
       const ghlFormatted = `
-SUBJECT: Day ${dayNumber}: ${email.subject}
+SUBJECT: Magnetic: Day ${dayNumber}
 
 CONTENT:
 ${email.content}

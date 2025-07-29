@@ -157,10 +157,10 @@ export default function PackageResults() {
               </Button>
             </div>
             
-            <div className="space-y-2 max-h-40 overflow-y-auto">
+            <div className="space-y-2">
               {emailTemplates.map((template: any) => (
                 <div key={template.day} className="flex items-center justify-between p-3 bg-secondary/10 rounded">
-                  <span className="text-sm">Day {template.day}: {template.subject}</span>
+                  <span className="text-sm">Magnetic: Day {template.day}</span>
                   <Button 
                     size="sm" 
                     variant="ghost"
