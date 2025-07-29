@@ -618,7 +618,7 @@ export const SprintPreview: React.FC = () => {
           <div className="flex gap-2">
             <Button 
               onClick={generatePackage} 
-              disabled={isGeneratingPackage}
+              disabled={isGeneratingPackage || isGenerating || sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)}
               className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary"
             >
               {isGeneratingPackage ? (
@@ -626,7 +626,12 @@ export const SprintPreview: React.FC = () => {
               ) : (
                 <Package className="w-4 h-4 mr-2" />
               )}
-              {isGeneratingPackage ? `Generating ${packageProgress}%` : 'Generate Package'}
+              {isGeneratingPackage 
+                ? `Publishing ${packageProgress}%` 
+                : sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)
+                  ? `Finalizing Sprint (${sprintData.dailyLessons.length}/${sprintData.sprintDuration})`
+                  : 'Publish Sprint'
+              }
             </Button>
             <Button variant="outline" onClick={saveSprint}>
               <Save className="w-4 h-4 mr-2" />

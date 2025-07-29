@@ -247,6 +247,11 @@ serve(async (req) => {
             await new Promise(resolve => setTimeout(resolve, 1000));
           } catch (error) {
             console.error(`Error generating content for day ${day}:`, error);
+            console.error(`Detailed error for day ${day}:`, {
+              name: error.name,
+              message: error.message,
+              stack: error.stack
+            });
             
             // Still broadcast a placeholder so the UI updates
             const channel = supabase.channel(channelName);
@@ -257,7 +262,7 @@ serve(async (req) => {
                 lesson: {
                   day: day,
                   title: `Day ${day}: Content Generation Failed`,
-                  content: `There was an error generating content for day ${day}. Please try regenerating this lesson.`,
+                  content: `There was an error generating content for day ${day}. Error: ${error.message}. Please try regenerating this lesson.`,
                   exercise: `Exercise for day ${day} will be available after regeneration.`,
                   affirmation: `Affirmation for day ${day} will be available after regeneration.`
                 },
@@ -268,6 +273,9 @@ serve(async (req) => {
                 }
               }
             });
+            
+            // Add a small delay before continuing to avoid overwhelming the API
+            await new Promise(resolve => setTimeout(resolve, 2000));
           }
         }
         
