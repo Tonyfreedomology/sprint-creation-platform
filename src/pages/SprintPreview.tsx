@@ -88,6 +88,11 @@ export const SprintPreview: React.FC = () => {
       if (location.state.channelName && location.state.isGenerating) {
         setupRealtimeChannel(location.state.channelName, contentData);
       }
+      
+      // Start batch generation if flagged
+      if (location.state.startGeneration && !location.state.isGenerating) {
+        startBatchGeneration(contentData, location.state.channelName);
+      }
     } else {
       // Check URL parameters for sprint ID and channel name
       const searchParams = new URLSearchParams(location.search);
@@ -216,6 +221,76 @@ export const SprintPreview: React.FC = () => {
       }
     };
   }, [realtimeChannel]);
+
+  const startBatchGeneration = async (sprintData: GeneratedContent, channelName: string) => {
+    setIsGenerating(true);
+    setGenerationProgress(0);
+    
+    try {
+      console.log('Starting batch content generation');
+      
+      // Extract form data from sprint data for batch generation
+      const formData = {
+        creatorName: sprintData.creatorInfo.name,
+        creatorEmail: sprintData.creatorInfo.email,
+        creatorBio: sprintData.creatorInfo.bio,
+        sprintTitle: sprintData.sprintTitle,
+        sprintDescription: sprintData.sprintDescription,
+        sprintDuration: sprintData.sprintDuration,
+        sprintCategory: sprintData.sprintCategory,
+        // Add default values for missing fields
+        targetAudience: 'Married men, Christian husbands, dads in their 30s and 40s, recovering nice guys',
+        contentGeneration: 'ai',
+        contentTypes: ['text', 'affirmations', 'exercises', 'challenges'],
+        toneStyle: 'encouraging',
+        experience: 'intermediate',
+        goals: '• Build strong masculine frame\n• Lead sexually with clarity and confidence\n• Increase intimacy and sexual frequency\n• Rewire approval-seeking habits\n• Establish daily habits of touch, eye contact, and pursuit',
+        specialRequirements: '',
+        voiceStyle: 'warm-coach',
+        voiceSampleFile: null,
+        writingStyleFile: null,
+        participantEmails: sprintData.creatorInfo.email
+      };
+      
+      // Use the batch generation system
+      const result = await orchestrateBatchGeneration(
+        {
+          formData,
+          masterPlan: sprintData.masterPlan,
+          sprintId: sprintData.sprintId,
+          channelName,
+          batchSize: 4
+        },
+        (progress) => {
+          console.log('Batch progress:', progress);
+          const progressPercentage = Math.round((progress.currentDay / progress.totalDays) * 100);
+          setGenerationProgress(progressPercentage);
+        }
+      );
+
+      if (!result.success) {
+        throw new Error(result.error || 'Batch generation failed');
+      }
+
+      console.log('Batch generation completed successfully');
+      setIsGenerating(false);
+      setGenerationProgress(100);
+      
+      toast({
+        title: "Generation Complete! 🎉",
+        description: "All 21 lessons have been generated successfully.",
+      });
+      
+    } catch (error) {
+      console.error('Error in batch content generation:', error);
+      setIsGenerating(false);
+      toast({
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to complete content generation",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleLessonEdit = (dayIndex: number, field: string, value: string) => {
     if (!sprintData) return;

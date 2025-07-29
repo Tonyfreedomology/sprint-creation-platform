@@ -7,6 +7,7 @@ import { ArrowLeft, GripVertical, Edit2, Check, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { orchestrateBatchGeneration } from '@/services/batchSprintGeneration';
 
 interface DayPlan {
   day: number;
@@ -93,29 +94,31 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
     }
     
     try {
-      console.log('Starting content generation with:', { sprintId, channelName, phase: 'content-generation' });
+      console.log('Starting batch content generation with:', { sprintId, channelName });
       
-      const response = await supabase.functions.invoke('generate-sprint-structured', {
-        body: {
-          formData,
-          sprintId,
+      // Navigate to sprint preview to show progress
+      navigate(`/sprint-preview?id=${sprintId}&channel=${channelName}`, {
+        state: {
+          sprintData: {
+            sprintId,
+            sprintTitle: formData.sprintTitle,
+            sprintDescription: formData.sprintDescription,
+            sprintDuration: formData.sprintDuration,
+            sprintCategory: formData.sprintCategory,
+            creatorInfo: {
+              name: formData.creatorName,
+              email: formData.creatorEmail,
+              bio: formData.creatorBio
+            },
+            masterPlan: editedPlan,
+            dailyLessons: [],
+            emailSequence: []
+          },
+          isGenerating: true,
           channelName,
-          masterPlan: editedPlan,
-          phase: 'content-generation'
+          startGeneration: true // Flag to trigger generation in preview page
         }
       });
-
-      console.log('Function response:', response);
-
-      if (response.error) {
-        console.error('Function returned error:', response.error);
-        throw new Error(response.error.message || 'Unknown error from function');
-      }
-
-      console.log('About to navigate to sprint preview with URL:', `/sprint-preview?id=${sprintId}&channel=${channelName}`);
-      
-      // Navigate immediately to the preview page
-      window.location.href = `/sprint-preview?id=${sprintId}&channel=${channelName}`;
 
     } catch (error) {
       console.error('Error starting content generation:', error);
