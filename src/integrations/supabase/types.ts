@@ -53,6 +53,33 @@ export type Database = {
         }
         Relationships: []
       }
+      sprint_user_progress: {
+        Row: {
+          created_at: string
+          id: string
+          sprint_id: string
+          started_at: string
+          updated_at: string
+          user_token: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sprint_id: string
+          started_at?: string
+          updated_at?: string
+          user_token: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sprint_id?: string
+          started_at?: string
+          updated_at?: string
+          user_token?: string
+        }
+        Relationships: []
+      }
       sprints: {
         Row: {
           audio_files: Json | null

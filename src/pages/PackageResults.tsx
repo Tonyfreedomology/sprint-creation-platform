@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -36,7 +37,21 @@ export default function PackageResults() {
         },
         emailTemplates: Array.from({length: 21}, (_, i) => ({
           day: i + 1,
-          ghlFormatted: `Day ${i + 1} email template content for GoHighLevel import...`
+          ghlFormatted: `Subject: Day ${i + 1} - {{custom_values.sprint_title}} 🚀
+
+Hi {{first_name}},
+
+Welcome to Day ${i + 1} of your ${sprint.sprintTitle} journey!
+
+Today's lesson is now available in your portal:
+👉 {{custom_values.portal_url}}?user={{custom_values.user_token}}
+
+${i === 0 ? 'This is your personal link - bookmark it for easy access throughout your sprint!' : 'Continue building on yesterday\'s progress.'}
+
+Ready to unlock today's transformation?
+
+Best regards,
+{{custom_values.creator_name}}`
         })),
         qrCode: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
       };
@@ -164,7 +179,24 @@ export default function PackageResults() {
                 <Button size="sm" variant="outline" onClick={() => copyToClipboard(portalUrl, 'Portal URL')}>
                   <Copy className="h-4 w-4" />
                 </Button>
-                <Button size="sm" onClick={() => window.open(portalUrl, '_blank')}>
+                <Button 
+                  size="sm" 
+                  onClick={async () => {
+                    try {
+                      const response = await supabase.functions.invoke('enroll-user', {
+                        body: { sprintId: 'demo-sprint-123' }
+                      });
+                      
+                      if (response.error) throw response.error;
+                      
+                      const enrollmentUrl = response.data.portalUrl;
+                      window.open(enrollmentUrl, '_blank');
+                    } catch (error) {
+                      console.error('Failed to generate enrollment URL:', error);
+                      window.open(portalUrl, '_blank');
+                    }
+                  }}
+                >
                   <ExternalLink className="h-4 w-4" />
                 </Button>
               </div>
@@ -299,13 +331,27 @@ export default function PackageResults() {
               <div className="flex items-start gap-3">
                 <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">1</div>
                 <div>
+                  <h4 className="font-medium">Set Up GHL Custom Fields</h4>
+                  <p className="text-sm text-muted-foreground mb-2">Create these custom contact fields in GoHighLevel:</p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• <code>user_token</code> - Auto-generated unique ID</li>
+                    <li>• <code>portal_url</code> - Your sprint portal base URL</li>
+                    <li>• <code>sprint_title</code> - Sprint name for emails</li>
+                    <li>• <code>creator_name</code> - Your name for email signatures</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">2</div>
+                <div>
                   <h4 className="font-medium">Import Email Templates to GHL</h4>
                   <p className="text-sm text-muted-foreground">Download and import the email templates into your GoHighLevel campaigns</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-3">
-                <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">2</div>
+                <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">3</div>
                 <div>
                   <h4 className="font-medium">Share the Portal</h4>
                   <p className="text-sm text-muted-foreground">Send participants the portal URL or QR code for easy mobile access</p>
@@ -313,7 +359,7 @@ export default function PackageResults() {
               </div>
               
               <div className="flex items-start gap-3">
-                <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">3</div>
+                <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">4</div>
                 <div>
                   <h4 className="font-medium">Set Up Email Automation</h4>
                   <p className="text-sm text-muted-foreground">Configure your GHL automation to send daily emails with portal links</p>

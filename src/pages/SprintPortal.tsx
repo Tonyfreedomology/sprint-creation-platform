@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause, RotateCcw, Lock, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 interface Sprint {
@@ -20,17 +21,77 @@ interface Sprint {
 
 export default function SprintPortal() {
   const { sprintId } = useParams<{ sprintId: string }>();
+  const [searchParams] = useSearchParams();
   const [sprint, setSprint] = useState<Sprint | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const [playingDay, setPlayingDay] = useState<number | null>(null);
   const [audioProgress, setAudioProgress] = useState<Record<number, number>>({});
+  const [userProgress, setUserProgress] = useState<any>(null);
+  const [maxUnlockedDay, setMaxUnlockedDay] = useState(1);
 
   useEffect(() => {
     if (sprintId) {
-      fetchSprint();
+      initializeUserProgress();
     }
   }, [sprintId]);
+
+  const initializeUserProgress = async () => {
+    try {
+      const userToken = searchParams.get('user');
+      
+      if (!userToken) {
+        // No user token - create new enrollment
+        await enrollUser();
+      } else {
+        // User token provided - check existing progress
+        await checkUserProgress(userToken);
+      }
+      
+      await fetchSprint();
+    } catch (error) {
+      console.error('Error initializing user progress:', error);
+      setLoading(false);
+    }
+  };
+
+  const enrollUser = async () => {
+    try {
+      const response = await supabase.functions.invoke('enroll-user', {
+        body: { sprintId }
+      });
+      
+      if (response.error) throw response.error;
+      
+      setUserProgress(response.data);
+      setMaxUnlockedDay(response.data.maxUnlockedDay);
+      
+      // Update URL with user token
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('user', response.data.userToken);
+      window.history.replaceState({}, '', newUrl.toString());
+    } catch (error) {
+      console.error('Error enrolling user:', error);
+      toast.error('Failed to start sprint');
+    }
+  };
+
+  const checkUserProgress = async (userToken: string) => {
+    try {
+      const response = await supabase.functions.invoke('enroll-user', {
+        body: { sprintId, userToken }
+      });
+      
+      if (response.error) throw response.error;
+      
+      setUserProgress(response.data);
+      setMaxUnlockedDay(response.data.maxUnlockedDay);
+    } catch (error) {
+      console.error('Error checking user progress:', error);
+      // If token is invalid, create new enrollment
+      await enrollUser();
+    }
+  };
 
   const fetchSprint = async () => {
     try {
@@ -132,11 +193,22 @@ export default function SprintPortal() {
           <div className="text-center">
             <h1 className="text-3xl font-bold text-foreground mb-2">{sprint.title}</h1>
             <p className="text-muted-foreground mb-4">{sprint.description}</p>
-            <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground mb-4">
               <span>Created by {sprint.creator_info.name}</span>
               <span>•</span>
               <span>{sprint.duration} days</span>
             </div>
+            
+            {userProgress && (
+              <div className="flex items-center justify-center gap-4 mb-2">
+                <Badge variant="secondary">
+                  Day {userProgress.currentDay} of {sprint.duration}
+                </Badge>
+                <Badge variant="outline">
+                  {maxUnlockedDay} {maxUnlockedDay === 1 ? 'day' : 'days'} unlocked
+                </Badge>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -149,20 +221,34 @@ export default function SprintPortal() {
             const isPlaying = playingDay === dayNumber;
             const progress = audioProgress[dayNumber] || 0;
             const hasAudio = sprint.audio_files[dayNumber.toString()];
+            const isLocked = dayNumber > maxUnlockedDay;
+            const isComingSoon = dayNumber === maxUnlockedDay + 1;
 
             return (
-              <Card key={dayNumber} className="overflow-hidden">
+              <Card key={dayNumber} className={`overflow-hidden ${isLocked ? 'opacity-60' : ''}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="flex items-center gap-3 mb-2">
-                        <span className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium">
-                          {dayNumber}
+                        <span className={`rounded-full w-8 h-8 flex items-center justify-center text-sm font-medium ${
+                          isLocked 
+                            ? 'bg-muted text-muted-foreground' 
+                            : 'bg-primary text-primary-foreground'
+                        }`}>
+                          {isLocked ? <Lock className="h-4 w-4" /> : dayNumber}
                         </span>
-                        {lesson.title}
+                        <div className="flex items-center gap-2">
+                          {isLocked ? 'Coming Soon' : lesson.title}
+                          {isComingSoon && (
+                            <Badge variant="outline" className="text-xs">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Unlocks Tomorrow
+                            </Badge>
+                          )}
+                        </div>
                       </CardTitle>
                     </div>
-                    {hasAudio && (
+                    {hasAudio && !isLocked && (
                       <div className="flex items-center gap-2">
                         <Button
                           size="sm"
@@ -192,30 +278,43 @@ export default function SprintPortal() {
                       </div>
                     )}
                   </div>
-                  {hasAudio && progress > 0 && (
+                  {hasAudio && progress > 0 && !isLocked && (
                     <Progress value={progress} className="mt-2" />
                   )}
                 </CardHeader>
                 <CardContent>
-                  <div className="prose prose-sm max-w-none">
-                    <div className="whitespace-pre-wrap text-muted-foreground">
-                      {lesson.content}
+                  {isLocked ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Lock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p className="font-medium mb-2">This content is locked</p>
+                      <p className="text-sm">
+                        {isComingSoon 
+                          ? 'Come back tomorrow to unlock this lesson!'
+                          : `This lesson unlocks on day ${dayNumber} of your sprint`
+                        }
+                      </p>
                     </div>
-                    {lesson.exercise && (
-                      <div className="mt-4 p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
-                        <h4 className="font-medium text-primary mb-2">Today's Exercise</h4>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                          {lesson.exercise}
-                        </p>
+                  ) : (
+                    <div className="prose prose-sm max-w-none">
+                      <div className="whitespace-pre-wrap text-muted-foreground">
+                        {lesson.content}
                       </div>
-                    )}
-                    {lesson.affirmation && (
-                      <div className="mt-4 p-4 bg-secondary/20 rounded-lg text-center">
-                        <h4 className="font-medium mb-2">Affirmation</h4>
-                        <p className="text-sm italic">"{lesson.affirmation}"</p>
-                      </div>
-                    )}
-                  </div>
+                      {lesson.exercise && (
+                        <div className="mt-4 p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
+                          <h4 className="font-medium text-primary mb-2">Today's Exercise</h4>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                            {lesson.exercise}
+                          </p>
+                        </div>
+                      )}
+                      {lesson.affirmation && (
+                        <div className="mt-4 p-4 bg-secondary/20 rounded-lg text-center">
+                          <h4 className="font-medium mb-2">Affirmation</h4>
+                          <p className="text-sm italic">"{lesson.affirmation}"</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
