@@ -148,9 +148,6 @@ const Index = () => {
                 muted
                 playsInline
                 className="absolute inset-0 w-full h-full object-cover rounded-3xl"
-                style={{ 
-                  filter: 'brightness(0.4)',
-                }}
               >
                 <source 
                   src="https://hufbbrvmcdugfrgjxwuv.supabase.co/storage/v1/object/sign/media/jonah_10079_A_vibrant_jade_digital_sappling_particle_effects__24600ee9-ca04-47cb-913a-4a15c5d7c153_3.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OTA2Yzk4OC0zYjdiLTRmZmUtODNkNy1mMGE1ZDVlODkyODgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJtZWRpYS9qb25haF8xMDA3OV9BX3ZpYnJhbnRfamFkZV9kaWdpdGFsX3NhcHBsaW5nX3BhcnRpY2xlX2VmZmVjdHNfXzI0NjAwZWU5LWNhMDQtNDdjYi05MTNhLTRhMTVjNWQ3YzE1M18zLm1wNCIsImlhdCI6MTc1MzkwMTc3MiwiZXhwIjoyMDY5MjYxNzcyfQ.Tk48j-rookfz-ZBZTm0guHfTyfCm0Sn5NMwJBN52eM8" 
