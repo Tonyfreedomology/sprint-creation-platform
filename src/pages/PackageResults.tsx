@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,130 +111,97 @@ Best regards,
     <div className="min-h-screen bg-cool-grey p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Main Container with Cyan Border */}
-        <motion.div 
+        <div 
           className="relative rounded-3xl p-8 md:p-12"
           style={{
             background: '#242424',
             border: '2px solid #22DFDC'
           }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
         >
           {/* Header Row */}
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-8">
             {/* Left: Back Button */}
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <div>
               <Button 
                 variant="ghost" 
                 onClick={() => navigate('/')} 
-                className="text-cool-text-secondary hover:text-white"
+                className="text-cool-text-secondary hover:text-white transition-all hover:scale-105"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
-            </motion.div>
+            </div>
             
             {/* Center: Title */}
             <div className="flex-1 text-center lg:text-left">
-              <motion.h1 
-                className="text-3xl lg:text-5xl font-bold leading-tight text-white mb-2"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-              >
+              <h1 className="text-3xl lg:text-5xl font-bold leading-tight text-white mb-2">
                 Magnetic - 7 Days to Lead Your Marriage
-              </motion.h1>
-              <motion.h2 
-                className="text-2xl lg:text-4xl font-bold" 
-                style={{ color: '#22DFDC' }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-              >
+              </h1>
+              <h2 className="text-2xl lg:text-4xl font-bold" style={{ color: '#22DFDC' }}>
                 with Confidence & Desire
-              </motion.h2>
+              </h2>
             </div>
             
             {/* Right: Status Pills */}
             <div className="flex flex-col gap-3">
-              <motion.div 
-                className="px-4 py-2 rounded-lg text-sm"
+              <div 
+                className="px-4 py-2 rounded-lg text-sm transition-all hover:scale-105"
                 style={{
                   background: '#242424',
                   border: '1px solid #22DFDC',
                   color: '#CFCFCF'
                 }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
               >
                 Publishing Progress: 7 / 8
-              </motion.div>
-              <motion.div 
-                className="px-4 py-2 rounded-lg text-sm"
+              </div>
+              <div 
+                className="px-4 py-2 rounded-lg text-sm transition-all hover:scale-105"
                 style={{
                   background: '#242424',
                   border: '1px solid #22DFDC', 
                   color: '#CFCFCF'
                 }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
               >
                 16:07:24 5ah outro
-              </motion.div>
+              </div>
             </div>
           </div>
           
           {/* Meta Cards */}
           <div className="flex flex-wrap gap-6 mb-8">
-            <motion.div 
-              className="rounded-2xl p-6 min-w-[140px]"
+            <div 
+              className="rounded-2xl p-6 min-w-[140px] transition-all hover:scale-105"
               style={{
                 background: '#1a1a1a',
                 border: '1px solid #22DFDC'
               }}
-              whileHover={{ scale: 1.02, boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.15)' }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
             >
               <div className="text-center">
                 <div className="text-lg font-medium text-cool-text-secondary mb-1">Duration</div>
                 <div className="text-2xl font-bold text-white">7 days</div>
               </div>
-            </motion.div>
-            <motion.div 
-              className="rounded-2xl p-6 min-w-[140px]"
+            </div>
+            <div 
+              className="rounded-2xl p-6 min-w-[140px] transition-all hover:scale-105"
               style={{
                 background: '#1a1a1a',
                 border: '1px solid #22DFDC'
               }}
-              whileHover={{ scale: 1.02, boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.15)' }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
             >
               <div className="text-center">
                 <div className="text-lg font-medium text-cool-text-secondary mb-1">Total lessons</div>
                 <div className="text-2xl font-bold text-white">7</div>
               </div>
-            </motion.div>
+            </div>
           </div>
 
           {/* Sprint Overview Card */}
-          <motion.div 
-            className="rounded-2xl p-6 mb-6"
+          <div 
+            className="rounded-2xl p-6 mb-6 transition-all hover:scale-105"
             style={{
               background: '#1a1a1a',
               border: '1px solid #22DFDC'
             }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            whileHover={{ y: -2 }}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -245,53 +211,39 @@ Best regards,
                 <h3 className="text-xl font-semibold text-white">Sprint Overview</h3>
               </div>
               <div className="flex gap-3">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button variant="ghost" className="text-cool-blue hover:bg-cool-blue/10">
-                    Lessons
-                  </Button>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button variant="ghost" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
-                    Edit
-                  </Button>
-                </motion.div>
+                <Button variant="ghost" className="text-cool-blue hover:bg-cool-blue/10 transition-all hover:scale-105">
+                  Lessons
+                </Button>
+                <Button variant="ghost" className="text-cool-text-secondary hover:bg-cool-text-secondary/10 transition-all hover:scale-105">
+                  Edit
+                </Button>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Lesson Cards */}
           <div className="space-y-4">
-            <motion.div 
-              className="rounded-2xl p-6"
+            <div 
+              className="rounded-2xl p-6 transition-all hover:scale-105"
               style={{
                 background: '#1a1a1a',
                 border: '1px solid #22DFDC'
               }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-              whileHover={{ y: -2 }}
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-semibold" style={{ color: '#22DFDC' }}>
                   Day 1: Awakening Your Masculine Presence
                 </h3>
                 <div className="flex gap-2">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
-                      Generate Audio
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </motion.div>
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10 transition-all hover:scale-105">
+                    Generate Audio
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10 transition-all hover:scale-105">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10 transition-all hover:scale-105">
+                    <Edit className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
               <div className="text-white">
@@ -310,61 +262,9 @@ Best regards,
                   that presence with your wife.
                 </p>
               </div>
-            </motion.div>
-
-            <motion.div 
-              className="rounded-2xl p-6"
-              style={{
-                background: '#1a1a1a',
-                border: '1px solid #22DFDC'
-              }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-              whileHover={{ y: -2 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold" style={{ color: '#22DFDC' }}>
-                  Day 2: Building Emotional Strength
-                </h3>
-                <div className="flex gap-2">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
-                      <Play className="h-4 w-4" />
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
-                      Generate Audio
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </motion.div>
-                </div>
-              </div>
-              <div className="text-white">
-                <p className="mb-3">
-                  This is day 2 of your Morning Mindfulness Mastery journey!
-                </p>
-                <p className="mb-3">
-                  Today's focus will be on building emotional resilience and creating deeper intimacy through authentic vulnerability.
-                </p>
-                <p style={{ color: '#22EDB6' }}>
-                  Challenge: Practice holding space for your partner's emotions without trying to fix or solve anything.
-                  Just listen, breathe, and be present.
-                </p>
-              </div>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

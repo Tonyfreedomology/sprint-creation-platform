@@ -134,13 +134,13 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#242424' }}>
+    <div className="min-h-screen relative" style={{ background: 'radial-gradient(circle at center, #1a2332 0%, #242424 70%, #1a1a1a 100%)' }}>
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16">
         <div className="container mx-auto px-4">
           {/* Hero Container with Gradient Border */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-[#242424] rounded-3xl p-8 md:p-12">
+            <div className="relative bg-[#242424] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
                   <div
@@ -157,7 +157,9 @@ const Index = () => {
                   
                   <h1 className="text-5xl md:text-[72px] leading-[1.1] font-bold text-white">
                     Create{' '}
-                    <span style={{ color: '#22DFDC' }}>
+                    <span 
+                      className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent"
+                    >
                       Powerful Sprints
                     </span>
                     {' '}That Change Lives
@@ -211,11 +213,19 @@ const Index = () => {
                 </div>
                 
                 <div className="relative">
+                  {/* Enhanced glow behind image */}
+                  <div 
+                    className="absolute -inset-8 opacity-40 blur-3xl rounded-full"
+                    style={{ background: 'radial-gradient(circle, #22DFDC 0%, #22EDB6 50%, transparent 70%)' }}
+                  ></div>
                   <img
                     src={heroImage}
                     alt="Freedomology Sprint Creation"
-                    className="rounded-2xl w-full"
-                    style={{ boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.15)' }}
+                    className="relative rounded-2xl w-full"
+                    style={{ 
+                      boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.3)',
+                      border: '1px solid rgba(34, 223, 220, 0.2)'
+                    }}
                   />
                 </div>
               </div>
@@ -224,11 +234,11 @@ const Index = () => {
 
           {/* Features Section */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px]">
-            <div className="relative bg-[#242424] rounded-3xl p-8 md:p-12">
+            <div className="relative bg-[#242424] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold mb-4 text-white">
                   Everything You Need to Create{' '}
-                  <span style={{ color: '#22EDB6' }}>Amazing</span>
+                  <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Amazing</span>
                 </h2>
                 <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.7 }}>
                   From AI-powered content creation to automated delivery and community building, 
