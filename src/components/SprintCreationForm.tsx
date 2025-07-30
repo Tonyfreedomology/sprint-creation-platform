@@ -684,7 +684,7 @@ export const SprintCreationForm: React.FC = () => {
     <div className="max-w-4xl mx-auto p-4">
       {/* Gradient Border Container */}
       <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px]">
-        <div className="relative bg-[#1E1E1E]/70 backdrop-blur-md border border-[#22DFDC]/20 rounded-3xl p-8">
+        <div className="relative bg-[#0A0A0A]/80 backdrop-blur-md border border-[#22DFDC]/20 rounded-3xl p-8">
           
           {/* Header with Back Button */}
           <div className="mb-8">
