@@ -702,27 +702,6 @@ export const SprintCreationForm: React.FC = () => {
   // Show form by default
   return (
     <div className="max-w-4xl mx-auto p-8">
-      {/* Back Button */}
-      <button 
-        onClick={() => window.history.back()}
-        className="text-[#22DFDC] hover:text-[#22EDB6] transition-colors mb-8 flex items-center gap-2"
-      >
-        ← Back
-      </button>
-      
-      {/* Hero Section */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-          Create Your
-        </h1>
-        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
-          Transformational Sprint
-        </h2>
-        <p className="text-[#CFCFCF] mt-4 opacity-70">
-          Turn your expertise into a powerful, community-driven experience that creates lasting change
-        </p>
-      </div>
-
       {/* Form Container */}
       <div className="max-w-[540px] mx-auto">
         {/* Gradient Border Container */}
