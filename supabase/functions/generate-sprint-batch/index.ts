@@ -92,40 +92,70 @@ function cleanAndParseJSON(response: string): any {
 }
 
 async function generateCompletion(prompt: string, apiKey: string, maxTokens: number = 2000): Promise<string> {
-  console.log('Making OpenAI request with prompt length:', prompt.length);
+  const maxRetries = 3;
+  const baseDelay = 1000; // 1 second
   
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a content generation expert. CRITICAL: Your response must be valid JSON only, no markdown formatting, no code blocks, no extra text. Return only the JSON object exactly as specified.'
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`Making OpenAI request (attempt ${attempt}/${maxRetries}) with prompt length:`, prompt.length);
+    
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
         },
-        {
-          role: 'user',
-          content: prompt
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14', // Use the most reliable model
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a content generation expert. CRITICAL: Your response must be valid JSON only, no markdown formatting, no code blocks, no extra text. Return only the JSON object exactly as specified.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: maxTokens,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`OpenAI API error (attempt ${attempt}):`, response.status, response.statusText, errorText);
+        
+        // Check if this is a retryable error (5xx errors)
+        if (response.status >= 500 && response.status < 600 && attempt < maxRetries) {
+          const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
         }
-      ],
-      max_tokens: maxTokens,
-      temperature: 0.7,
-    }),
-  });
+        
+        throw new Error(`OpenAI API error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('OpenAI API error:', response.status, response.statusText, errorText);
-    throw new Error(`OpenAI API error: ${response.status} ${response.statusText} - ${errorText}`);
+      const data: OpenAIResponse = await response.json();
+      console.log('OpenAI response received, content length:', data.choices[0]?.message?.content?.length || 0);
+      return data.choices[0]?.message?.content || '';
+      
+    } catch (error) {
+      // If it's a network error and we have retries left, try again
+      if (attempt < maxRetries && (error instanceof TypeError || error.message.includes('fetch'))) {
+        const delay = baseDelay * Math.pow(2, attempt - 1);
+        console.log(`Network error (attempt ${attempt}), retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // Re-throw the error if we've exhausted retries or it's not retryable
+      throw error;
+    }
   }
-
-  const data: OpenAIResponse = await response.json();
-  console.log('OpenAI response received, content length:', data.choices[0]?.message?.content?.length || 0);
-  return data.choices[0]?.message?.content || '';
+  
+  throw new Error('Max retries exceeded');
 }
 
 async function generateDailyScript(
