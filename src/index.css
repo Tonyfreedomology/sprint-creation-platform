@@ -145,7 +145,8 @@ All colors MUST be HSL.
   
   /* Global page content with dark gradient background */
   .page-content {
-    @apply min-h-screen bg-gradient-to-br from-[#020D24] to-[#010611] p-8 rounded-3xl;
+    @apply min-h-screen p-8 rounded-3xl;
+    background: radial-gradient(circle at center, #060a0f 0%, #0f0f0f 70%, #080808 100%);
   }
   
   /* Global card wrapper with gradient border */

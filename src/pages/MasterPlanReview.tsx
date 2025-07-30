@@ -277,13 +277,21 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
         </div>
 
         <div className="flex items-center justify-between pt-6">
-          <Button variant="outline" onClick={onBack} className="border-white/20 hover:bg-white/10 text-white">
+          <Button 
+            variant="ghost" 
+            onClick={onBack} 
+            className="text-white hover:bg-white/10 border-white/20"
+          >
             Back to Form
           </Button>
           <Button 
             onClick={handleApproveAndGenerate}
             disabled={isGenerating}
-            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white disabled:opacity-50"
+            className="px-8 py-4 text-lg rounded-xl font-medium text-white transition-all hover:scale-105 disabled:opacity-50"
+            style={{ 
+              background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
+              border: 'none'
+            }}
           >
             {isGenerating ? 'Starting Generation...' : 'Approve & Generate Content'}
           </Button>
