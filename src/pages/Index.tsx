@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -105,229 +106,388 @@ const Index = () => {
 
   if (showForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5">
+      <div className="min-h-screen" style={{ background: '#242424' }}>
         <div className="container mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <Button
-              variant="ghost"
-              onClick={() => setShowForm(false)}
-              className="mb-4"
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              ← Back to Overview
-            </Button>
-            <h1 className="text-4xl font-bold bg-gradient-hero bg-clip-text text-transparent mb-4">
-              Create Your Transformational Sprint
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Turn your expertise into a powerful, community-driven experience that creates lasting change
-            </p>
+              <Button
+                variant="ghost"
+                onClick={() => setShowForm(false)}
+                className="mb-4 text-cool-text-secondary hover:text-white"
+              >
+                ← Back to Overview
+              </Button>
+              <h1 className="text-4xl font-bold text-white mb-4">
+                Create Your <span style={{ color: '#22DFDC' }}>Transformational Sprint</span>
+              </h1>
+              <p className="text-xl text-cool-text-secondary max-w-2xl mx-auto">
+                Turn your expertise into a powerful, community-driven experience that creates lasting change
+              </p>
+            </motion.div>
           </div>
           
-          <SprintCreationForm />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <SprintCreationForm />
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ background: '#242424' }}>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/5">
+      <section className="relative overflow-hidden">
         <div className="container mx-auto px-4 py-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6 animate-fade-in">
-              <Badge className="bg-gradient-primary text-white border-0 w-fit">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Transform Lives Through Sprints
-              </Badge>
+            <motion.div 
+              className="space-y-6"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <Badge 
+                  className="border w-fit text-sm"
+                  style={{ 
+                    backgroundColor: '#1a1a1a',
+                    border: '1px solid #22DFDC',
+                    color: '#22DFDC'
+                  }}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Transform Lives Through Sprints
+                </Badge>
+              </motion.div>
               
-              <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+              <motion.h1 
+                className="text-5xl lg:text-6xl font-bold leading-tight text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
                 Create{' '}
-                <span className="bg-gradient-hero bg-clip-text text-transparent">
+                <span style={{ color: '#22DFDC' }}>
                   Powerful Sprints
                 </span>
                 {' '}That Change Lives
-              </h1>
+              </motion.h1>
               
-              <p className="text-xl text-muted-foreground leading-relaxed">
+              <motion.p 
+                className="text-xl leading-relaxed"
+                style={{ color: '#CFCFCF' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
                 Join Freedomology and turn your expertise into transformational 21-40 day experiences. 
                 Our AI-powered platform helps you create engaging, habit-forming sprints that deliver real results.
-              </p>
+              </motion.p>
               
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  variant="hero"
-                  onClick={() => setShowForm(true)}
-                  className="text-lg px-8"
-                >
-                  Start Creating
-                  <ChevronRight className="w-5 h-5 ml-2" />
-                </Button>
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    onClick={() => setShowForm(true)}
+                    className="text-lg px-8 text-white"
+                    style={{ 
+                      background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
+                      border: 'none'
+                    }}
+                  >
+                    Start Creating
+                    <ChevronRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </motion.div>
                 
-                <Button
-                  size="lg"
-                  variant="elegant"
-                  className="text-lg px-8"
-                  onClick={() => window.location.href = '/package-results'}
-                >
-                  Test Publish Page
-                </Button>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="text-lg px-8 text-cool-blue border-cool-blue hover:bg-cool-blue/10"
+                    onClick={() => window.location.href = '/package-results'}
+                  >
+                    Test Publish Page
+                  </Button>
+                </motion.div>
                 
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="text-lg px-8"
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Watch Demo
-                </Button>
-              </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="text-lg px-8 text-cool-text-secondary border-cool-text-secondary hover:bg-cool-text-secondary/10"
+                  >
+                    <Play className="w-5 h-5 mr-2" />
+                    Watch Demo
+                  </Button>
+                </motion.div>
+              </motion.div>
               
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <motion.div 
+                className="flex items-center gap-6 text-sm"
+                style={{ color: '#CFCFCF' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+              >
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
                   No coding required
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
                   AI-powered content
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
                   Community included
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
             
-            <div className="relative animate-float">
-              <div className="absolute -inset-4 bg-gradient-hero opacity-20 blur-xl rounded-full"></div>
+            <motion.div 
+              className="relative"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              whileHover={{ y: -10 }}
+            >
+              <div 
+                className="absolute -inset-4 opacity-20 blur-xl rounded-full"
+                style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
+              ></div>
               <img
                 src={heroImage}
                 alt="Freedomology Sprint Creation"
-                className="relative rounded-2xl shadow-elegant w-full"
+                className="relative rounded-2xl w-full"
+                style={{ boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.15)' }}
               />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-card">
+      <section className="py-20" style={{ background: '#1a1a1a' }}>
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl font-bold mb-4 text-white">
               Everything You Need to Create{' '}
-              <span className="bg-gradient-secondary bg-clip-text text-transparent">
+              <span style={{ color: '#22DFDC' }}>
                 Amazing Sprints
               </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF' }}>
               From AI-powered content creation to automated delivery and community building, 
               we've got every aspect covered.
             </p>
-          </div>
+          </motion.div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="border-primary/20 hover:shadow-card transition-all duration-300 hover:scale-105">
-                <CardHeader>
-                  <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-white mb-4">
-                    {feature.icon}
-                  </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-base">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ 
+                  y: -5,
+                  boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.15)'
+                }}
+              >
+                <Card 
+                  className="h-full"
+                  style={{
+                    background: '#2a2a2a',
+                    border: '1px solid #22DFDC',
+                    borderRadius: '16px'
+                  }}
+                >
+                  <CardHeader>
+                    <div 
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-white mb-4"
+                      style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
+                    >
+                      {feature.icon}
+                    </div>
+                    <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-base" style={{ color: '#CFCFCF' }}>
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section className="py-20">
+      <section className="py-20" style={{ background: '#242424' }}>
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl font-bold mb-4 text-white">
               Create Sprints in Any{' '}
-              <span className="bg-gradient-hero bg-clip-text text-transparent">
+              <span style={{ color: '#22EDB6' }}>
                 Category
               </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF' }}>
               Whether you're an expert in health, wealth, relationships, or personal development, 
               our platform adapts to your unique expertise.
             </p>
-          </div>
+          </motion.div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((category, index) => (
-              <Card key={index} className="border-primary/20 hover:shadow-elegant transition-all duration-300 hover:scale-105 group">
-                <CardHeader className="text-center">
-                  <div className={`w-16 h-16 ${category.color} rounded-full flex items-center justify-center text-white mx-auto mb-4 group-hover:scale-110 transition-transform`}>
-                    {category.icon}
-                  </div>
-                  <CardTitle className="text-xl">{category.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-center text-base">
-                    {category.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ 
+                  y: -5,
+                  scale: 1.02
+                }}
+              >
+                <Card 
+                  className="h-full text-center group"
+                  style={{
+                    background: '#2a2a2a',
+                    border: '1px solid #22DFDC',
+                    borderRadius: '16px'
+                  }}
+                >
+                  <CardHeader>
+                    <motion.div 
+                      className={`w-16 h-16 rounded-full flex items-center justify-center text-white mx-auto mb-4`}
+                      style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      {category.icon}
+                    </motion.div>
+                    <CardTitle className="text-xl text-white">{category.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-center text-base" style={{ color: '#CFCFCF' }}>
+                      {category.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-card">
+      <section className="py-20" style={{ background: '#1a1a1a' }}>
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">
+          <motion.div 
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl font-bold mb-4 text-white">
               Loved by{' '}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
+              <span style={{ color: '#22DFDC' }}>
                 Creators Worldwide
               </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF' }}>
               Join thousands of experts who have transformed their knowledge into powerful sprints
             </p>
-          </div>
+          </motion.div>
           
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-primary/20 hover:shadow-card transition-all duration-300">
-                <CardHeader>
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    ))}
-                  </div>
-                  <CardDescription className="text-base italic">
-                    "{testimonial.content}"
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div>
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                  </div>
-                </CardContent>
-              </Card>
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -5 }}
+              >
+                <Card 
+                  className="h-full"
+                  style={{
+                    background: '#2a2a2a',
+                    border: '1px solid #22DFDC',
+                    borderRadius: '16px'
+                  }}
+                >
+                  <CardHeader>
+                    <div className="flex items-center gap-1 mb-2">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-current" style={{ color: '#22EDB6' }} />
+                      ))}
+                    </div>
+                    <CardDescription className="text-base italic" style={{ color: '#CFCFCF' }}>
+                      "{testimonial.content}"
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-sm" style={{ color: '#CFCFCF' }}>{testimonial.role}</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-hero text-white">
+      <section 
+        className="py-20 text-white"
+        style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
+      >
         <div className="container mx-auto px-4 text-center">
-          <div className="max-w-4xl mx-auto">
+          <motion.div 
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
             <h2 className="text-5xl font-bold mb-6">
               Ready to Transform Lives?
             </h2>
@@ -336,15 +496,21 @@ const Index = () => {
               Your expertise deserves to reach more people.
             </p>
             
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => setShowForm(true)}
-              className="text-lg px-12 py-6 text-primary hover:text-primary/90"
-            >
-              Create Your First Sprint
-              <Sparkles className="w-5 h-5 ml-2" />
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="lg"
+                onClick={() => setShowForm(true)}
+                className="text-lg px-12 py-6"
+                style={{
+                  background: '#242424',
+                  color: '#22DFDC',
+                  border: 'none'
+                }}
+              >
+                Create Your First Sprint
+                <Sparkles className="w-5 h-5 ml-2" />
+              </Button>
+            </motion.div>
             
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm opacity-80">
               <div className="flex items-center gap-2">
@@ -360,7 +526,7 @@ const Index = () => {
                 Launch in minutes
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

@@ -127,7 +127,12 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    @apply dark; /* Force dark theme globally */
+  }
+
   body {
     @apply bg-background text-foreground;
+    background: #242424; /* Ensure dark grey background */
   }
 }
