@@ -140,7 +140,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           {/* Hero Container with Gradient Border */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-[#0F0F0F]/80 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
                   <div
@@ -234,7 +234,7 @@ const Index = () => {
 
           {/* Features Section */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px]">
-            <div className="relative bg-[#0F0F0F]/80 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold mb-4 text-white">
                   Everything You Need to Create{' '}
