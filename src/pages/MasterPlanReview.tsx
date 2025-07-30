@@ -129,7 +129,7 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
   };
 
   return (
-    <div className="min-h-screen bg-black p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#020D24] to-[#010611] p-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="flex items-center gap-4 mb-8">
           <Button variant="ghost" onClick={onBack} className="flex items-center gap-2 text-white hover:bg-white/10">
