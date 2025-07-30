@@ -13,12 +13,32 @@ export default function PackageResults() {
   
   const packageData = searchParams.get('packageData');
   
-  if (!packageData) {
-    navigate('/');
-    return null;
-  }
-
-  const data = JSON.parse(decodeURIComponent(packageData));
+  // If no package data, use mock data for testing
+  const data = packageData 
+    ? JSON.parse(decodeURIComponent(packageData))
+    : {
+        sprint: {
+          sprintTitle: "Morning Mindfulness Mastery",
+          sprintDescription: "Transform your mornings and unlock peak performance through science-backed mindfulness practices",
+          sprintCategory: "Health & Wellness",
+          sprintDuration: 21,
+          voiceId: "custom"
+        },
+        portalUrl: "https://yourapp.com/sprint/demo-sprint-123",
+        audioFiles: {
+          "1": "https://example.com/audio/day-1.wav",
+          "2": "https://example.com/audio/day-2.wav", 
+          "3": "https://example.com/audio/day-3.wav",
+          "4": "https://example.com/audio/day-4.wav",
+          "5": "https://example.com/audio/day-5.wav"
+        },
+        emailTemplates: Array.from({length: 21}, (_, i) => ({
+          day: i + 1,
+          ghlFormatted: `Day ${i + 1} email template content for GoHighLevel import...`
+        })),
+        qrCode: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+      };
+  
   const { sprint, portalUrl, audioFiles, emailTemplates, qrCode } = data;
 
   const copyToClipboard = (text: string, label: string) => {
