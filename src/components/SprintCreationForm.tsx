@@ -9,11 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
-import { ArrowRight, ArrowLeft, Sparkles, Users, Brain, Heart, DollarSign, CheckCircle } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, Users, Brain, Heart, DollarSign, CheckCircle, Upload, FileText } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { SprintGenerationLoading } from './SprintGenerationLoading';
 import { SprintReviewPage } from './SprintReviewPage';
 import { OpenAIKeyModal } from './OpenAIKeyModal';
+import { VoiceRecorder } from './VoiceRecorder';
 import { supabase } from '@/integrations/supabase/client';
 import MasterPlanReview from '@/pages/MasterPlanReview';
 
@@ -44,7 +45,9 @@ interface SprintFormData {
   voiceStyle: string;
   voiceGender?: string;
   voiceSampleFile: File | null;
+  voiceRecordingBlob: Blob | null;
   writingStyleFile: File | null;
+  writingStyleAnalysis?: string;
   participantEmails: string;
 }
 
@@ -91,7 +94,9 @@ const initialFormData: SprintFormData = {
   voiceStyle: 'warm-coach', // Default voice style
   voiceGender: 'female', // Default voice gender
   voiceSampleFile: null,
+  voiceRecordingBlob: null,
   writingStyleFile: null,
+  writingStyleAnalysis: undefined,
   participantEmails: '',
 };
 
@@ -110,6 +115,8 @@ export const SprintCreationForm: React.FC = () => {
   const [showMasterPlanReview, setShowMasterPlanReview] = useState(false);
   const [sprintId, setSprintId] = useState('');
   const [channelName, setChannelName] = useState('');
+  const [isAnalyzingWritingStyle, setIsAnalyzingWritingStyle] = useState(false);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -132,9 +139,61 @@ export const SprintCreationForm: React.FC = () => {
     setFormData(prev => ({ ...prev, voiceSampleFile: file }));
   };
 
-  const handleWritingStyleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWritingStyleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
     setFormData(prev => ({ ...prev, writingStyleFile: file }));
+    
+    if (file) {
+      await analyzeWritingStyle(file);
+    }
+  };
+
+  const handleVoiceRecordingComplete = (audioBlob: Blob) => {
+    setFormData(prev => ({ ...prev, voiceRecordingBlob: audioBlob }));
+    setShowVoiceRecorder(false);
+    toast({
+      title: "Voice recorded successfully",
+      description: "Your voice sample has been saved",
+    });
+  };
+
+  const analyzeWritingStyle = async (file: File) => {
+    setIsAnalyzingWritingStyle(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const { data, error } = await supabase.functions.invoke('analyze-writing-style', {
+        body: formData,
+      });
+      
+      if (error) throw error;
+      
+      if (data?.success) {
+        setFormData(prev => ({ 
+          ...prev, 
+          writingStyleAnalysis: data.styleAnalysis 
+        }));
+        
+        toast({
+          title: "Writing style analyzed",
+          description: "Your writing style has been analyzed and will be used to personalize content",
+        });
+      } else {
+        throw new Error(data?.error || 'Failed to analyze writing style');
+      }
+      
+    } catch (error: any) {
+      console.error('Writing style analysis error:', error);
+      toast({
+        title: "Analysis failed",
+        description: error.message || "Failed to analyze writing style. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzingWritingStyle(false);
+    }
   };
 
   const nextStep = () => {
@@ -510,25 +569,52 @@ export const SprintCreationForm: React.FC = () => {
                       </label>
                       <Button
                         type="button"
+                        onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
                         className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-4 py-2 text-sm"
                       >
-                        Record
+                        {showVoiceRecorder ? 'Cancel' : 'Record'}
                       </Button>
                     </div>
+                    
+                    {/* Voice Recorder Component */}
+                    {showVoiceRecorder && (
+                      <div className="mt-4 p-4 border border-white/10 rounded-lg bg-[#1E1E1E]/20">
+                        <VoiceRecorder 
+                          onRecordingComplete={handleVoiceRecordingComplete}
+                          maxDuration={60}
+                        />
+                      </div>
+                    )}
+                    
                     <p className="text-xs text-white/50">
-                      Upload 30-60 seconds of clear speech for voice cloning
+                      Upload or record 30-60 seconds of clear speech for voice cloning
                     </p>
+                    
+                    {(formData.voiceSampleFile || formData.voiceRecordingBlob) && (
+                      <p className="text-sm text-green-400 mt-1">
+                        ✓ Voice sample ready: {formData.voiceSampleFile?.name || 'Recording saved'}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
 
               <div>
-                <Label className="text-white text-sm font-medium mb-3 block">Writing Style Sample (Optional)</Label>
+                <Label className="text-white text-sm font-medium mb-3 block">
+                  Writing Style Sample (Optional)
+                  {isAnalyzingWritingStyle && (
+                    <span className="ml-2 text-xs text-[#22DFDC]">Analyzing...</span>
+                  )}
+                </Label>
                 <label htmlFor="writingStyle" className="cursor-pointer block">
-                  <div className="border border-white/20 rounded-lg px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
-                    <span className="text-white/70 text-sm">
+                  <div className="border border-white/20 rounded-lg px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors flex items-center gap-3">
+                    <FileText className="w-4 h-4 text-white/50" />
+                    <span className="text-white/70 text-sm flex-1">
                       {formData.writingStyleFile ? formData.writingStyleFile.name : 'Choose document...'}
                     </span>
+                    {isAnalyzingWritingStyle && (
+                      <div className="w-4 h-4 border-2 border-[#22DFDC] border-t-transparent rounded-full animate-spin"></div>
+                    )}
                   </div>
                   <Input
                     id="writingStyle"
@@ -536,11 +622,18 @@ export const SprintCreationForm: React.FC = () => {
                     accept=".txt,.docx,.pdf"
                     onChange={handleWritingStyleFileChange}
                     className="hidden"
+                    disabled={isAnalyzingWritingStyle}
                   />
                 </label>
                 <p className="text-xs text-white/50 mt-2">
-                  Upload a document example for AI to analyze your writing style
+                  Upload a .txt document for AI to analyze and learn your writing style
                 </p>
+                {formData.writingStyleAnalysis && (
+                  <div className="mt-3 p-3 bg-[#22DFDC]/10 border border-[#22DFDC]/20 rounded-lg">
+                    <p className="text-xs text-[#22DFDC] font-medium mb-1">Style Analysis Complete</p>
+                    <p className="text-xs text-white/70 line-clamp-3">{formData.writingStyleAnalysis}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
