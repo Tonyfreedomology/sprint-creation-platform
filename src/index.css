@@ -136,3 +136,35 @@ All colors MUST be HSL.
     background: #141414; /* Much darker background */
   }
 }
+
+@layer components {
+  /* Global page wrapper with gradient border */
+  .page-wrapper {
+    @apply relative before:absolute before:inset-0 before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] before:rounded-3xl before:-z-10;
+  }
+  
+  /* Global page content with dark gradient background */
+  .page-content {
+    @apply min-h-screen bg-gradient-to-br from-[#020D24] to-[#010611] p-8 rounded-3xl;
+  }
+  
+  /* Global card wrapper with gradient border */
+  .card-wrapper {
+    @apply relative before:absolute before:inset-0 before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] before:rounded-3xl before:-z-10;
+  }
+  
+  /* Global card content */
+  .card-content {
+    @apply bg-[#1E1E1E]/70 backdrop-blur border border-[#22EDB6]/20 rounded-2xl p-8;
+  }
+  
+  /* Global gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent;
+  }
+  
+  /* Global centered header */
+  .centered-header {
+    @apply text-center flex-1;
+  }
+}
