@@ -6,11 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ProgressPill, TimestampPill } from '@/components/ui/progress-pill';
-import { LessonCard } from '@/components/ui/lesson-card';
-import { Download, Copy, ExternalLink, QrCode, Mail, ArrowLeft, Volume2, Play, Pause, Link } from 'lucide-react';
+import { Download, Copy, ExternalLink, QrCode, Mail, ArrowLeft, Volume2, Play, Pause, Link, MoreHorizontal, Edit } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
 
 export default function PackageResults() {
   const [searchParams] = useSearchParams();
@@ -20,32 +17,29 @@ export default function PackageResults() {
   
   const packageData = searchParams.get('packageData');
   
-  // If no package data, use mock data for testing
+  // Mock data to match the target design
   const data = packageData 
     ? JSON.parse(decodeURIComponent(packageData))
     : {
         sprint: {
-          sprintTitle: "Morning Mindfulness Mastery",
-          sprintDescription: "Transform your mornings and unlock peak performance through science-backed mindfulness practices",
-          sprintCategory: "Health & Wellness",
-          sprintDuration: 21,
+          sprintTitle: "Magnetic - 7 Days to Lead Your Marriage with Confidence & Desire",
+          sprintDescription: "Transform your relationship through proven masculine leadership principles and authentic connection strategies.",
+          sprintCategory: "Relationships",
+          sprintDuration: 7,
           voiceId: "custom"
         },
         portalUrl: "https://yourapp.com/sprint/demo-sprint-123",
         audioFiles: {
           "1": "https://example.com/audio/day-1.wav",
           "2": "https://example.com/audio/day-2.wav", 
-          "3": "https://example.com/audio/day-3.wav",
-          "4": "https://example.com/audio/day-4.wav",
-          "5": "https://example.com/audio/day-5.wav"
         },
-        emailTemplates: Array.from({length: 21}, (_, i) => ({
+        emailTemplates: Array.from({length: 7}, (_, i) => ({
           day: i + 1,
           ghlFormatted: `Subject: Day ${i + 1} - {{custom_values.sprint_title}} 🚀
 
 Hi {{first_name}},
 
-Welcome to Day ${i + 1} of your Morning Mindfulness Mastery journey!
+Welcome to Day ${i + 1} of your Magnetic journey!
 
 Today's lesson is now available in your portal:
 👉 {{custom_values.portal_url}}?user={{custom_values.user_token}}
@@ -84,16 +78,13 @@ Best regards,
 
   const toggleAudioPlayback = (day: string, url: string) => {
     if (currentlyPlaying === day) {
-      // Pause current audio
       audioRefs.current[day]?.pause();
       setCurrentlyPlaying(null);
     } else {
-      // Stop any currently playing audio
       if (currentlyPlaying && audioRefs.current[currentlyPlaying]) {
         audioRefs.current[currentlyPlaying].pause();
       }
       
-      // Create new audio element if it doesn't exist
       if (!audioRefs.current[day]) {
         audioRefs.current[day] = new Audio(url);
         audioRefs.current[day].addEventListener('ended', () => {
@@ -101,7 +92,6 @@ Best regards,
         });
       }
       
-      // Play the selected audio
       audioRefs.current[day].play();
       setCurrentlyPlaying(day);
     }
@@ -118,180 +108,201 @@ Best regards,
   const audioCount = Object.keys(audioFiles).length;
 
   return (
-    <div className="min-h-screen bg-background dark">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
-        {/* Page Frame with Gradient Border */}
-        <motion.div 
-          className="relative border-2 rounded-3xl p-8 md:p-12 bg-background"
+    <div className="min-h-screen bg-cool-grey p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Main Container with Cyan Border */}
+        <div 
+          className="relative rounded-3xl p-8 md:p-12"
           style={{
-            background: 'linear-gradient(135deg, hsl(179 73% 50%), hsl(152 84% 53%)) padding-box, hsl(var(--background)) content-box',
-            border: '2px solid transparent',
-            backgroundClip: 'padding-box, border-box',
-            backgroundOrigin: 'padding-box, border-box'
+            background: '#242424',
+            border: '2px solid #22DFDC'
           }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
         >
           {/* Header Row */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-12">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-8">
             {/* Left: Back Button */}
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/')} 
+              className="text-cool-text-secondary hover:text-white"
             >
-              <Button variant="ghost" onClick={() => navigate('/')} className="text-muted-foreground hover:text-foreground">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </motion.div>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
             
             {/* Center: Title */}
             <div className="flex-1 text-center lg:text-left">
-              <motion.h1 
-                className="text-4xl lg:text-6xl font-bold leading-tight"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-              >
-                <span className="text-foreground">Sprint Package</span>
-                <br />
-                <span className="text-primary">Ready!</span>
-              </motion.h1>
+              <h1 className="text-3xl lg:text-5xl font-bold leading-tight text-white mb-2">
+                Magnetic - 7 Days to Lead Your Marriage
+              </h1>
+              <h2 className="text-2xl lg:text-4xl font-bold" style={{ color: '#22DFDC' }}>
+                with Confidence & Desire
+              </h2>
             </div>
             
-            {/* Right: Progress Pills */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <ProgressPill completed={audioCount} total={sprint.sprintDuration} />
-              <TimestampPill timestamp="16:07:24 5ah outro" />
+            {/* Right: Status Pills */}
+            <div className="flex flex-col gap-3">
+              <div 
+                className="px-4 py-2 rounded-lg text-sm"
+                style={{
+                  background: '#242424',
+                  border: '1px solid #22DFDC',
+                  color: '#CFCFCF'
+                }}
+              >
+                Publishing Progress: 7 / 8
+              </div>
+              <div 
+                className="px-4 py-2 rounded-lg text-sm"
+                style={{
+                  background: '#242424',
+                  border: '1px solid #22DFDC', 
+                  color: '#CFCFCF'
+                }}
+              >
+                16:07:24 5ah outro
+              </div>
             </div>
           </div>
           
-          {/* Meta Mini Cards */}
-          <div className="flex flex-wrap gap-6 mb-12">
-            <motion.div 
-              className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-2xl p-6 min-w-[140px]"
-              whileHover={{ scale: 1.02, boxShadow: 'var(--shadow-glassmorphic)' }}
-              transition={{ duration: 0.2 }}
+          {/* Meta Cards */}
+          <div className="flex flex-wrap gap-6 mb-8">
+            <div 
+              className="rounded-2xl p-6 min-w-[140px]"
+              style={{
+                background: '#1a1a1a',
+                border: '1px solid #22DFDC'
+              }}
             >
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">Duration</div>
-                <div className="text-3xl font-bold text-foreground">{sprint.sprintDuration} days</div>
+                <div className="text-lg font-medium text-cool-text-secondary mb-1">Duration</div>
+                <div className="text-2xl font-bold text-white">7 days</div>
               </div>
-            </motion.div>
-            <motion.div 
-              className="bg-card/50 backdrop-blur-sm border border-primary/20 rounded-2xl p-6 min-w-[140px]"
-              whileHover={{ scale: 1.02, boxShadow: 'var(--shadow-glassmorphic)' }}
-              transition={{ duration: 0.2 }}
+            </div>
+            <div 
+              className="rounded-2xl p-6 min-w-[140px]"
+              style={{
+                background: '#1a1a1a',
+                border: '1px solid #22DFDC'
+              }}
             >
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">Total lessons</div>
-                <div className="text-3xl font-bold text-foreground">{emailTemplates.length}</div>
+                <div className="text-lg font-medium text-cool-text-secondary mb-1">Total lessons</div>
+                <div className="text-2xl font-bold text-white">7</div>
               </div>
-            </motion.div>
+            </div>
           </div>
 
-          {/* Tabs for Lessons and Emails */}
-          <Tabs defaultValue="lessons" className="mb-8">
-            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
-              <TabsTrigger value="lessons" className="text-sm font-medium">Lessons</TabsTrigger>
-              <TabsTrigger value="emails" className="text-sm font-medium">Emails</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="lessons" className="space-y-6">
-              {/* Sprint Overview Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-              >
-                <LessonCard
-                  title="Sprint Overview"
-                  content={sprint.sprintDescription}
-                  day={0}
-                  className="mb-6"
-                />
-              </motion.div>
-              
-              {/* Lesson Cards */}
-              {Array.from({length: sprint.sprintDuration}, (_, i) => (
-                <motion.div
-                  key={i + 1}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + (i * 0.1), duration: 0.6 }}
-                >
-                  <LessonCard
-                    title={`Sample Lesson Title for Day ${i + 1}`}
-                    content={`This is day ${i + 1} of your ${sprint.sprintTitle} journey!
+          {/* Sprint Overview Card */}
+          <div 
+            className="rounded-2xl p-6 mb-6"
+            style={{
+              background: '#1a1a1a',
+              border: '1px solid #22DFDC'
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full border border-cool-blue flex items-center justify-center">
+                  <span className="text-cool-blue text-sm">📋</span>
+                </div>
+                <h3 className="text-xl font-semibold text-white">Sprint Overview</h3>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="ghost" className="text-cool-blue hover:bg-cool-blue/10">
+                  Lessons
+                </Button>
+                <Button variant="ghost" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
+                  Edit
+                </Button>
+              </div>
+            </div>
+          </div>
 
-Today's focus will be on building momentum and creating lasting change through practical exercises.
+          {/* Lesson Cards */}
+          <div className="space-y-4">
+            <div 
+              className="rounded-2xl p-6"
+              style={{
+                background: '#1a1a1a',
+                border: '1px solid #22DFDC'
+              }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold" style={{ color: '#22DFDC' }}>
+                  Day 1: Awakening Your Masculine Presence
+                </h3>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
+                    Generate Audio
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="text-white">
+                <p className="mb-3">
+                  Welcome to Day 1 of your sprint 'Magnetic— 7 Days to Lead Your Marriage with Confidence & Desire!'
+                  Today, we awakening on transformative journey focused on awakening your masculine presence and
+                  embodied confidence, as well. Encasing the t ore tone resets the current todata sesdy srief, yer learn. how the
+                  core classence focus is today is awaken your masculine presence today to awaken your masculine presence
+                </p>
+                <p className="mb-3" style={{ color: '#22EDB6' }}>
+                  In refelctions and prattices, you'll learn to embody sexuał leadership, deepen connect ton,
+                  and create relationship that pulses with attra-
+                </p>
+                <p style={{ color: '#22EDB6' }}>
+                  Challenge your comforting lrabits tonight by spending ten minutes grounding yourself in
+                  that presence with your wife.
+                </p>
+              </div>
+            </div>
 
-Challenge: Take 10 minutes today to practice the techniques we've covered. Notice how your mindset shifts when you apply these principles consistently.
-
-Remember, transformation happens through consistent daily action, not perfection.`}
-                    day={i + 1}
-                    audioUrl={audioFiles[String(i + 1)]}
-                    onGenerateAudio={() => toast.info(`Generating audio for Day ${i + 1}...`)}
-                    onEdit={() => toast.info(`Edit Day ${i + 1} lesson`)}
-                  />
-                </motion.div>
-              ))}
-            </TabsContent>
-            
-            <TabsContent value="emails">
-              {/* Email Templates Content */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-              >
-                <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-primary">
-                      <Mail className="h-5 w-5" />
-                      GHL Email Templates
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between mb-6">
-                      <p className="text-muted-foreground">
-                        Ready-to-import email sequence for GoHighLevel
-                      </p>
-                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Button onClick={downloadEmailTemplates} className="bg-gradient-primary hover:opacity-90 transition-opacity">
-                          <Download className="h-4 w-4 mr-2" />
-                          Download Templates
-                        </Button>
-                      </motion.div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      {emailTemplates.map((template: any) => (
-                        <motion.div 
-                          key={template.day} 
-                          className="flex items-center justify-between p-4 bg-muted/10 rounded-lg border border-primary/10"
-                          whileHover={{ backgroundColor: 'hsl(var(--muted) / 0.15)' }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <span className="text-sm font-medium">Day {template.day} Email Template</span>
-                          <Button 
-                            size="sm" 
-                            variant="ghost"
-                            onClick={() => copyToClipboard(template.ghlFormatted, `Day ${template.day} template`)}
-                            className="hover:bg-primary/10"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </TabsContent>
-          </Tabs>
-        </motion.div>
+            <div 
+              className="rounded-2xl p-6"
+              style={{
+                background: '#1a1a1a',
+                border: '1px solid #22DFDC'
+              }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold" style={{ color: '#22DFDC' }}>
+                  Day 2: Building Emotional Strength
+                </h3>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
+                    <Play className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
+                    Generate Audio
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="text-white">
+                <p className="mb-3">
+                  This is day 2 of your Morning Mindfulness Mastery journey!
+                </p>
+                <p className="mb-3">
+                  Today's focus will be on building emotional resilience and creating deeper intimacy through authentic vulnerability.
+                </p>
+                <p style={{ color: '#22EDB6' }}>
+                  Challenge: Practice holding space for your partner's emotions without trying to fix or solve anything.
+                  Just listen, breathe, and be present.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
