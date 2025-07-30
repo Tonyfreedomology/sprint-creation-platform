@@ -141,14 +141,33 @@ const Index = () => {
           {/* Hero Container with Gradient Border */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
             <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
-              <div className="grid lg:grid-cols-2 gap-12 items-center">
-                <div className="space-y-6">
+              {/* Video Background */}
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover rounded-3xl"
+                style={{ 
+                  filter: 'brightness(0.4)',
+                }}
+              >
+                <source 
+                  src="https://hufbbrvmcdugfrgjxwuv.supabase.co/storage/v1/object/sign/media/jonah_10079_A_vibrant_jade_digital_sappling_particle_effects__24600ee9-ca04-47cb-913a-4a15c5d7c153_3.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OTA2Yzk4OC0zYjdiLTRmZmUtODNkNy1mMGE1ZDVlODkyODgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJtZWRpYS9qb25haF8xMDA3OV9BX3ZpYnJhbnRfamFkZV9kaWdpdGFsX3NhcHBsaW5nX3BhcnRpY2xlX2VmZmVjdHNfXzI0NjAwZWU5LWNhMDQtNDdjYi05MTNhLTRhMTVjNWQ3YzE1M18zLm1wNCIsImlhdCI6MTc1MzkwMTc3MiwiZXhwIjoyMDY5MjYxNzcyfQ.Tk48j-rookfz-ZBZTm0guHfTyfCm0Sn5NMwJBN52eM8" 
+                  type="video/mp4" 
+                />
+              </video>
+
+              {/* Content Overlay */}
+              <div className="relative z-10 flex items-center min-h-[600px]">
+                <div className="w-full max-w-2xl space-y-6">
                   <div
                     className="border w-fit text-sm px-4 py-2 rounded-full"
                     style={{ 
-                      backgroundColor: '#1a1a1a',
+                      backgroundColor: 'rgba(26, 26, 26, 0.8)',
                       border: '1px solid #22DFDC',
-                      color: '#22DFDC'
+                      color: '#22DFDC',
+                      backdropFilter: 'blur(10px)'
                     }}
                   >
                     <Sparkles className="w-4 h-4 mr-2 inline" />
@@ -165,7 +184,7 @@ const Index = () => {
                     {' '}That Change Lives
                   </h1>
                   
-                  <p className="text-xl leading-relaxed max-w-[48ch]" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                  <p className="text-xl leading-relaxed max-w-[48ch]" style={{ color: '#CFCFCF', opacity: 0.9 }}>
                     Join Freedomology and turn your expertise into transformational 21-40 day experiences. 
                     Our AI-powered platform helps you create engaging, habit-forming sprints that deliver real results.
                   </p>
@@ -185,11 +204,12 @@ const Index = () => {
                     
                     <button
                       onClick={() => window.location.href = '/package-results'}
-                      className="px-8 py-4 text-lg rounded-xl font-medium transition-all hover:scale-105 hover:bg-[#22DFDC]/10"
+                      className="px-8 py-4 text-lg rounded-xl font-medium transition-all hover:scale-105"
                       style={{ 
                         color: '#22DFDC',
                         border: '1px solid #22DFDC',
-                        backgroundColor: 'transparent'
+                        backgroundColor: 'rgba(34, 223, 220, 0.1)',
+                        backdropFilter: 'blur(10px)'
                       }}
                     >
                       Test Publish Page
@@ -210,23 +230,6 @@ const Index = () => {
                       Community included
                     </div>
                   </div>
-                </div>
-                
-                <div className="relative">
-                  {/* Enhanced glow behind image */}
-                  <div 
-                    className="absolute -inset-8 opacity-40 blur-3xl rounded-full"
-                    style={{ background: 'radial-gradient(circle, #22DFDC 0%, #22EDB6 50%, transparent 70%)' }}
-                  ></div>
-                  <img
-                    src={heroImage}
-                    alt="Freedomology Sprint Creation"
-                    className="relative rounded-2xl w-full"
-                    style={{ 
-                      boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.3)',
-                      border: '1px solid rgba(34, 223, 220, 0.2)'
-                    }}
-                  />
                 </div>
               </div>
             </div>
