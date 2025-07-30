@@ -301,85 +301,73 @@ export const SprintCreationForm: React.FC = () => {
 
       case 2:
         return (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold bg-gradient-secondary bg-clip-text text-transparent">
-                Design Your Sprint
-              </h2>
-              <p className="text-muted-foreground mt-2">
-                Shape the core of your transformational experience
-              </p>
-            </div>
-
+          <div className="space-y-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="sprintTitle">Sprint Title *</Label>
+                <Label htmlFor="sprintTitle" className="text-white text-sm font-medium">Sprint Title *</Label>
                 <Input
                   id="sprintTitle"
                   placeholder="e.g., 'Enough.' - 21 Days to Unshakeable Self-Worth"
                   value={formData.sprintTitle}
                   onChange={(e) => handleInputChange('sprintTitle', e.target.value)}
-                  className="mt-1"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="sprintDescription">Sprint Description *</Label>
+                <Label htmlFor="sprintDescription" className="text-white text-sm font-medium">Sprint Description *</Label>
                 <Textarea
                   id="sprintDescription"
                   placeholder="Describe what participants will learn, experience, and achieve in this sprint..."
                   value={formData.sprintDescription}
                   onChange={(e) => handleInputChange('sprintDescription', e.target.value)}
-                  className="mt-1 min-h-[120px]"
+                  className="mt-2 min-h-[120px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="sprintDuration">Duration</Label>
+                  <Label htmlFor="sprintDuration" className="text-white text-sm font-medium">Duration</Label>
                   <Select value={formData.sprintDuration} onValueChange={(value) => handleInputChange('sprintDuration', value)}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
+                    <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
+                      <SelectValue placeholder="Select duration" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="7">7 Days</SelectItem>
-                      <SelectItem value="14">14 Days</SelectItem>
-                      <SelectItem value="21">21 Days</SelectItem>
-                      <SelectItem value="30">30 Days</SelectItem>
-                      <SelectItem value="40">40 Days</SelectItem>
+                    <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
+                      <SelectItem value="7" className="text-white hover:bg-[#22DFDC]/10">7 Days</SelectItem>
+                      <SelectItem value="14" className="text-white hover:bg-[#22DFDC]/10">14 Days</SelectItem>
+                      <SelectItem value="21" className="text-white hover:bg-[#22DFDC]/10">21 Days</SelectItem>
+                      <SelectItem value="30" className="text-white hover:bg-[#22DFDC]/10">30 Days</SelectItem>
+                      <SelectItem value="40" className="text-white hover:bg-[#22DFDC]/10">40 Days</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="sprintCategory">Category</Label>
+                  <Label htmlFor="sprintCategory" className="text-white text-sm font-medium">Category</Label>
                   <Select value={formData.sprintCategory} onValueChange={(value) => handleInputChange('sprintCategory', value)}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="health">
+                    <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
+                      <SelectItem value="health" className="text-white hover:bg-[#22DFDC]/10">
                         <div className="flex items-center gap-2">
                           <Heart className="w-4 h-4" />
                           Health & Wellness
                         </div>
                       </SelectItem>
-                      <SelectItem value="wealth">
+                      <SelectItem value="wealth" className="text-white hover:bg-[#22DFDC]/10">
                         <div className="flex items-center gap-2">
                           <DollarSign className="w-4 h-4" />
                           Wealth & Finance
                         </div>
                       </SelectItem>
-                      <SelectItem value="relationships">
+                      <SelectItem value="relationships" className="text-white hover:bg-[#22DFDC]/10">
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
                           Relationships
                         </div>
                       </SelectItem>
-                      <SelectItem value="personal">
+                      <SelectItem value="personal" className="text-white hover:bg-[#22DFDC]/10">
                         <div className="flex items-center gap-2">
                           <Brain className="w-4 h-4" />
                           Personal Development
@@ -391,24 +379,24 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="targetAudience">Target Audience</Label>
+                <Label htmlFor="targetAudience" className="text-white text-sm font-medium">Target Audience</Label>
                 <Input
                   id="targetAudience"
                   placeholder="e.g., Working mothers, New entrepreneurs, College students..."
                   value={formData.targetAudience}
                   onChange={(e) => handleInputChange('targetAudience', e.target.value)}
-                  className="mt-1"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="goals">Primary Goals</Label>
+                <Label htmlFor="goals" className="text-white text-sm font-medium">Primary Goals</Label>
                 <Textarea
                   id="goals"
                   placeholder="What specific outcomes do you want participants to achieve?"
                   value={formData.goals}
                   onChange={(e) => handleInputChange('goals', e.target.value)}
-                  className="mt-1"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
             </div>
@@ -417,53 +405,41 @@ export const SprintCreationForm: React.FC = () => {
 
       case 3:
         return (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-hero rounded-full flex items-center justify-center mx-auto mb-4">
-                <Brain className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-                Content & Style
-              </h2>
-              <p className="text-muted-foreground mt-2">
-                How do you want to create and deliver your content?
-              </p>
-            </div>
-
+          <div className="space-y-6">
             <div className="space-y-6">
               <div>
-                <Label className="text-base font-semibold">Content Generation Preference</Label>
+                <Label className="text-white text-sm font-medium">Content Generation Preference</Label>
                 <RadioGroup 
                   value={formData.contentGeneration} 
                   onValueChange={(value) => handleInputChange('contentGeneration', value)}
                   className="mt-3"
                 >
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-2 p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
                     <RadioGroupItem value="ai" id="ai" />
-                    <Label htmlFor="ai" className="flex-1 cursor-pointer">
+                    <Label htmlFor="ai" className="flex-1 cursor-pointer text-white">
                       <div className="font-medium">AI-Powered Creation</div>
-                      <div className="text-sm text-muted-foreground">Let AI write scripts and content based on your input, then customize</div>
+                      <div className="text-sm text-white/70">Let AI write scripts and content based on your input, then customize</div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-2 p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
                     <RadioGroupItem value="hybrid" id="hybrid" />
-                    <Label htmlFor="hybrid" className="flex-1 cursor-pointer">
+                    <Label htmlFor="hybrid" className="flex-1 cursor-pointer text-white">
                       <div className="font-medium">Hybrid Approach</div>
-                      <div className="text-sm text-muted-foreground">AI helps with outlines and drafts, you write the final content</div>
+                      <div className="text-sm text-white/70">AI helps with outlines and drafts, you write the final content</div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-2 p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
                     <RadioGroupItem value="manual" id="manual" />
-                    <Label htmlFor="manual" className="flex-1 cursor-pointer">
+                    <Label htmlFor="manual" className="flex-1 cursor-pointer text-white">
                       <div className="font-medium">Manual Creation</div>
-                      <div className="text-sm text-muted-foreground">You'll write all content yourself with template guidance</div>
+                      <div className="text-sm text-white/70">You'll write all content yourself with template guidance</div>
                     </Label>
                   </div>
                 </RadioGroup>
               </div>
 
               <div>
-                <Label className="text-base font-semibold">Content Types (Select all that apply)</Label>
+                <Label className="text-white text-sm font-medium">Content Types (Select all that apply)</Label>
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   {[
                     { id: 'text', label: 'Written Lessons' },
@@ -471,66 +447,66 @@ export const SprintCreationForm: React.FC = () => {
                      { id: 'affirmations', label: 'Affirmations' },
                      { id: 'exercises', label: 'Practical Exercises' },
                   ].map((type) => (
-                    <div key={type.id} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                    <div key={type.id} className="flex items-center space-x-2 p-3 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
                       <Checkbox
                         id={type.id}
                         checked={formData.contentTypes.includes(type.id)}
                         onCheckedChange={(checked) => handleContentTypeChange(type.id, checked as boolean)}
                       />
-                      <Label htmlFor={type.id} className="text-sm cursor-pointer">{type.label}</Label>
+                      <Label htmlFor={type.id} className="text-sm cursor-pointer text-white">{type.label}</Label>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="toneStyle">Tone & Style</Label>
+                <Label htmlFor="toneStyle" className="text-white text-sm font-medium">Tone & Style</Label>
                 <Select value={formData.toneStyle} onValueChange={(value) => handleInputChange('toneStyle', value)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
+                  <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
+                    <SelectValue placeholder="Select tone & style" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="encouraging">Encouraging & Supportive</SelectItem>
-                    <SelectItem value="motivational">Motivational & Energetic</SelectItem>
-                    <SelectItem value="gentle">Gentle & Nurturing</SelectItem>
-                    <SelectItem value="professional">Professional & Informative</SelectItem>
-                    <SelectItem value="conversational">Conversational & Friendly</SelectItem>
-                    <SelectItem value="inspiring">Inspiring & Uplifting</SelectItem>
+                  <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
+                    <SelectItem value="encouraging" className="text-white hover:bg-[#22DFDC]/10">Encouraging & Supportive</SelectItem>
+                    <SelectItem value="motivational" className="text-white hover:bg-[#22DFDC]/10">Motivational & Energetic</SelectItem>
+                    <SelectItem value="gentle" className="text-white hover:bg-[#22DFDC]/10">Gentle & Nurturing</SelectItem>
+                    <SelectItem value="professional" className="text-white hover:bg-[#22DFDC]/10">Professional & Informative</SelectItem>
+                    <SelectItem value="conversational" className="text-white hover:bg-[#22DFDC]/10">Conversational & Friendly</SelectItem>
+                    <SelectItem value="inspiring" className="text-white hover:bg-[#22DFDC]/10">Inspiring & Uplifting</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="voiceStyle">Voice Style for Audio Generation</Label>
+                <Label htmlFor="voiceStyle" className="text-white text-sm font-medium">Voice Style for Audio Generation</Label>
                 <Select value={formData.voiceStyle} onValueChange={(value) => handleInputChange('voiceStyle', value)}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
+                  <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
+                    <SelectValue placeholder="Select voice style" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border border-border z-50">
-                    <SelectItem value="warm-coach">Warm Coach - Encouraging & Patient</SelectItem>
-                    <SelectItem value="strong-mentor">Strong Mentor - Confident & Wise</SelectItem>
-                    <SelectItem value="wise-guide">Wise Guide - Calm & Transformational</SelectItem>
-                    <SelectItem value="motivational-speaker">Motivational Speaker - Dynamic & Inspiring</SelectItem>
-                    <SelectItem value="trusted-friend">Trusted Friend - Warm & Relatable</SelectItem>
-                    <SelectItem value="professional-trainer">Professional Trainer - Clear & Competent</SelectItem>
-                    <SelectItem value="compassionate-counselor">Compassionate Counselor - Gentle & Safe</SelectItem>
+                  <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
+                    <SelectItem value="warm-coach" className="text-white hover:bg-[#22DFDC]/10">Warm Coach - Encouraging & Patient</SelectItem>
+                    <SelectItem value="strong-mentor" className="text-white hover:bg-[#22DFDC]/10">Strong Mentor - Confident & Wise</SelectItem>
+                    <SelectItem value="wise-guide" className="text-white hover:bg-[#22DFDC]/10">Wise Guide - Calm & Transformational</SelectItem>
+                    <SelectItem value="motivational-speaker" className="text-white hover:bg-[#22DFDC]/10">Motivational Speaker - Dynamic & Inspiring</SelectItem>
+                    <SelectItem value="trusted-friend" className="text-white hover:bg-[#22DFDC]/10">Trusted Friend - Warm & Relatable</SelectItem>
+                    <SelectItem value="professional-trainer" className="text-white hover:bg-[#22DFDC]/10">Professional Trainer - Clear & Competent</SelectItem>
+                    <SelectItem value="compassionate-counselor" className="text-white hover:bg-[#22DFDC]/10">Compassionate Counselor - Gentle & Safe</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-white/70 mt-1">
                   Choose the voice personality that will narrate your entire sprint consistently
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="voiceSample">Voice Sample for Cloning (Optional)</Label>
+                <Label htmlFor="voiceSample" className="text-white text-sm font-medium">Voice Sample for Cloning (Optional)</Label>
                 <Input
                   id="voiceSample"
                   type="file"
                   accept="audio/*,.mp3,.wav,.m4a"
                   onChange={handleVoiceFileChange}
-                  className="mt-1"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition"
                 />
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-white/70 mt-1">
                   Upload a clear 30-60 second audio sample for AI voice cloning (optional)
                 </p>
                  {formData.voiceSampleFile && (
@@ -541,15 +517,15 @@ export const SprintCreationForm: React.FC = () => {
                </div>
 
                <div>
-                 <Label htmlFor="writingStyle">Writing Style Sample (Optional)</Label>
+                 <Label htmlFor="writingStyle" className="text-white text-sm font-medium">Writing Style Sample (Optional)</Label>
                  <Input
                    id="writingStyle"
                    type="file"
                    accept=".txt,.docx,.pdf"
                    onChange={handleWritingStyleFileChange}
-                   className="mt-1"
+                   className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition"
                  />
-                 <p className="text-sm text-muted-foreground mt-1">
+                 <p className="text-sm text-white/70 mt-1">
                    Upload a document example of your writing style for AI to mimic (optional)
                  </p>
                  {formData.writingStyleFile && (
@@ -564,58 +540,45 @@ export const SprintCreationForm: React.FC = () => {
 
       case 4:
         return (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Final Details
-              </h2>
-              <p className="text-muted-foreground mt-2">
-                Any special requirements or webhook URL for processing
-              </p>
-            </div>
-
+          <div className="space-y-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="specialRequirements">Special Requirements</Label>
+                <Label htmlFor="specialRequirements" className="text-white text-sm font-medium">Special Requirements</Label>
                 <Textarea
                   id="specialRequirements"
                   placeholder="Any specific requests, special considerations, or additional information..."
                   value={formData.specialRequirements}
                   onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
-                  className="mt-1"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="participantEmails">Participant Email List</Label>
+                <Label htmlFor="participantEmails" className="text-white text-sm font-medium">Participant Email List</Label>
                 <Textarea
                   id="participantEmails"
-                  placeholder="Enter participant emails separated by commas:\nexample1@email.com, example2@email.com, example3@email.com"
+                  placeholder="Enter participant emails separated by commas:&#10;example1@email.com, example2@email.com, example3@email.com"
                   value={formData.participantEmails}
                   onChange={(e) => handleInputChange('participantEmails', e.target.value)}
-                  className="mt-1 min-h-[100px]"
+                  className="mt-2 min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-white/70 mt-1">
                   List all participant emails who will receive the daily sprint content
                 </p>
               </div>
 
-
-              <div className="bg-gradient-card p-6 rounded-lg border border-primary/20">
-                <h3 className="font-semibold text-lg mb-3">Sprint Summary</h3>
-                <div className="space-y-2 text-sm">
-                  <div><strong>Title:</strong> {formData.sprintTitle || 'Not specified'}</div>
-                  <div><strong>Duration:</strong> {formData.sprintDuration} days</div>
-                  <div><strong>Category:</strong> {formData.sprintCategory || 'Not specified'}</div>
-                  <div><strong>Content Generation:</strong> {formData.contentGeneration}</div>
-                  <div><strong>Content Types:</strong> {formData.contentTypes.join(', ') || 'None selected'}</div>
-                  <div><strong>Tone:</strong> {formData.toneStyle}</div>
-                  <div><strong>Participants:</strong> {formData.participantEmails ? formData.participantEmails.split(',').length : 0} people</div>
-                   <div><strong>Voice Sample:</strong> {formData.voiceSampleFile ? 'Uploaded' : 'None'}</div>
-                   <div><strong>Writing Style:</strong> {formData.writingStyleFile ? 'Uploaded' : 'None'}</div>
+              <div className="bg-[#1E1E1E]/50 p-6 rounded-lg border border-white/10">
+                <h3 className="font-semibold text-lg mb-3 text-white">Sprint Summary</h3>
+                <div className="space-y-2 text-sm text-white/80">
+                  <div><strong className="text-white">Title:</strong> {formData.sprintTitle || 'Not specified'}</div>
+                  <div><strong className="text-white">Duration:</strong> {formData.sprintDuration} days</div>
+                  <div><strong className="text-white">Category:</strong> {formData.sprintCategory || 'Not specified'}</div>
+                  <div><strong className="text-white">Content Generation:</strong> {formData.contentGeneration}</div>
+                  <div><strong className="text-white">Content Types:</strong> {formData.contentTypes.join(', ') || 'None selected'}</div>
+                  <div><strong className="text-white">Tone:</strong> {formData.toneStyle}</div>
+                  <div><strong className="text-white">Participants:</strong> {formData.participantEmails ? formData.participantEmails.split(',').length : 0} people</div>
+                   <div><strong className="text-white">Voice Sample:</strong> {formData.voiceSampleFile ? 'Uploaded' : 'None'}</div>
+                   <div><strong className="text-white">Writing Style:</strong> {formData.writingStyleFile ? 'Uploaded' : 'None'}</div>
                 </div>
               </div>
             </div>
