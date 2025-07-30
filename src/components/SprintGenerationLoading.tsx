@@ -192,9 +192,9 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
                 {loadingSteps.map((step, index) => (
                   <div
                     key={step.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
+                     className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
                       completedSteps.has(step.id)
-                        ? 'bg-green-50 border border-green-200'
+                        ? 'bg-green-500/10 border border-green-500/20'
                          : index === currentStepIndex
                         ? 'bg-gradient-card border border-primary/20'
                         : 'bg-muted/30'
@@ -216,7 +216,7 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
                     <div className="flex-1">
                       <div className={`font-medium ${
                         completedSteps.has(step.id)
-                          ? 'text-green-700'
+                          ? 'text-green-400'
                           : index === currentStepIndex
                           ? 'text-foreground'
                           : 'text-muted-foreground'
