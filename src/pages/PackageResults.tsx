@@ -41,7 +41,7 @@ export default function PackageResults() {
 
 Hi {{first_name}},
 
-Welcome to Day ${i + 1} of your ${sprint.sprintTitle} journey!
+Welcome to Day ${i + 1} of your Morning Mindfulness Mastery journey!
 
 Today's lesson is now available in your portal:
 👉 {{custom_values.portal_url}}?user={{custom_values.user_token}}
