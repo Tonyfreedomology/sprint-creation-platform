@@ -129,20 +129,21 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020D24] to-[#010611] p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" onClick={onBack} className="flex items-center gap-2 text-white hover:bg-white/10">
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-2xl font-semibold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
-              Review Master Plan
-            </h1>
-            <p className="text-white/60 text-sm mt-1">Turn your expertise into a powerful, community-driven experience that creates lasting change</p>
+    <div className="relative before:absolute before:inset-0 before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] before:rounded-3xl before:-z-10">
+      <div className="min-h-screen bg-gradient-to-br from-[#020D24] to-[#010611] p-8 rounded-3xl">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="flex items-center gap-4 mb-8">
+            <Button variant="ghost" onClick={onBack} className="flex items-center gap-2 text-white hover:bg-white/10">
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+            <div className="text-center flex-1">
+              <h1 className="text-2xl font-semibold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
+                Review Master Plan
+              </h1>
+              <p className="text-white/60 text-sm mt-1">Turn your expertise into a powerful, community-driven experience that creates lasting change</p>
+            </div>
           </div>
-        </div>
 
         <div className="relative before:absolute before:inset-0 before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] before:rounded-3xl before:-z-10">
           <div className="bg-[#1E1E1E]/70 backdrop-blur border border-[#22EDB6]/20 rounded-2xl p-8">
@@ -288,6 +289,7 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
           </Button>
         </div>
       </div>
+    </div>
     </div>
   );
 }
