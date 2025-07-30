@@ -482,6 +482,21 @@ export const SprintPreview: React.FC = () => {
         supabase.removeChannel(channel);
       });
 
+      // Listen for generation errors
+      channel.on('broadcast', { event: 'generation-error' }, (payload: any) => {
+        console.error('Generation error received:', payload);
+        setIsGenerating(false);
+        
+        toast({
+          title: "Generation Failed",
+          description: `Error generating Day ${payload.payload.day}: ${payload.payload.error}`,
+          variant: "destructive",
+        });
+        
+        // Clean up channel
+        supabase.removeChannel(channel);
+      });
+
       // Subscribe to channel
       await channel.subscribe();
       setRealtimeChannel(channel);

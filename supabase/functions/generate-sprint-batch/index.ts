@@ -449,26 +449,28 @@ serve(async (req) => {
       } catch (error) {
         console.error(`CRITICAL ERROR generating content for day ${day} at ${new Date().toISOString()}:`, error);
         
-        // Still broadcast a placeholder so the UI updates
+        // Update status to failed and stop batch processing
+        await supabase
+          .from('sprint_generation_progress')
+          .update({ 
+            status: 'failed',
+            current_day: day  // Don't advance past the failed day
+          })
+          .eq('id', progressId);
+        
+        // Broadcast the error so UI can handle it
         const channel = supabase.channel(progress.channel_name);
         await channel.send({
           type: 'broadcast',
-          event: 'lesson-generated',
+          event: 'generation-error',
           payload: {
-            lesson: {
-              day: day,
-              title: `Day ${day}: Content Generation Failed`,
-              content: `There was an error generating content for day ${day}. Error: ${error.message}. Please try regenerating this lesson.`,
-              exercise: `Exercise for day ${day} will be available after regeneration.`,
-              affirmation: `Affirmation for day ${day} will be available after regeneration.`
-            },
-            email: {
-              day: day,
-              subject: `Day ${day}: Content Generation Failed`,
-              content: `There was an error generating the email for day ${day}. Please try regenerating this content.`
-            }
+            day: day,
+            error: error.message,
+            sprintId: progress.sprint_id
           }
         });
+        
+        throw error; // Stop the batch processing
       }
     }
 
