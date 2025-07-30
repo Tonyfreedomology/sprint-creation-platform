@@ -222,37 +222,31 @@ serve(async (req) => {
     console.log('Hume API response received:', Object.keys(responseData));
     console.log('Full response structure:', JSON.stringify(responseData, null, 2));
 
-    // Extract generation ID and audio URL from the correct structure
+    // Extract generation ID and audio base64 from the correct structure
     let generation_id = null;
-    let audioUrl = null;
+    let audioBase64 = null;
     
-    // Check the actual response structure
+    // Check the actual response structure - Hume returns audio as base64 in the audio field
     if (responseData.generations && Array.isArray(responseData.generations) && responseData.generations.length > 0) {
       const firstGeneration = responseData.generations[0];
       generation_id = firstGeneration.generation_id || firstGeneration.id;
-      audioUrl = firstGeneration.audio_url || firstGeneration.url;
+      audioBase64 = firstGeneration.audio; // Audio is returned as base64, not URL
     } else {
       // Fallback for different response structures
       generation_id = responseData.generation_id || responseData.id;
-      audioUrl = responseData.audio_url || responseData.url;
+      audioBase64 = responseData.audio;
     }
     
     console.log('Generation ID:', generation_id);
-    console.log('Audio URL:', audioUrl);
+    console.log('Audio base64 length:', audioBase64?.length || 0);
     
-    if (!audioUrl) {
-      console.error('No audio URL found in response:', responseData);
-      throw new Error('Audio URL not found in Hume API response');
+    if (!audioBase64) {
+      console.error('No audio base64 found in response:', responseData);
+      throw new Error('Audio data not found in Hume API response');
     }
 
-    // Download the audio file
-    const audioResponse = await fetch(audioUrl);
-    if (!audioResponse.ok) {
-      throw new Error(`Failed to download audio: ${audioResponse.status} ${audioResponse.statusText}`);
-    }
-
-    const audioArrayBuffer = await audioResponse.arrayBuffer();
-    console.log('Audio downloaded, size:', audioArrayBuffer.byteLength);
+    // Audio is already in base64 format, no need to download
+    console.log('Audio received as base64, length:', audioBase64.length);
 
     // If this is a new voice (not using savedVoiceId) and we have a sprintId, save the voice
     let newVoiceId = null;
@@ -288,26 +282,12 @@ serve(async (req) => {
       }
     }
 
-    // Convert audio to base64 safely for large files
-    const uint8Array = new Uint8Array(audioArrayBuffer);
-    let binaryString = '';
-    
-    // Process in small chunks to avoid stack overflow
-    for (let i = 0; i < uint8Array.length; i += 1024) {
-      const chunk = uint8Array.slice(i, i + 1024);
-      for (let j = 0; j < chunk.length; j++) {
-        binaryString += String.fromCharCode(chunk[j]);
-      }
-    }
-    
-    const audioBase64 = btoa(binaryString);
-    
-    console.log('Audio generation successful, converted to base64');
+    console.log('Audio generation successful, using Hume base64 data');
 
     return new Response(
       JSON.stringify({ 
         audioContent: audioBase64,
-        contentType: 'audio/wav',
+        contentType: 'audio/mp3', // Hume returns MP3 format
         voiceUsed: finalVoiceDescription,
         actingInstructions: finalActingInstructions,
         generationId: generation_id,
