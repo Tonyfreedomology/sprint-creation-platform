@@ -248,44 +248,44 @@ export const SprintCreationForm: React.FC = () => {
           <div className="space-y-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="creatorName" className="text-white text-sm font-medium">Your Name *</Label>
+                <Label htmlFor="creatorName" className="text-sm font-medium">Your Name *</Label>
                 <Input
                   id="creatorName"
                   placeholder="Enter your full name"
                   value={formData.creatorName}
                   onChange={(e) => handleInputChange('creatorName', e.target.value)}
-                  className="mt-2 bg-[#2a2a2a] border-[#22DFDC]/30 text-white placeholder:text-[#CFCFCF]/50 focus:border-[#22DFDC] focus:ring-[#22DFDC]/20"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="creatorEmail" className="text-white text-sm font-medium">Email Address *</Label>
+                <Label htmlFor="creatorEmail" className="text-sm font-medium">Email Address *</Label>
                 <Input
                   id="creatorEmail"
                   type="email"
                   placeholder="your.email@example.com"
                   value={formData.creatorEmail}
                   onChange={(e) => handleInputChange('creatorEmail', e.target.value)}
-                  className="mt-2 bg-[#2a2a2a] border-[#22DFDC]/30 text-white placeholder:text-[#CFCFCF]/50 focus:border-[#22DFDC] focus:ring-[#22DFDC]/20"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="creatorBio" className="text-white text-sm font-medium">About You</Label>
+                <Label htmlFor="creatorBio" className="text-sm font-medium">About You</Label>
                 <Textarea
                   id="creatorBio"
                   placeholder="Tell us about your background, expertise, and what drives you to create this sprint..."
                   value={formData.creatorBio}
                   onChange={(e) => handleInputChange('creatorBio', e.target.value)}
-                  className="mt-2 min-h-[100px] bg-[#2a2a2a] border-[#22DFDC]/30 text-white placeholder:text-[#CFCFCF]/50 focus:border-[#22DFDC] focus:ring-[#22DFDC]/20"
+                  className="mt-2 min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="experience" className="text-white text-sm font-medium">Your Experience Level</Label>
+                <Label htmlFor="experience" className="text-sm font-medium">Your Experience Level</Label>
                 <Select value={formData.experience} onValueChange={(value) => handleInputChange('experience', value)}>
-                  <SelectTrigger className="mt-2 bg-[#2a2a2a] border-[#22DFDC]/30 text-white focus:border-[#22DFDC] focus:ring-[#22DFDC]/20">
-                    <SelectValue placeholder="Select your experience level" className="text-[#CFCFCF]/50" />
+                  <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 focus:border-[#22DFDC] outline-none transition">
+                    <SelectValue placeholder="Select your experience level" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30">
                     <SelectItem value="beginner" className="text-white hover:bg-[#22DFDC]/10">Beginner - New to creating content</SelectItem>
@@ -679,153 +679,117 @@ export const SprintCreationForm: React.FC = () => {
     );
   }
 
+  const getStepTitle = () => {
+    switch (currentStep) {
+      case 1: return "Tell us about yourself";
+      case 2: return "Design Your Sprint";
+      case 3: return "Content & Style";
+      case 4: return "Final Details";
+      default: return "";
+    }
+  };
+
+  const getStepIcon = () => {
+    switch (currentStep) {
+      case 1: return Users;
+      case 2: return Sparkles;
+      case 3: return Brain;
+      case 4: return CheckCircle;
+      default: return Users;
+    }
+  };
+
   // Show form by default
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      {/* Gradient Border Container */}
-      <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px]">
-        <div className="relative bg-[#111111] backdrop-blur-md border border-[#22DFDC]/20 rounded-3xl p-8">
-          
-          {/* Header with Back Button */}
-          <div className="mb-8">
-            <button 
-              onClick={() => window.history.back()}
-              className="text-[#22DFDC] hover:text-[#22EDB6] transition-colors mb-6 flex items-center gap-2"
-            >
-              ← Back to Overview
-            </button>
+    <div className="max-w-4xl mx-auto p-8">
+      {/* Back Button */}
+      <button 
+        onClick={() => window.history.back()}
+        className="text-[#22DFDC] hover:text-[#22EDB6] transition-colors mb-8 flex items-center gap-2"
+      >
+        ← Back
+      </button>
+      
+      {/* Hero Section */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+          Create Your
+        </h1>
+        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
+          Transformational Sprint
+        </h2>
+        <p className="text-[#CFCFCF] mt-4 opacity-70">
+          Turn your expertise into a powerful, community-driven experience that creates lasting change
+        </p>
+      </div>
+
+      {/* Form Container */}
+      <div className="max-w-[540px] mx-auto">
+        {/* Gradient Border Container */}
+        <div className="relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[1px]">
+          <div className="relative bg-[#111111]/90 backdrop-blur-md rounded-2xl p-8">
             
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                Create Your
-              </h1>
-              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
-                Transformational Sprint
-              </h2>
-              <p className="text-[#CFCFCF] mt-4 opacity-70">
-                Turn your expertise into a powerful, community-driven experience that creates lasting change
-              </p>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-[1fr,60px] gap-8">
-            {/* Main Content */}
-            <div>
-              {/* Inner Card */}
-              <div className="bg-[#1E1E1E]/70 backdrop-blur-md border border-[#22DFDC]/20 rounded-2xl p-6">
-                
-                {/* Step Header */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center"
-                      style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
-                    >
-                      <Users className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-white">
-                        Create Your Sprint
-                      </h3>
-                      <p className="text-[#CFCFCF] text-sm">
-                        Step {currentStep} of {totalSteps}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* Step Content Title */}
-                  <div className="border-b border-[#22DFDC]/20 pb-4 mb-6">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}>
-                      <Users className="w-6 h-6 text-white" />
-                    </div>
-                    <h4 className="text-xl font-semibold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent text-center">
-                      Tell us about yourself
-                    </h4>
-                    <p className="text-[#CFCFCF] text-center mt-2 opacity-70">
-                      Let's get to know the amazing person behind this sprint
-                    </p>
+            {/* Step Header */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#22EDB6] flex items-center justify-center text-[#242424]">
+                  {React.createElement(getStepIcon(), { className: "w-5 h-5" })}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white">
+                    {getStepTitle()}
+                  </h3>
+                  <p className="text-xs text-[#CFCFCF] uppercase tracking-wide mt-0.5">
+                    STEP {currentStep} OF {totalSteps}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-semibold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
+                    {Math.round(progress)}%
                   </div>
                 </div>
-
-                {/* Form Content */}
-                <div className="space-y-6">
-                  {renderStep()}
-                </div>
-
-                {/* Navigation */}
-                <div className="flex justify-between mt-8 pt-6 border-t border-[#22DFDC]/20">
-                  <Button
-                    variant="ghost"
-                    onClick={prevStep}
-                    disabled={currentStep === 1}
-                    className="flex items-center gap-2 text-[#CFCFCF] hover:text-white hover:bg-[#22DFDC]/10"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                  </Button>
-                  
-                  {currentStep < totalSteps ? (
-                    <Button
-                      onClick={nextStep}
-                      disabled={!canProceed()}
-                      className="flex items-center gap-2 text-white"
-                      style={{ 
-                        background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
-                        border: 'none'
-                      }}
-                    >
-                      Next
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={!canProceed() || isSubmitting}
-                      className="flex items-center gap-2 text-white"
-                      style={{ 
-                        background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
-                        border: 'none'
-                      }}
-                    >
-                      {isSubmitting ? 'Creating...' : 'Create Sprint'}
-                      <Sparkles className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
               </div>
+              
+              {/* Thin divider */}
+              <div className="h-px bg-[#22DFDC]/20 mt-6"></div>
             </div>
 
-            {/* Vertical Progress Bar */}
-            <div className="hidden lg:flex flex-col items-center">
-              <div className="text-sm text-[#CFCFCF] mb-2">Progress</div>
-              <div className="text-lg font-bold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent mb-4">
-                {Math.round(progress)}%
-              </div>
+            {/* Form Content */}
+            <div className="space-y-6">
+              {renderStep()}
+            </div>
+
+            {/* Navigation */}
+            <div className="flex justify-between mt-8">
+              <Button
+                variant="ghost"
+                onClick={prevStep}
+                disabled={currentStep === 1}
+                className="text-[#CFCFCF] hover:text-white hover:bg-[#22DFDC]/10"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
               
-              {/* Vertical Progress Container */}
-              <div className="relative h-48 w-1 bg-[#22DFDC]/20 rounded-full overflow-hidden">
-                <div
-                  className="absolute bottom-0 w-full rounded-full transition-all duration-500 ease-out"
-                  style={{
-                    height: `${progress}%`,
-                    background: 'linear-gradient(to top, #22DFDC, #22EDB6)'
-                  }}
-                />
-              </div>
-              
-              {/* Step Indicators */}
-              <div className="flex flex-col gap-4 mt-4">
-                {Array.from({ length: totalSteps }, (_, i) => (
-                  <div
-                    key={i + 1}
-                    className={`w-3 h-3 rounded-full border-2 transition-all ${
-                      i + 1 <= currentStep
-                        ? 'bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] border-transparent'
-                        : 'border-[#22DFDC]/40 bg-transparent'
-                    }`}
-                  />
-                ))}
-              </div>
+              {currentStep < totalSteps ? (
+                <Button
+                  onClick={nextStep}
+                  disabled={!canProceed()}
+                  className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white hover:opacity-90"
+                >
+                  Next
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!canProceed() || isSubmitting}
+                  className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white hover:opacity-90"
+                >
+                  {isSubmitting ? 'Creating...' : 'Create Sprint'}
+                  <Sparkles className="w-4 h-4 ml-2" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
