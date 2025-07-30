@@ -88,6 +88,26 @@ export class SprintPackageGenerator {
       
       const baseProgress = 25;
       const stepProgress = ((i + 1) / sprintData.dailyLessons.length) * 45;
+      
+      // Check if audio file already exists
+      const fileName = `${sprintData.sprintId}/day-${dayNumber}.wav`;
+      const { data: existingFile, error: checkError } = await supabase.storage
+        .from('sprint-audio')
+        .list(sprintData.sprintId, {
+          search: `day-${dayNumber}.wav`
+        });
+
+      if (!checkError && existingFile && existingFile.length > 0) {
+        // Audio file already exists, get its public URL
+        const { data: urlData } = supabase.storage
+          .from('sprint-audio')
+          .getPublicUrl(fileName);
+        
+        audioFiles[dayNumber.toString()] = urlData.publicUrl;
+        onProgress?.(`✅ Using existing audio for Day ${dayNumber}`, baseProgress + stepProgress);
+        continue;
+      }
+
       onProgress?.(`Generating audio for Day ${dayNumber}...`, baseProgress + stepProgress);
 
       try {
