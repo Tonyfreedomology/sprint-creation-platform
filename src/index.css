@@ -1,3 +1,5 @@
+@import url("https://cdn.jsdelivr.net/npm/@fontsource-variable/satoshi/index.min.css");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,49 +10,56 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Core theme colors - Cool tones only */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 14%; /* #242424 converted */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 14%;
 
+    /* Blue accent: #22DFDC */
     --primary: 179 73% 50%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 179 73% 60%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Jade accent: #22EDB6 */
+    --secondary: 152 84% 53%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 81%; /* #CFCFCF */
 
-    --accent: 152 84% 53%;
+    --accent: 152 84% 53%; /* Jade */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 179 73% 50%;
 
-    /* Freedomology brand gradients */
+    /* Cool-toned gradients - Blue to Jade */
     --gradient-primary: linear-gradient(135deg, hsl(179 73% 50%), hsl(152 84% 53%));
     --gradient-secondary: linear-gradient(135deg, hsl(179 73% 60%), hsl(179 73% 50%));
     --gradient-hero: linear-gradient(135deg, hsl(179 73% 50%) 0%, hsl(152 84% 53%) 100%);
     --gradient-card: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(179 73% 50% / 0.03) 100%);
+    --gradient-stroke: linear-gradient(135deg, hsl(179 73% 50%), hsl(152 84% 53%));
+    --gradient-glassmorphic: linear-gradient(135deg, hsl(179 73% 50% / 0.1), hsl(152 84% 53% / 0.1));
     
-    /* Shadows */
+    /* Enhanced shadows */
     --shadow-glow: 0 0 40px hsl(179 73% 50% / 0.3);
     --shadow-card: 0 10px 30px -10px hsl(179 73% 50% / 0.1);
     --shadow-elegant: 0 20px 40px -12px hsl(179 73% 50% / 0.15);
+    --shadow-glassmorphic: 0 8px 32px hsl(179 73% 50% / 0.15);
     
-    /* Transitions */
+    /* Smooth transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-hover: all 0.25s ease-out;
 
     --radius: 0.5rem;
 
@@ -72,33 +81,36 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark theme - Grey bg #242424 */
+    --background: 0 0% 14%; /* #242424 */
+    --foreground: 0 0% 100%; /* White text */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 14%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 14%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Blue accent stays same */
+    --primary: 179 73% 50%; /* #22DFDC */
+    --primary-foreground: 0 0% 14%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Jade accent */
+    --secondary: 152 84% 53%; /* #22EDB6 */
+    --secondary-foreground: 0 0% 14%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 81%; /* #CFCFCF secondary text */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 152 84% 53%; /* Jade */
+    --accent-foreground: 0 0% 14%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 0 0% 30%;
+    --input: 0 0% 20%;
+    --ring: 179 73% 50%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

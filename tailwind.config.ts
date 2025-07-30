@@ -18,6 +18,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Satoshi Variable', 'Inter', 'system-ui', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -62,18 +65,26 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				/* Cool-toned theme colors */
+				'cool-blue': 'hsl(179 73% 50%)', /* #22DFDC */
+				'cool-jade': 'hsl(152 84% 53%)', /* #22EDB6 */
+				'cool-grey': 'hsl(0 0% 14%)', /* #242424 */
+				'cool-text-secondary': 'hsl(0 0% 81%)', /* #CFCFCF */
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-secondary': 'var(--gradient-secondary)',
 				'gradient-hero': 'var(--gradient-hero)',
 				'gradient-card': 'var(--gradient-card)',
+				'gradient-stroke': 'var(--gradient-stroke)',
+				'gradient-glassmorphic': 'var(--gradient-glassmorphic)',
 			},
 			boxShadow: {
 				'glow': 'var(--shadow-glow)',
 				'card': 'var(--shadow-card)',
 				'elegant': 'var(--shadow-elegant)',
+				'glassmorphic': 'var(--shadow-glassmorphic)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
