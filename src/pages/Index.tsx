@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -109,11 +108,7 @@ const Index = () => {
       <div className="min-h-screen" style={{ background: '#242424' }}>
         <div className="container mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
+            <div>
               <Button
                 variant="ghost"
                 onClick={() => setShowForm(false)}
@@ -127,16 +122,12 @@ const Index = () => {
               <p className="text-xl text-cool-text-secondary max-w-2xl mx-auto">
                 Turn your expertise into a powerful, community-driven experience that creates lasting change
               </p>
-            </motion.div>
+            </div>
           </div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
+          <div>
             <SprintCreationForm />
-          </motion.div>
+          </div>
         </div>
       </div>
     );
@@ -145,388 +136,127 @@ const Index = () => {
   return (
     <div className="min-h-screen" style={{ background: '#242424' }}>
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div 
-              className="space-y-6"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <Badge 
-                  className="border w-fit text-sm"
-                  style={{ 
-                    backgroundColor: '#1a1a1a',
-                    border: '1px solid #22DFDC',
-                    color: '#22DFDC'
-                  }}
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Transform Lives Through Sprints
-                </Badge>
-              </motion.div>
-              
-              <motion.h1 
-                className="text-5xl lg:text-6xl font-bold leading-tight text-white"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                Create{' '}
-                <span style={{ color: '#22DFDC' }}>
-                  Powerful Sprints
-                </span>
-                {' '}That Change Lives
-              </motion.h1>
-              
-              <motion.p 
-                className="text-xl leading-relaxed"
-                style={{ color: '#CFCFCF' }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                Join Freedomology and turn your expertise into transformational 21-40 day experiences. 
-                Our AI-powered platform helps you create engaging, habit-forming sprints that deliver real results.
-              </motion.p>
-              
-              <motion.div 
-                className="flex flex-col sm:flex-row gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-              >
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    size="lg"
-                    onClick={() => setShowForm(true)}
-                    className="text-lg px-8 text-white"
+      <section className="relative overflow-hidden py-16">
+        <div className="container mx-auto px-4">
+          {/* Hero Container with Gradient Border */}
+          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
+            <div className="relative bg-[#242424] rounded-3xl p-8 md:p-12">
+              <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div className="space-y-6">
+                  <div
+                    className="border w-fit text-sm px-4 py-2 rounded-full"
                     style={{ 
-                      background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
-                      border: 'none'
+                      backgroundColor: '#1a1a1a',
+                      border: '1px solid #22DFDC',
+                      color: '#22DFDC'
                     }}
                   >
-                    Start Creating
-                    <ChevronRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </motion.div>
+                    <Sparkles className="w-4 h-4 mr-2 inline" />
+                    Transform Lives Through Sprints
+                  </div>
+                  
+                  <h1 className="text-5xl md:text-[72px] leading-[1.1] font-bold text-white">
+                    Create{' '}
+                    <span style={{ color: '#22DFDC' }}>
+                      Powerful Sprints
+                    </span>
+                    {' '}That Change Lives
+                  </h1>
+                  
+                  <p className="text-xl leading-relaxed max-w-[48ch]" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                    Join Freedomology and turn your expertise into transformational 21-40 day experiences. 
+                    Our AI-powered platform helps you create engaging, habit-forming sprints that deliver real results.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      onClick={() => setShowForm(true)}
+                      className="px-8 py-4 text-lg rounded-xl font-medium text-white transition-all hover:scale-105"
+                      style={{ 
+                        background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
+                        border: 'none'
+                      }}
+                    >
+                      Start Creating
+                      <ChevronRight className="w-5 h-5 ml-2 inline" />
+                    </button>
+                    
+                    <button
+                      onClick={() => window.location.href = '/package-results'}
+                      className="px-8 py-4 text-lg rounded-xl font-medium transition-all hover:scale-105 hover:bg-[#22DFDC]/10"
+                      style={{ 
+                        color: '#22DFDC',
+                        border: '1px solid #22DFDC',
+                        backgroundColor: 'transparent'
+                      }}
+                    >
+                      Test Publish Page
+                    </button>
+                  </div>
+                  
+                  <div className="flex items-center gap-6 text-sm" style={{ color: '#CFCFCF' }}>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
+                      No coding required
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
+                      AI-powered content
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
+                      Community included
+                    </div>
+                  </div>
+                </div>
                 
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="text-lg px-8 text-cool-blue border-cool-blue hover:bg-cool-blue/10"
-                    onClick={() => window.location.href = '/package-results'}
-                  >
-                    Test Publish Page
-                  </Button>
-                </motion.div>
-                
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="text-lg px-8 text-cool-text-secondary border-cool-text-secondary hover:bg-cool-text-secondary/10"
-                  >
-                    <Play className="w-5 h-5 mr-2" />
-                    Watch Demo
-                  </Button>
-                </motion.div>
-              </motion.div>
-              
-              <motion.div 
-                className="flex items-center gap-6 text-sm"
-                style={{ color: '#CFCFCF' }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
-                  No coding required
+                <div className="relative">
+                  <img
+                    src={heroImage}
+                    alt="Freedomology Sprint Creation"
+                    className="rounded-2xl w-full"
+                    style={{ boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.15)' }}
+                  />
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
-                  AI-powered content
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
-                  Community included
-                </div>
-              </motion.div>
-            </motion.div>
-            
-            <motion.div 
-              className="relative"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              whileHover={{ y: -10 }}
-            >
-              <div 
-                className="absolute -inset-4 opacity-20 blur-xl rounded-full"
-                style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
-              ></div>
-              <img
-                src={heroImage}
-                alt="Freedomology Sprint Creation"
-                className="relative rounded-2xl w-full"
-                style={{ boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.15)' }}
-              />
-            </motion.div>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="py-20" style={{ background: '#1a1a1a' }}>
-        <div className="container mx-auto px-4">
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-bold mb-4 text-white">
-              Everything You Need to Create{' '}
-              <span style={{ color: '#22DFDC' }}>
-                Amazing Sprints
-              </span>
-            </h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF' }}>
-              From AI-powered content creation to automated delivery and community building, 
-              we've got every aspect covered.
-            </p>
-          </motion.div>
+          {/* Features Section */}
+          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px]">
+            <div className="relative bg-[#242424] rounded-3xl p-8 md:p-12">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold mb-4 text-white">
+                  Everything You Need to Create{' '}
+                  <span style={{ color: '#22EDB6' }}>Amazing</span>
+                </h2>
+                <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                  From AI-powered content creation to automated delivery and community building, 
+                  we've got every aspect covered.
+                </p>
+              </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ 
-                  y: -5,
-                  boxShadow: '0 20px 40px -12px rgba(34, 223, 220, 0.15)'
-                }}
-              >
-                <Card 
-                  className="h-full"
-                  style={{
-                    background: '#2a2a2a',
-                    border: '1px solid #22DFDC',
-                    borderRadius: '16px'
-                  }}
-                >
-                  <CardHeader>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {features.map((feature, index) => (
+                  <div
+                    key={index}
+                    className="rounded-xl bg-[#1E1E1E]/70 backdrop-blur-md border border-transparent hover:border-[#22DFDC] transition-all duration-300 p-6 group hover:scale-105"
+                  >
                     <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-white mb-4"
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform"
                       style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
                     >
                       {feature.icon}
                     </div>
-                    <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base" style={{ color: '#CFCFCF' }}>
+                    <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                    <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
                       {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="py-20" style={{ background: '#242424' }}>
-        <div className="container mx-auto px-4">
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-bold mb-4 text-white">
-              Create Sprints in Any{' '}
-              <span style={{ color: '#22EDB6' }}>
-                Category
-              </span>
-            </h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF' }}>
-              Whether you're an expert in health, wealth, relationships, or personal development, 
-              our platform adapts to your unique expertise.
-            </p>
-          </motion.div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map((category, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ 
-                  y: -5,
-                  scale: 1.02
-                }}
-              >
-                <Card 
-                  className="h-full text-center group"
-                  style={{
-                    background: '#2a2a2a',
-                    border: '1px solid #22DFDC',
-                    borderRadius: '16px'
-                  }}
-                >
-                  <CardHeader>
-                    <motion.div 
-                      className={`w-16 h-16 rounded-full flex items-center justify-center text-white mx-auto mb-4`}
-                      style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
-                      whileHover={{ scale: 1.1 }}
-                    >
-                      {category.icon}
-                    </motion.div>
-                    <CardTitle className="text-xl text-white">{category.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-center text-base" style={{ color: '#CFCFCF' }}>
-                      {category.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20" style={{ background: '#1a1a1a' }}>
-        <div className="container mx-auto px-4">
-          <motion.div 
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-bold mb-4 text-white">
-              Loved by{' '}
-              <span style={{ color: '#22DFDC' }}>
-                Creators Worldwide
-              </span>
-            </h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF' }}>
-              Join thousands of experts who have transformed their knowledge into powerful sprints
-            </p>
-          </motion.div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -5 }}
-              >
-                <Card 
-                  className="h-full"
-                  style={{
-                    background: '#2a2a2a',
-                    border: '1px solid #22DFDC',
-                    borderRadius: '16px'
-                  }}
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-1 mb-2">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-current" style={{ color: '#22EDB6' }} />
-                      ))}
-                    </div>
-                    <CardDescription className="text-base italic" style={{ color: '#CFCFCF' }}>
-                      "{testimonial.content}"
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div>
-                      <div className="font-semibold text-white">{testimonial.name}</div>
-                      <div className="text-sm" style={{ color: '#CFCFCF' }}>{testimonial.role}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section 
-        className="py-20 text-white"
-        style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
-      >
-        <div className="container mx-auto px-4 text-center">
-          <motion.div 
-            className="max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-5xl font-bold mb-6">
-              Ready to Transform Lives?
-            </h2>
-            <p className="text-xl mb-8 opacity-90">
-              Join the movement of creators who are changing the world one sprint at a time. 
-              Your expertise deserves to reach more people.
-            </p>
-            
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                size="lg"
-                onClick={() => setShowForm(true)}
-                className="text-lg px-12 py-6"
-                style={{
-                  background: '#242424',
-                  color: '#22DFDC',
-                  border: 'none'
-                }}
-              >
-                Create Your First Sprint
-                <Sparkles className="w-5 h-5 ml-2" />
-              </Button>
-            </motion.div>
-            
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm opacity-80">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                Free to start
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                No technical skills needed
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                Launch in minutes
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>
