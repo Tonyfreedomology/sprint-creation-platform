@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Download, Copy, ExternalLink, QrCode, Mail, ArrowLeft, Volume2 } from 'lucide-react';
+import { Download, Copy, ExternalLink, QrCode, Mail, ArrowLeft, Volume2, Play, Pause, Link } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function PackageResults() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+  const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
   
   const packageData = searchParams.get('packageData');
   
@@ -59,6 +61,39 @@ export default function PackageResults() {
     a.click();
     URL.revokeObjectURL(url);
     toast.success('Email templates downloaded!');
+  };
+
+  const toggleAudioPlayback = (day: string, url: string) => {
+    if (currentlyPlaying === day) {
+      // Pause current audio
+      audioRefs.current[day]?.pause();
+      setCurrentlyPlaying(null);
+    } else {
+      // Stop any currently playing audio
+      if (currentlyPlaying && audioRefs.current[currentlyPlaying]) {
+        audioRefs.current[currentlyPlaying].pause();
+      }
+      
+      // Create new audio element if it doesn't exist
+      if (!audioRefs.current[day]) {
+        audioRefs.current[day] = new Audio(url);
+        audioRefs.current[day].addEventListener('ended', () => {
+          setCurrentlyPlaying(null);
+        });
+      }
+      
+      // Play the selected audio
+      audioRefs.current[day].play();
+      setCurrentlyPlaying(day);
+    }
+  };
+
+  const downloadAudio = (url: string, day: string) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `day-${day}-audio.wav`;
+    link.click();
+    toast.success(`Day ${day} audio download started!`);
   };
 
   const audioCount = Object.keys(audioFiles).length;
@@ -207,24 +242,38 @@ export default function PackageResults() {
             </p>
             
             {Object.keys(audioFiles).length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="space-y-3">
                 {Object.entries(audioFiles).map(([day, url]) => (
-                  <div key={day} className="flex items-center justify-between p-3 bg-secondary/10 rounded">
+                  <div key={day} className="flex items-center justify-between p-4 bg-secondary/10 rounded-lg">
                     <span className="text-sm font-medium">Day {day} Audio</span>
                     <div className="flex gap-2">
                       <Button 
                         size="sm" 
                         variant="ghost"
-                        onClick={() => window.open(url as string, '_blank')}
+                        onClick={() => toggleAudioPlayback(day, url as string)}
+                        className="flex items-center gap-1"
                       >
-                        <ExternalLink className="h-4 w-4" />
+                        {currentlyPlaying === day ? (
+                          <Pause className="h-4 w-4" />
+                        ) : (
+                          <Play className="h-4 w-4" />
+                        )}
                       </Button>
                       <Button 
                         size="sm" 
                         variant="ghost"
-                        onClick={() => copyToClipboard(url as string, `Day ${day} audio URL`)}
+                        onClick={() => downloadAudio(url as string, day)}
+                        className="flex items-center gap-1"
                       >
-                        <Copy className="h-4 w-4" />
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => copyToClipboard(url as string, `Day ${day} audio link`)}
+                        className="flex items-center gap-1"
+                      >
+                        <Link className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
