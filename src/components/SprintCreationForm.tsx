@@ -248,44 +248,44 @@ export const SprintCreationForm: React.FC = () => {
           <div className="space-y-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="creatorName" className="text-sm font-medium">Your Name *</Label>
+                <Label htmlFor="creatorName" className="text-white text-sm font-medium">Your Name *</Label>
                 <Input
                   id="creatorName"
                   placeholder="Enter your full name"
                   value={formData.creatorName}
                   onChange={(e) => handleInputChange('creatorName', e.target.value)}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="creatorEmail" className="text-sm font-medium">Email Address *</Label>
+                <Label htmlFor="creatorEmail" className="text-white text-sm font-medium">Email Address *</Label>
                 <Input
                   id="creatorEmail"
                   type="email"
                   placeholder="your.email@example.com"
                   value={formData.creatorEmail}
                   onChange={(e) => handleInputChange('creatorEmail', e.target.value)}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="creatorBio" className="text-sm font-medium">About You</Label>
+                <Label htmlFor="creatorBio" className="text-white text-sm font-medium">About You</Label>
                 <Textarea
                   id="creatorBio"
                   placeholder="Tell us about your background, expertise, and what drives you to create this sprint..."
                   value={formData.creatorBio}
                   onChange={(e) => handleInputChange('creatorBio', e.target.value)}
-                  className="mt-2 min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
               <div>
-                <Label htmlFor="experience" className="text-sm font-medium">Your Experience Level</Label>
+                <Label htmlFor="experience" className="text-white text-sm font-medium">Your Experience Level</Label>
                 <Select value={formData.experience} onValueChange={(value) => handleInputChange('experience', value)}>
-                  <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 focus:border-[#22DFDC] outline-none transition">
-                    <SelectValue placeholder="Select your experience level" />
+                  <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
+                    <SelectValue placeholder="Select your experience level" className="text-white/50" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30">
                     <SelectItem value="beginner" className="text-white hover:bg-[#22DFDC]/10">Beginner - New to creating content</SelectItem>
@@ -706,7 +706,7 @@ export const SprintCreationForm: React.FC = () => {
       <div className="max-w-[540px] mx-auto">
         {/* Gradient Border Container */}
         <div className="relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[1px]">
-          <div className="relative bg-[#111111]/90 backdrop-blur-md rounded-2xl p-8">
+          <div className="relative bg-[#0F0F0F] rounded-2xl p-8">
             
             {/* Step Header */}
             <div className="mb-8">
