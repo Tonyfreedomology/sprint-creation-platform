@@ -42,6 +42,7 @@ interface SprintFormData {
   
   // Voice and delivery options
   voiceStyle: string;
+  voiceGender?: string;
   voiceSampleFile: File | null;
   writingStyleFile: File | null;
   participantEmails: string;
@@ -88,6 +89,7 @@ const initialFormData: SprintFormData = {
   goals: '',
   specialRequirements: '',
   voiceStyle: 'warm-coach', // Default voice style
+  voiceGender: 'female', // Default voice gender
   voiceSampleFile: null,
   writingStyleFile: null,
   participantEmails: '',
@@ -408,44 +410,13 @@ export const SprintCreationForm: React.FC = () => {
           <div className="space-y-6">
             <div className="space-y-6">
               <div>
-                <Label className="text-white text-sm font-medium">Content Generation Preference</Label>
-                <RadioGroup 
-                  value={formData.contentGeneration} 
-                  onValueChange={(value) => handleInputChange('contentGeneration', value)}
-                  className="mt-3"
-                >
-                  <div className="flex items-center space-x-2 p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="ai" id="ai" />
-                    <Label htmlFor="ai" className="flex-1 cursor-pointer text-white">
-                      <div className="font-medium">AI-Powered Creation</div>
-                      <div className="text-sm text-white/70">Let AI write scripts and content based on your input, then customize</div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="hybrid" id="hybrid" />
-                    <Label htmlFor="hybrid" className="flex-1 cursor-pointer text-white">
-                      <div className="font-medium">Hybrid Approach</div>
-                      <div className="text-sm text-white/70">AI helps with outlines and drafts, you write the final content</div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="manual" id="manual" />
-                    <Label htmlFor="manual" className="flex-1 cursor-pointer text-white">
-                      <div className="font-medium">Manual Creation</div>
-                      <div className="text-sm text-white/70">You'll write all content yourself with template guidance</div>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div>
                 <Label className="text-white text-sm font-medium">Content Types (Select all that apply)</Label>
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   {[
-                    { id: 'text', label: 'Written Lessons' },
-                     { id: 'challenges', label: 'Daily Challenges' },
-                     { id: 'affirmations', label: 'Affirmations' },
-                     { id: 'exercises', label: 'Practical Exercises' },
+                    { id: 'written-lessons', label: 'Written Lessons' },
+                    { id: 'audio-lessons', label: 'Audio Lessons' },
+                    { id: 'daily-emails', label: 'Daily Emails' },
+                    { id: 'challenges', label: 'Challenges' },
                   ].map((type) => (
                     <div key={type.id} className="flex items-center space-x-2 p-3 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
                       <Checkbox
@@ -477,66 +448,103 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="voiceStyle" className="text-white text-sm font-medium">Voice Style for Audio Generation</Label>
-                <Select value={formData.voiceStyle} onValueChange={(value) => handleInputChange('voiceStyle', value)}>
-                  <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
-                    <SelectValue placeholder="Select voice style" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
-                    <SelectItem value="warm-coach" className="text-white hover:bg-[#22DFDC]/10">Warm Coach - Encouraging & Patient</SelectItem>
-                    <SelectItem value="strong-mentor" className="text-white hover:bg-[#22DFDC]/10">Strong Mentor - Confident & Wise</SelectItem>
-                    <SelectItem value="wise-guide" className="text-white hover:bg-[#22DFDC]/10">Wise Guide - Calm & Transformational</SelectItem>
-                    <SelectItem value="motivational-speaker" className="text-white hover:bg-[#22DFDC]/10">Motivational Speaker - Dynamic & Inspiring</SelectItem>
-                    <SelectItem value="trusted-friend" className="text-white hover:bg-[#22DFDC]/10">Trusted Friend - Warm & Relatable</SelectItem>
-                    <SelectItem value="professional-trainer" className="text-white hover:bg-[#22DFDC]/10">Professional Trainer - Clear & Competent</SelectItem>
-                    <SelectItem value="compassionate-counselor" className="text-white hover:bg-[#22DFDC]/10">Compassionate Counselor - Gentle & Safe</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-white/70 mt-1">
-                  Choose the voice personality that will narrate your entire sprint consistently
-                </p>
+                <Label className="text-white text-sm font-medium mb-3 block">Voice Options</Label>
+                <div className="space-y-4">
+                  {/* Voice Gender Selection */}
+                  <div>
+                    <Label className="text-white text-xs font-medium uppercase tracking-wide opacity-70">Voice Gender</Label>
+                    <RadioGroup 
+                      value={formData.voiceGender || 'female'} 
+                      onValueChange={(value) => handleInputChange('voiceGender', value)}
+                      className="flex gap-4 mt-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="male" id="male" />
+                        <Label htmlFor="male" className="text-white text-sm">Male</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="female" id="female" />
+                        <Label htmlFor="female" className="text-white text-sm">Female</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {/* Voice Style */}
+                  <div>
+                    <Label htmlFor="voiceStyle" className="text-white text-xs font-medium uppercase tracking-wide opacity-70">Voice Personality</Label>
+                    <Select value={formData.voiceStyle} onValueChange={(value) => handleInputChange('voiceStyle', value)}>
+                      <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
+                        <SelectValue placeholder="Select voice style" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
+                        <SelectItem value="warm-coach" className="text-white hover:bg-[#22DFDC]/10">Warm Coach - Encouraging & Patient</SelectItem>
+                        <SelectItem value="strong-mentor" className="text-white hover:bg-[#22DFDC]/10">Strong Mentor - Confident & Wise</SelectItem>
+                        <SelectItem value="wise-guide" className="text-white hover:bg-[#22DFDC]/10">Wise Guide - Calm & Transformational</SelectItem>
+                        <SelectItem value="motivational-speaker" className="text-white hover:bg-[#22DFDC]/10">Motivational Speaker - Dynamic & Inspiring</SelectItem>
+                        <SelectItem value="trusted-friend" className="text-white hover:bg-[#22DFDC]/10">Trusted Friend - Warm & Relatable</SelectItem>
+                        <SelectItem value="professional-trainer" className="text-white hover:bg-[#22DFDC]/10">Professional Trainer - Clear & Competent</SelectItem>
+                        <SelectItem value="compassionate-counselor" className="text-white hover:bg-[#22DFDC]/10">Compassionate Counselor - Gentle & Safe</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="text-center text-white/50 text-xs uppercase tracking-wider">— OR —</div>
+
+                  {/* Voice Sample Upload */}
+                  <div className="space-y-3">
+                    <Label className="text-white text-xs font-medium uppercase tracking-wide opacity-70">Upload Voice Sample</Label>
+                    <div className="flex gap-3">
+                      <label htmlFor="voiceSample" className="flex-1 cursor-pointer">
+                        <div className="border border-white/20 rounded-lg px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
+                          <span className="text-white/70 text-sm">
+                            {formData.voiceSampleFile ? formData.voiceSampleFile.name : 'Choose audio file...'}
+                          </span>
+                        </div>
+                        <Input
+                          id="voiceSample"
+                          type="file"
+                          accept="audio/*,.mp3,.wav,.m4a"
+                          onChange={handleVoiceFileChange}
+                          className="hidden"
+                        />
+                      </label>
+                      <Button
+                        type="button"
+                        className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-4 py-2 text-sm"
+                      >
+                        Record
+                      </Button>
+                    </div>
+                    <p className="text-xs text-white/50">
+                      Upload 30-60 seconds of clear speech for voice cloning
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div>
-                <Label htmlFor="voiceSample" className="text-white text-sm font-medium">Voice Sample for Cloning (Optional)</Label>
-                <Input
-                  id="voiceSample"
-                  type="file"
-                  accept="audio/*,.mp3,.wav,.m4a"
-                  onChange={handleVoiceFileChange}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition"
-                />
-                <p className="text-sm text-white/70 mt-1">
-                  Upload a clear 30-60 second audio sample for AI voice cloning (optional)
+                <Label className="text-white text-sm font-medium mb-3 block">Writing Style Sample (Optional)</Label>
+                <label htmlFor="writingStyle" className="cursor-pointer block">
+                  <div className="border border-white/20 rounded-lg px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
+                    <span className="text-white/70 text-sm">
+                      {formData.writingStyleFile ? formData.writingStyleFile.name : 'Choose document...'}
+                    </span>
+                  </div>
+                  <Input
+                    id="writingStyle"
+                    type="file"
+                    accept=".txt,.docx,.pdf"
+                    onChange={handleWritingStyleFileChange}
+                    className="hidden"
+                  />
+                </label>
+                <p className="text-xs text-white/50 mt-2">
+                  Upload a document example for AI to analyze your writing style
                 </p>
-                 {formData.voiceSampleFile && (
-                   <p className="text-sm text-green-600 mt-1">
-                     ✓ File selected: {formData.voiceSampleFile.name}
-                   </p>
-                 )}
-               </div>
-
-               <div>
-                 <Label htmlFor="writingStyle" className="text-white text-sm font-medium">Writing Style Sample (Optional)</Label>
-                 <Input
-                   id="writingStyle"
-                   type="file"
-                   accept=".txt,.docx,.pdf"
-                   onChange={handleWritingStyleFileChange}
-                   className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition"
-                 />
-                 <p className="text-sm text-white/70 mt-1">
-                   Upload a document example of your writing style for AI to mimic (optional)
-                 </p>
-                 {formData.writingStyleFile && (
-                   <p className="text-sm text-green-600 mt-1">
-                     ✓ File selected: {formData.writingStyleFile.name}
-                   </p>
-                 )}
-               </div>
-             </div>
-           </div>
-         );
+              </div>
+            </div>
+          </div>
+        );
 
       case 4:
         return (
