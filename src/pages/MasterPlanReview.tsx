@@ -129,10 +129,10 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+          <Button variant="ghost" onClick={onBack} className="flex items-center gap-2 text-foreground hover:bg-primary/10">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
@@ -141,24 +141,24 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
           </h1>
         </div>
 
-        <Card className="border-primary/20 shadow-card">
+        <Card className="bg-gradient-card border border-primary/20 shadow-elegant">
           <CardHeader>
-            <CardTitle>Sprint Overview</CardTitle>
+            <CardTitle className="text-foreground">Sprint Overview</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">Progression Arc</h3>
+                <h3 className="font-semibold mb-2 text-foreground">Progression Arc</h3>
                 <p className="text-muted-foreground">{editedPlan.overallStructure.progressionArc}</p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Phases</h3>
+                <h3 className="font-semibold mb-2 text-foreground">Phases</h3>
                 <div className="grid gap-2">
                   {editedPlan.overallStructure.phases.map((phase, index) => (
-                    <div key={index} className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
-                      <span className="font-medium">{phase.name}</span>
-                      <span className="text-sm text-muted-foreground">Days {phase.days}</span>
-                      <span className="text-sm">{phase.focus}</span>
+                    <div key={index} className="flex items-center gap-4 p-3 bg-primary/5 border border-primary/10 rounded-lg">
+                      <span className="font-medium text-foreground">{phase.name}</span>
+                      <span className="text-sm text-primary">Days {phase.days}</span>
+                      <span className="text-sm text-muted-foreground">{phase.focus}</span>
                     </div>
                   ))}
                 </div>
@@ -169,14 +169,14 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Daily Plan ({editedPlan.dailyPlans.length} days)</h2>
+            <h2 className="text-2xl font-bold text-foreground">Daily Plan ({editedPlan.dailyPlans.length} days)</h2>
             <p className="text-sm text-muted-foreground">Drag to reorder • Click to edit</p>
           </div>
 
           {editedPlan.dailyPlans.map((day, index) => (
             <Card 
               key={day.day} 
-              className={`border-primary/20 shadow-card cursor-move transition-all ${
+              className={`bg-gradient-card border border-primary/20 shadow-elegant cursor-move transition-all hover:border-primary/30 ${
                 draggedIndex === index ? 'opacity-50' : ''
               }`}
               draggable
@@ -195,13 +195,14 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
                           <Input
                             value={day.theme}
                             onChange={(e) => handleDayEdit(index, 'theme', e.target.value)}
-                            className="h-8 font-semibold"
+                            className="h-8 font-semibold bg-background/50 border-primary/20"
                             placeholder="Lesson theme..."
                           />
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => setEditingDay(null)}
+                            className="hover:bg-primary/10"
                           >
                             <Check className="w-4 h-4" />
                           </Button>
@@ -209,11 +210,12 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
                       ) : (
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-semibold">{day.theme}</h3>
+                            <h3 className="font-semibold text-foreground">{day.theme}</h3>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => setEditingDay(index)}
+                              className="hover:bg-primary/10"
                             >
                               <Edit2 className="w-4 h-4" />
                             </Button>
@@ -237,19 +239,19 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
               {editingDay === index && (
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium">Learning Objective</label>
+                    <label className="text-sm font-medium text-foreground">Learning Objective</label>
                     <Textarea
                       value={day.learningObjective}
                       onChange={(e) => handleDayEdit(index, 'learningObjective', e.target.value)}
-                      className="mt-1"
+                      className="mt-1 bg-background/50 border-primary/20"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Key Takeaways (one per line)</label>
+                    <label className="text-sm font-medium text-foreground">Key Takeaways (one per line)</label>
                     <Textarea
                       value={day.keyTakeaways.join('\n')}
                       onChange={(e) => handleDayEdit(index, 'keyTakeaways', e.target.value.split('\n'))}
-                      className="mt-1"
+                      className="mt-1 bg-background/50 border-primary/20"
                     />
                   </div>
                 </CardContent>
@@ -259,13 +261,13 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
         </div>
 
         <div className="flex items-center justify-between pt-6">
-          <Button variant="outline" onClick={onBack}>
+          <Button variant="outline" onClick={onBack} className="border-primary/20 hover:bg-primary/10">
             Back to Form
           </Button>
           <Button 
             onClick={handleApproveAndGenerate}
             disabled={isGenerating}
-            className="bg-gradient-to-r from-primary to-primary-glow"
+            className="bg-gradient-to-r from-primary to-primary-glow hover:shadow-glow disabled:opacity-50"
           >
             {isGenerating ? 'Starting Generation...' : 'Approve & Generate Content'}
           </Button>
