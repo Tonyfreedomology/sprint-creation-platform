@@ -705,7 +705,10 @@ export const SprintCreationForm: React.FC = () => {
       {/* Form Container */}
       <div className="max-w-[540px] mx-auto">
         {/* Gradient Border Container */}
-        <div className="relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[1px]">
+        <div className="relative">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[#22DFDC] to-[#22EDB6] p-[1px]">
+            <div className="w-full h-full bg-[#0F0F0F] rounded-2xl"></div>
+          </div>
           <div className="relative bg-[#0F0F0F] rounded-2xl p-8">
             
             {/* Step Header */}
