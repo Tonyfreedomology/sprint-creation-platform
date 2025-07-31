@@ -161,25 +161,7 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
             
             <div className="space-y-6">
               <div>
-                <p className="text-white/80 leading-relaxed max-w-prose">{editedPlan.overallStructure.progressionArc}</p>
-              </div>
-              
-              <div>
-                <h3 className="gradient-text font-medium mb-4">Phases</h3>
-                <div className="space-y-3">
-                  {editedPlan.overallStructure.phases.map((phase, index) => (
-                    <div key={index} className="flex items-start gap-4 py-4 border-t border-white/10 first:border-t-0">
-                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <div className="w-2 h-2 rounded-full bg-black" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-white font-medium">{phase.name}</h4>
-                        <p className="gradient-text text-sm">Day {phase.days}</p>
-                        <p className="text-white/70 text-sm mt-1 leading-relaxed max-w-prose">{phase.focus}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-white/80 leading-relaxed">{editedPlan.overallStructure.progressionArc}</p>
               </div>
             </div>
           </div>
