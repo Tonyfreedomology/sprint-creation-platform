@@ -17,57 +17,79 @@ serve(async (req) => {
       throw new Error('HUME_API_KEY is not configured');
     }
 
-    const formData = await req.formData();
-    const audioFile = formData.get('audio') as File;
-    const voiceName = formData.get('voiceName') as string;
+    const { voiceName, voiceDescription, sampleText } = await req.json();
     
-    if (!audioFile) {
-      throw new Error('No audio file provided');
+    if (!voiceName || !voiceDescription || !sampleText) {
+      throw new Error('Voice name, description, and sample text are required');
     }
 
-    console.log('Creating voice clone for:', voiceName, 'with file size:', audioFile.size);
+    console.log('Creating custom voice:', voiceName, 'with description:', voiceDescription);
 
-    // Step 1: Create the voice clone with Hume
-    const cloneResponse = await fetch('https://api.hume.ai/v0/evi/voices', {
+    // Step 1: Generate TTS with the voice description to create a generation
+    const ttsResponse = await fetch('https://api.hume.ai/v0/tts/synthesize', {
       method: 'POST',
       headers: {
         'X-Hume-Api-Key': HUME_API_KEY,
+        'Content-Type': 'application/json',
       },
-      body: (() => {
-        const cloneFormData = new FormData();
-        cloneFormData.append('file', audioFile);
-        cloneFormData.append('name', voiceName || `Voice_${Date.now()}`);
-        return cloneFormData;
-      })(),
+      body: JSON.stringify({
+        text: sampleText,
+        voice: {
+          description: voiceDescription
+        },
+        return_meta: true // This ensures we get the generation_id
+      }),
     });
 
-    if (!cloneResponse.ok) {
-      const errorText = await cloneResponse.text();
-      console.error('Hume voice clone error:', errorText);
-      throw new Error(`Failed to create voice clone: ${cloneResponse.status} - ${errorText}`);
+    if (!ttsResponse.ok) {
+      const errorText = await ttsResponse.text();
+      console.error('Hume TTS generation error:', errorText);
+      throw new Error(`Failed to generate TTS: ${ttsResponse.status} - ${errorText}`);
     }
 
-    const cloneData = await cloneResponse.json();
-    console.log('Voice clone created successfully:', cloneData);
+    const ttsData = await ttsResponse.json();
+    console.log('TTS generation successful:', ttsData);
 
-    // The response should contain the voice ID
-    const voiceId = cloneData.id;
+    const generationId = ttsData.generation_id;
     
-    if (!voiceId) {
-      throw new Error('No voice ID returned from Hume');
+    if (!generationId) {
+      throw new Error('No generation ID returned from TTS');
     }
+
+    // Step 2: Save the voice using the generation ID
+    const saveResponse = await fetch('https://api.hume.ai/v0/tts/voices', {
+      method: 'POST',
+      headers: {
+        'X-Hume-Api-Key': HUME_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        generation_id: generationId,
+        name: voiceName
+      }),
+    });
+
+    if (!saveResponse.ok) {
+      const errorText = await saveResponse.text();
+      console.error('Hume voice save error:', errorText);
+      throw new Error(`Failed to save voice: ${saveResponse.status} - ${errorText}`);
+    }
+
+    const voiceData = await saveResponse.json();
+    console.log('Voice saved successfully:', voiceData);
 
     return new Response(JSON.stringify({
       success: true,
-      voiceId: voiceId,
-      voiceName: cloneData.name || voiceName,
-      message: 'Voice clone created successfully'
+      voiceId: voiceData.id,
+      voiceName: voiceData.name,
+      generationId: generationId,
+      message: 'Custom voice created successfully'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Voice cloning error:', error);
+    console.error('Voice creation error:', error);
     return new Response(JSON.stringify({
       success: false,
       error: error.message || 'Unknown error occurred'

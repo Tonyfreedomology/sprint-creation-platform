@@ -213,33 +213,38 @@ export const SprintCreationForm: React.FC = () => {
     setIsCreatingVoiceClone(true);
     
     try {
-      const audioFile = formData.voiceSampleFile || formData.voiceRecordingBlob;
-      if (!audioFile) return null;
+      const hasVoiceSample = formData.voiceSampleFile || formData.voiceRecordingBlob;
+      if (!hasVoiceSample) return null;
 
-      console.log('Creating voice clone for sprint:', sprintId);
+      console.log('Creating custom voice for sprint:', sprintId);
       
-      const cloneFormData = new FormData();
-      cloneFormData.append('audio', audioFile);
-      cloneFormData.append('voiceName', `${formData.creatorName}_${sprintId}`);
+      // Create a voice description based on the form data
+      const voiceDescription = `A ${formData.voiceGender} voice with a ${formData.voiceStyle} tone, suitable for coaching and educational content. The voice should sound confident, warm, and engaging.`;
+      const sampleText = "Welcome to this transformative journey. I'm here to guide you through each step with clarity and confidence.";
+      const voiceName = `${formData.creatorName}_${sprintId}`;
       
       const { data, error } = await supabase.functions.invoke('clone-voice-hume', {
-        body: cloneFormData,
+        body: {
+          voiceName,
+          voiceDescription,
+          sampleText
+        },
       });
       
       if (error) {
-        console.error('Voice cloning error:', error);
-        throw new Error(error.message || 'Failed to create voice clone');
+        console.error('Voice creation error:', error);
+        throw new Error(error.message || 'Failed to create custom voice');
       }
       
       if (data.success) {
-        console.log('Voice clone created successfully:', data.voiceId);
+        console.log('Custom voice created successfully:', data.voiceId);
         toast({
-          title: "Voice clone created",
-          description: `Successfully cloned voice: ${data.voiceName}`,
+          title: "Custom voice created",
+          description: `Successfully created voice: ${data.voiceName}`,
         });
         return data.voiceId;
       } else {
-        throw new Error(data.error || 'Voice cloning failed');
+        throw new Error(data.error || 'Voice creation failed');
       }
       
     } catch (error: any) {
