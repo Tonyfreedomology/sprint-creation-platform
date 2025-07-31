@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, Volume2, Download } from 'lucide-react';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,8 @@ interface AudioPlayerProps {
   onDownload?: () => void;
   className?: string;
   showDownload?: boolean;
+  // New props to sync with external audio
+  externalAudio?: HTMLAudioElement;
 }
 
 export function AudioPlayer({ 
@@ -20,52 +22,46 @@ export function AudioPlayer({
   onPlayToggle, 
   onDownload,
   className,
-  showDownload = true 
+  showDownload = true,
+  externalAudio 
 }: AudioPlayerProps) {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
+  // Sync with external audio element if provided
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    if (!externalAudio) return;
 
     const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
+      setDuration(externalAudio.duration);
       setIsLoaded(true);
     };
 
     const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
+      setCurrentTime(externalAudio.currentTime);
     };
 
     const handleEnded = () => {
       setCurrentTime(0);
-      onPlayToggle?.();
     };
 
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
+    externalAudio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    externalAudio.addEventListener('timeupdate', handleTimeUpdate);
+    externalAudio.addEventListener('ended', handleEnded);
+
+    // Set initial values if already loaded
+    if (externalAudio.duration) {
+      setDuration(externalAudio.duration);
+      setIsLoaded(true);
+    }
 
     return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
+      externalAudio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      externalAudio.removeEventListener('timeupdate', handleTimeUpdate);
+      externalAudio.removeEventListener('ended', handleEnded);
     };
-  }, [onPlayToggle]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.play().catch(console.error);
-    } else {
-      audio.pause();
-    }
-  }, [isPlaying]);
+  }, [externalAudio]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -74,14 +70,13 @@ export function AudioPlayer({
   };
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const audio = audioRef.current;
-    if (!audio || !duration) return;
+    if (!externalAudio || !duration) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const newTime = (clickX / rect.width) * duration;
     
-    audio.currentTime = newTime;
+    externalAudio.currentTime = newTime;
     setCurrentTime(newTime);
   };
 
@@ -93,8 +88,6 @@ export function AudioPlayer({
       "bg-gradient-to-r from-neutral-900/80 to-neutral-800/80",
       className
     )}>
-      <audio ref={audioRef} src={audioUrl} preload="metadata" />
-      
       {/* Ambient glow effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#22DFDC]/10 to-[#22EDB6]/10 blur-sm -z-10" />
       

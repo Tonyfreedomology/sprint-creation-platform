@@ -1135,6 +1135,7 @@ export const SprintPreview: React.FC = () => {
                           title={`Day ${lesson.day} Audio`}
                           isPlaying={playingAudio[lesson.day]}
                           onPlayToggle={() => toggleAudio(lesson.day)}
+                          externalAudio={audioElements[lesson.day]}
                           onDownload={() => {
                             const link = document.createElement('a');
                             link.href = audioUrls[lesson.day];
