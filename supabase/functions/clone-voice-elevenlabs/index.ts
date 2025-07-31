@@ -53,7 +53,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       voiceId: voiceData.voice_id,
-      voiceName: voiceData.name,
+      voiceName: voiceName, // Use the name we sent, since API response might not include it
       message: 'Voice clone created successfully'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

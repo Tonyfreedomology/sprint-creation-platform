@@ -218,8 +218,8 @@ export const SprintCreationForm: React.FC = () => {
 
       console.log('Creating custom voice for sprint:', sprintId);
       
-      // Create voice clone using ElevenLabs with the uploaded audio
-      const voiceName = `${formData.creatorName}_${sprintId}`;
+      // Create a descriptive voice name with the creator's name and sprint title
+      const voiceName = `${formData.creatorName}'s Voice - ${formData.sprintTitle.substring(0, 30)}...`;
       
       // Create form data for the audio file
       const formData_upload = new FormData();
