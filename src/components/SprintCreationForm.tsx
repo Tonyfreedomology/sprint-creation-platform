@@ -226,7 +226,7 @@ export const SprintCreationForm: React.FC = () => {
       formData_upload.append('voiceName', voiceName);
       
       // Use the voice recording blob if available
-      if (formData.voiceRecordingBlob && Object.keys(formData.voiceRecordingBlob).length > 0) {
+      if (formData.voiceRecordingBlob && formData.voiceRecordingBlob.size > 0) {
         const audioBlob = formData.voiceRecordingBlob;
         formData_upload.append('audioFile', audioBlob, 'voice_sample.wav');
       } else if (formData.voiceSampleFile) {
