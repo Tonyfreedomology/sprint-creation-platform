@@ -540,6 +540,7 @@ export const SprintCreationForm: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="space-y-6">
+              {/* Content Types - Commented out as unnecessary since we generate all content types
               <div>
                 <Label className="text-white text-sm font-medium mb-3 block">Content Types</Label>
                 <StyledDropdown
@@ -576,6 +577,7 @@ export const SprintCreationForm: React.FC = () => {
                   className="mt-2"
                 />
               </div>
+              */}
 
               <div>
                 <Label htmlFor="toneStyle" className="text-white text-sm font-medium">Tone & Style</Label>
@@ -729,8 +731,6 @@ export const SprintCreationForm: React.FC = () => {
                   <div><strong className="text-white">Title:</strong> {formData.sprintTitle || 'Not specified'}</div>
                   <div><strong className="text-white">Duration:</strong> {formData.sprintDuration} days</div>
                   <div><strong className="text-white">Category:</strong> {formData.sprintCategory || 'Not specified'}</div>
-                  <div><strong className="text-white">Content Generation:</strong> {formData.contentGeneration}</div>
-                  <div><strong className="text-white">Content Types:</strong> {formData.contentTypes.join(', ') || 'None selected'}</div>
                   <div><strong className="text-white">Tone:</strong> {formData.toneStyle}</div>
                   
                    <div><strong className="text-white">Voice Sample:</strong> {formData.voiceSampleFile || formData.voiceRecordingBlob ? 'Ready' : 'None'}</div>
@@ -753,7 +753,7 @@ export const SprintCreationForm: React.FC = () => {
       case 2:
         return formData.sprintTitle.trim() && formData.sprintDescription.trim() && formData.sprintCategory;
       case 3:
-        return formData.contentGeneration && formData.contentTypes.length > 0;
+        return formData.toneStyle; // Only require tone/style selection
       case 4:
         return true; // No longer require participant emails
       default:
