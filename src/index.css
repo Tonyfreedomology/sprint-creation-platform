@@ -32,7 +32,7 @@ All colors MUST be HSL.
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 81%; /* #CFCFCF */
 
-    --accent: 152 84% 53%; /* Jade */
+    --accent: 0 0% 25%; /* Neutral dark gray */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -109,8 +109,8 @@ All colors MUST be HSL.
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 81%; /* #CFCFCF secondary text */
 
-    --accent: 152 84% 53%; /* Jade */
-    --accent-foreground: 0 0% 14%;
+    --accent: 0 0% 30%; /* Neutral lighter gray for dark mode */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
