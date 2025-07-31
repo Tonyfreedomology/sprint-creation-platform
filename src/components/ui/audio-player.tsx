@@ -155,22 +155,6 @@ export function AudioPlayer({
         </div>
       </div>
 
-      {/* Animated waves visualization */}
-      {isPlaying && (
-        <div className="absolute left-16 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className="w-0.5 bg-gradient-to-t from-[#22DFDC] to-[#22EDB6] rounded-full animate-pulse"
-              style={{
-                height: `${8 + Math.sin(Date.now() * 0.01 + i) * 4}px`,
-                animationDelay: `${i * 0.1}s`,
-                animationDuration: `${0.8 + i * 0.1}s`
-              }}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
