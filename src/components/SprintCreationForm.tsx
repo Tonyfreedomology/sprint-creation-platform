@@ -77,27 +77,32 @@ interface GeneratedContent {
 }
 
 const initialFormData: SprintFormData = {
-  creatorName: '',
-  creatorEmail: '',
-  creatorBio: '',
-  sprintTitle: '',
-  sprintDescription: '',
-  sprintDuration: '',
-  sprintCategory: '',
-  targetAudience: '',
+  // Creator information - prefilled for testing
+  creatorName: 'Tony',
+  creatorEmail: 'tony@freedomology.com',
+  creatorBio: "I'm a creator, coach, and co-founder at Freedomology—on a mission to help people build lives full of purpose, energy, and deep alignment. I've led teams, built brands, and walked with people through real transformation in their health, relationships, and mindset. I'm creating this sprint because I've seen firsthand how much power there is in structured momentum—and I'm all in on making change stick.",
+
+  // Sprint details - prefilled for testing
+  sprintTitle: 'Magnetic – 7 Days to Lead Your Marriage with Confidence & Desire',
+  sprintDescription: 'This sprint is for married men who want to reignite desire, reclaim their masculine presence, and lead with confidence in the bedroom and beyond. Through daily challenges, reflections, and practices, you\'ll learn how to embody sexual leadership, deepen connection, and create a relationship that pulses with attraction and trust.',
+  sprintDuration: '7',
+  sprintCategory: 'relationships',
+  
+  // Target audience and content - prefilled for testing
+  targetAudience: 'Married men, Christian husbands, dads in their 30s and 40s, recovering nice guys',
   contentGeneration: 'ai',
-  contentTypes: [],
+  contentTypes: ['written-lessons', 'audio-lessons', 'daily-emails', 'challenges'],
   toneStyle: '',
-  experience: '',
-  goals: '',
+  experience: 'intermediate',
+  goals: '• Build strong masculine frame\n• Lead sexually with clarity and confidence\n• Increase intimacy and sexual frequency\n• Rewire approval-seeking habits\n• Establish daily habits of touch, eye contact, and pursuit',
   specialRequirements: '',
-  voiceStyle: 'warm-coach', // Default voice style
-  voiceGender: 'female', // Default voice gender
+  voiceStyle: 'warm-coach',
+  voiceGender: 'female',
   voiceSampleFile: null,
   voiceRecordingBlob: null,
   writingStyleFile: null,
   writingStyleAnalysis: undefined,
-  participantEmails: '',
+  participantEmails: 'tony@freedomology.com',
 };
 
 export const SprintCreationForm: React.FC = () => {
