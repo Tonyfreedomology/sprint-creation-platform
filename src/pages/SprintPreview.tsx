@@ -82,6 +82,36 @@ export const SprintPreview: React.FC = () => {
   const [regeneratingLessons, setRegeneratingLessons] = useState<Set<number>>(new Set());
   const [activeTab, setActiveTab] = useState("lessons");
 
+  // Enhanced text formatter for better readability
+  const formatText = (text: string) => {
+    if (!text) return '';
+    
+    // Split into paragraphs based on double line breaks or periods followed by capital letters
+    let paragraphs = text
+      .split(/\n\s*\n/)  // Split on double line breaks
+      .filter(p => p.trim().length > 0);
+    
+    // If no double line breaks, try to split on sentences that likely start new paragraphs
+    if (paragraphs.length === 1) {
+      paragraphs = text
+        .split(/\. (?=[A-Z][a-z]|So,|But |And |When |If |Here's|Let's|Today|Tomorrow|Now|First|Second|Third|Finally|In |This |That |Your |You |I )/g)
+        .filter(p => p.trim().length > 20) // Only split if resulting paragraph is substantial
+        .map((p, index, array) => {
+          // Add back the period except for the last paragraph
+          return index < array.length - 1 && !p.trim().endsWith('.') ? p.trim() + '.' : p.trim();
+        });
+    }
+    
+    return paragraphs
+      .map(paragraph => {
+        return paragraph
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          .replace(/\n/g, '<br>');
+      })
+      .join('</p><p class="mb-4 text-white/80 leading-relaxed">');
+  };
+
   // Simple markdown renderer for emails
   const renderMarkdown = (text: string) => {
     return text
@@ -1081,7 +1111,10 @@ export const SprintPreview: React.FC = () => {
                       <>
                         <div>
                           <h4 className="font-semibold mb-2 text-white/80">Content</h4>
-                          <p className="text-white/80 leading-relaxed">{lesson.content}</p>
+                          <div 
+                            className="mb-4 text-white/80 leading-relaxed"
+                            dangerouslySetInnerHTML={{ __html: `<p class="mb-4 text-white/80 leading-relaxed">${formatText(lesson.content)}</p>` }}
+                          />
                         </div>
                         <div className="border-t border-white/10 pt-4">
                           <h4 className="font-semibold mb-2 text-white/80">Exercise</h4>
