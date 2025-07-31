@@ -137,17 +137,17 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative" style={{ background: 'radial-gradient(circle at center, #060a0f 0%, #0f0f0f 70%, #080808 100%)' }}>
-      {/* Animated Rays Background - positioned at top */}
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
-        <AnimatedRays 
-          intensity={0.08} 
-          speed={0.3}
-          color1="#22DFDC"
-          color2="#22EDB6"
-        />
-      </div>
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16">
+        {/* Animated Rays - positioned above hero card */}
+        <div className="absolute top-0 left-0 w-full h-64 pointer-events-none" style={{ zIndex: 1 }}>
+          <AnimatedRays 
+            intensity={0.12} 
+            speed={0.3}
+            color1="#22DFDC"
+            color2="#22EDB6"
+          />
+        </div>
         <div className="container mx-auto px-4">
           {/* Hero Container with Gradient Border */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
