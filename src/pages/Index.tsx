@@ -119,7 +119,7 @@ const Index = () => {
                 ← Back to Overview
               </Button>
               <h1 className="text-4xl font-bold text-white mb-4">
-                Create Your <span style={{ color: '#22DFDC' }}>Transformational Sprint</span>
+                Create Your <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Transformational Sprint</span>
               </h1>
               <p className="text-xl text-cool-text-secondary max-w-2xl mx-auto">
                 Turn your expertise into a powerful, community-driven experience that creates lasting change
