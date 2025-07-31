@@ -218,17 +218,25 @@ export const SprintCreationForm: React.FC = () => {
 
       console.log('Creating custom voice for sprint:', sprintId);
       
-      // Create a voice description based on the form data
-      const voiceDescription = `A ${formData.voiceGender} voice with a ${formData.voiceStyle} tone, suitable for coaching and educational content. The voice should sound confident, warm, and engaging.`;
-      const sampleText = "Welcome to this transformative journey. I'm here to guide you through each step with clarity and confidence.";
+      // Create voice clone using ElevenLabs with the uploaded audio
       const voiceName = `${formData.creatorName}_${sprintId}`;
       
-      const { data, error } = await supabase.functions.invoke('clone-voice-hume', {
-        body: {
-          voiceName,
-          voiceDescription,
-          sampleText
-        },
+      // Create form data for the audio file
+      const formData_upload = new FormData();
+      formData_upload.append('voiceName', voiceName);
+      
+      // Use the voice recording blob if available
+      if (formData.voiceRecordingBlob && Object.keys(formData.voiceRecordingBlob).length > 0) {
+        const audioBlob = formData.voiceRecordingBlob;
+        formData_upload.append('audioFile', audioBlob, 'voice_sample.wav');
+      } else if (formData.voiceSampleFile) {
+        formData_upload.append('audioFile', formData.voiceSampleFile);
+      } else {
+        throw new Error('No audio file available for voice cloning');
+      }
+      
+      const { data, error } = await supabase.functions.invoke('clone-voice-elevenlabs', {
+        body: formData_upload,
       });
       
       if (error) {
