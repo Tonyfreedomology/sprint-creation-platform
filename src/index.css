@@ -155,7 +155,7 @@ All colors MUST be HSL.
     @apply min-h-screen p-8 rounded-3xl;
     background: 
       var(--gradient-radial-bg),
-      linear-gradient(135deg, #020D24 0%, #010611 100%);
+      linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
   }
   
   /* Global card wrapper with gradient border */
