@@ -350,17 +350,18 @@ export const SprintCreationForm: React.FC = () => {
 
               <div>
                 <Label htmlFor="experience" className="text-white text-sm font-medium">Your Experience Level</Label>
-                <Select value={formData.experience} onValueChange={(value) => handleInputChange('experience', value)}>
-                  <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
-                    <SelectValue placeholder="Select your experience level" className="text-white/50" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30">
-                    <SelectItem value="beginner" className="text-white hover:bg-[#22DFDC]/10">Beginner - New to creating content</SelectItem>
-                    <SelectItem value="intermediate" className="text-white hover:bg-[#22DFDC]/10">Intermediate - Some experience with courses/content</SelectItem>
-                    <SelectItem value="advanced" className="text-white hover:bg-[#22DFDC]/10">Advanced - Experienced creator/coach</SelectItem>
-                    <SelectItem value="expert" className="text-white hover:bg-[#22DFDC]/10">Expert - Industry professional</SelectItem>
-                  </SelectContent>
-                </Select>
+                <StyledDropdown
+                  options={[
+                    { value: 'beginner', label: 'Beginner', description: 'New to creating content' },
+                    { value: 'intermediate', label: 'Intermediate', description: 'Some experience with courses/content' },
+                    { value: 'advanced', label: 'Advanced', description: 'Experienced creator/coach' },
+                    { value: 'expert', label: 'Expert', description: 'Industry professional' },
+                  ]}
+                  value={formData.experience}
+                  onChange={(value) => handleInputChange('experience', value)}
+                  placeholder="Select your experience level"
+                  className="mt-2"
+                />
               </div>
             </div>
           </div>
@@ -395,53 +396,51 @@ export const SprintCreationForm: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="sprintDuration" className="text-white text-sm font-medium">Duration</Label>
-                  <Select value={formData.sprintDuration} onValueChange={(value) => handleInputChange('sprintDuration', value)}>
-                    <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
-                      <SelectValue placeholder="Select duration" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
-                      <SelectItem value="7" className="text-white hover:bg-[#22DFDC]/10">7 Days</SelectItem>
-                      <SelectItem value="14" className="text-white hover:bg-[#22DFDC]/10">14 Days</SelectItem>
-                      <SelectItem value="21" className="text-white hover:bg-[#22DFDC]/10">21 Days</SelectItem>
-                      <SelectItem value="30" className="text-white hover:bg-[#22DFDC]/10">30 Days</SelectItem>
-                      <SelectItem value="40" className="text-white hover:bg-[#22DFDC]/10">40 Days</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <StyledDropdown
+                    options={[
+                      { value: '7', label: '7 Days' },
+                      { value: '14', label: '14 Days' },
+                      { value: '21', label: '21 Days' },
+                      { value: '30', label: '30 Days' },
+                      { value: '40', label: '40 Days' },
+                    ]}
+                    value={formData.sprintDuration}
+                    onChange={(value) => handleInputChange('sprintDuration', value)}
+                    placeholder="Select duration"
+                    className="mt-2"
+                  />
                 </div>
 
                 <div>
                   <Label htmlFor="sprintCategory" className="text-white text-sm font-medium">Category</Label>
-                  <Select value={formData.sprintCategory} onValueChange={(value) => handleInputChange('sprintCategory', value)}>
-                    <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
-                      <SelectItem value="health" className="text-white hover:bg-[#22DFDC]/10">
-                        <div className="flex items-center gap-2">
-                          <Heart className="w-4 h-4" />
-                          Health & Wellness
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="wealth" className="text-white hover:bg-[#22DFDC]/10">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4" />
-                          Wealth & Finance
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="relationships" className="text-white hover:bg-[#22DFDC]/10">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          Relationships
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="personal" className="text-white hover:bg-[#22DFDC]/10">
-                        <div className="flex items-center gap-2">
-                          <Brain className="w-4 h-4" />
-                          Personal Development
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <StyledDropdown
+                    options={[
+                      { 
+                        value: 'health', 
+                        label: 'Health & Wellness',
+                        icon: <Heart className="w-4 h-4" />
+                      },
+                      { 
+                        value: 'wealth', 
+                        label: 'Wealth & Finance',
+                        icon: <DollarSign className="w-4 h-4" />
+                      },
+                      { 
+                        value: 'relationships', 
+                        label: 'Relationships',
+                        icon: <Users className="w-4 h-4" />
+                      },
+                      { 
+                        value: 'personal', 
+                        label: 'Personal Development',
+                        icon: <Brain className="w-4 h-4" />
+                      },
+                    ]}
+                    value={formData.sprintCategory}
+                    onChange={(value) => handleInputChange('sprintCategory', value)}
+                    placeholder="Select category"
+                    className="mt-2"
+                  />
                 </div>
               </div>
 
@@ -513,19 +512,20 @@ export const SprintCreationForm: React.FC = () => {
 
               <div>
                 <Label htmlFor="toneStyle" className="text-white text-sm font-medium">Tone & Style</Label>
-                <Select value={formData.toneStyle} onValueChange={(value) => handleInputChange('toneStyle', value)}>
-                  <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
-                    <SelectValue placeholder="Select tone & style" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
-                    <SelectItem value="encouraging" className="text-white hover:bg-[#22DFDC]/10">Encouraging & Supportive</SelectItem>
-                    <SelectItem value="motivational" className="text-white hover:bg-[#22DFDC]/10">Motivational & Energetic</SelectItem>
-                    <SelectItem value="gentle" className="text-white hover:bg-[#22DFDC]/10">Gentle & Nurturing</SelectItem>
-                    <SelectItem value="professional" className="text-white hover:bg-[#22DFDC]/10">Professional & Informative</SelectItem>
-                    <SelectItem value="conversational" className="text-white hover:bg-[#22DFDC]/10">Conversational & Friendly</SelectItem>
-                    <SelectItem value="inspiring" className="text-white hover:bg-[#22DFDC]/10">Inspiring & Uplifting</SelectItem>
-                  </SelectContent>
-                </Select>
+                <StyledDropdown
+                  options={[
+                    { value: 'encouraging', label: 'Encouraging & Supportive' },
+                    { value: 'motivational', label: 'Motivational & Energetic' },
+                    { value: 'gentle', label: 'Gentle & Nurturing' },
+                    { value: 'professional', label: 'Professional & Informative' },
+                    { value: 'conversational', label: 'Conversational & Friendly' },
+                    { value: 'inspiring', label: 'Inspiring & Uplifting' },
+                  ]}
+                  value={formData.toneStyle}
+                  onChange={(value) => handleInputChange('toneStyle', value)}
+                  placeholder="Select tone & style"
+                  className="mt-2"
+                />
               </div>
 
               <div>
@@ -553,20 +553,21 @@ export const SprintCreationForm: React.FC = () => {
                   {/* Voice Style */}
                   <div>
                     <Label htmlFor="voiceStyle" className="text-white text-xs font-medium uppercase tracking-wide opacity-70">Voice Personality</Label>
-                    <Select value={formData.voiceStyle} onValueChange={(value) => handleInputChange('voiceStyle', value)}>
-                      <SelectTrigger className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white focus:border-[#22DFDC] outline-none transition">
-                        <SelectValue placeholder="Select voice style" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#2a2a2a] border-[#22DFDC]/30 z-50">
-                        <SelectItem value="warm-coach" className="text-white hover:bg-[#22DFDC]/10">Warm Coach - Encouraging & Patient</SelectItem>
-                        <SelectItem value="strong-mentor" className="text-white hover:bg-[#22DFDC]/10">Strong Mentor - Confident & Wise</SelectItem>
-                        <SelectItem value="wise-guide" className="text-white hover:bg-[#22DFDC]/10">Wise Guide - Calm & Transformational</SelectItem>
-                        <SelectItem value="motivational-speaker" className="text-white hover:bg-[#22DFDC]/10">Motivational Speaker - Dynamic & Inspiring</SelectItem>
-                        <SelectItem value="trusted-friend" className="text-white hover:bg-[#22DFDC]/10">Trusted Friend - Warm & Relatable</SelectItem>
-                        <SelectItem value="professional-trainer" className="text-white hover:bg-[#22DFDC]/10">Professional Trainer - Clear & Competent</SelectItem>
-                        <SelectItem value="compassionate-counselor" className="text-white hover:bg-[#22DFDC]/10">Compassionate Counselor - Gentle & Safe</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <StyledDropdown
+                      options={[
+                        { value: 'warm-coach', label: 'Warm Coach', description: 'Encouraging & Patient' },
+                        { value: 'strong-mentor', label: 'Strong Mentor', description: 'Confident & Wise' },
+                        { value: 'wise-guide', label: 'Wise Guide', description: 'Calm & Transformational' },
+                        { value: 'motivational-speaker', label: 'Motivational Speaker', description: 'Dynamic & Inspiring' },
+                        { value: 'trusted-friend', label: 'Trusted Friend', description: 'Warm & Relatable' },
+                        { value: 'professional-trainer', label: 'Professional Trainer', description: 'Clear & Competent' },
+                        { value: 'compassionate-counselor', label: 'Compassionate Counselor', description: 'Gentle & Safe' },
+                      ]}
+                      value={formData.voiceStyle}
+                      onChange={(value) => handleInputChange('voiceStyle', value)}
+                      placeholder="Select voice style"
+                      className="mt-2"
+                    />
                   </div>
 
                   <div className="text-center text-white/50 text-xs uppercase tracking-wider">— OR —</div>

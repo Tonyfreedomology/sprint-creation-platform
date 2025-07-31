@@ -80,7 +80,7 @@ const StyledDropdown: React.FC<StyledDropdownProps> = ({
       <motion.button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-slate-900/50 backdrop-blur-sm rounded-lg border border-slate-700/50 px-4 py-3 flex items-center justify-between text-left transition-all duration-200 hover:border-[#22DFDC]/50 focus:outline-none focus:border-[#22DFDC] group"
+        className="w-full bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 flex items-center justify-between text-left transition-all duration-200 hover:border-[#22DFDC]/50 focus:outline-none focus:border-[#22DFDC] group"
         whileTap={{ scale: 0.98 }}
       >
         <span className="text-white text-sm font-medium">
@@ -103,7 +103,7 @@ const StyledDropdown: React.FC<StyledDropdownProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-md rounded-lg border border-slate-700/50 shadow-xl z-50 overflow-hidden"
+            className="absolute top-full left-0 right-0 mt-2 bg-[#2a2a2a] border-[#22DFDC]/30 rounded shadow-xl z-50 overflow-hidden"
           >
             <div className="py-2">
               {options.map((option, index) => (
@@ -134,15 +134,20 @@ const StyledDropdown: React.FC<StyledDropdownProps> = ({
                     </div>
                   </div>
                   
-                  {isSelected(option.value) && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="text-[#22DFDC]"
-                    >
-                      <Check className="w-4 h-4" />
-                    </motion.div>
-                  )}
+                  {/* Radio/Circle Button */}
+                  <div className="flex items-center">
+                    {isSelected(option.value) ? (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-4 h-4 rounded-full bg-[#22DFDC] flex items-center justify-center"
+                      >
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </motion.div>
+                    ) : (
+                      <div className="w-4 h-4 rounded-full border-2 border-white/30 group-hover:border-[#22DFDC]/50 transition-colors" />
+                    )}
+                  </div>
                 </motion.button>
               ))}
             </div>
