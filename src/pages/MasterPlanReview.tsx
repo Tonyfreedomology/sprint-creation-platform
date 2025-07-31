@@ -141,7 +141,7 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
               <h1 className="text-2xl font-semibold gradient-text">
                 Review Master Plan
               </h1>
-              <p className="text-white/60 text-sm mt-1">Turn your expertise into a powerful, community-driven experience that creates lasting change</p>
+              <p className="text-white/70 text-sm mt-1">Turn your expertise into a powerful, community-driven experience that creates lasting change</p>
             </div>
           </div>
 
@@ -161,21 +161,21 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
             
             <div className="space-y-6">
               <div>
-                <p className="text-white/60 leading-relaxed max-w-prose">{editedPlan.overallStructure.progressionArc}</p>
+                <p className="text-white/80 leading-relaxed max-w-prose">{editedPlan.overallStructure.progressionArc}</p>
               </div>
               
               <div>
-                <h3 className="text-[#22EDB6] font-medium mb-4">Phases</h3>
+                <h3 className="gradient-text font-medium mb-4">Phases</h3>
                 <div className="space-y-3">
                   {editedPlan.overallStructure.phases.map((phase, index) => (
-                    <div key={index} className="flex items-start gap-4 py-4 border-t border-white/8 first:border-t-0">
-                      <div className="w-6 h-6 rounded-full bg-[#22EDB6]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <div className="w-2 h-2 rounded-full bg-[#22EDB6]" />
+                    <div key={index} className="flex items-start gap-4 py-4 border-t border-white/10 first:border-t-0">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-2 h-2 rounded-full bg-black" />
                       </div>
                       <div className="flex-1">
                         <h4 className="text-white font-medium">{phase.name}</h4>
-                        <p className="text-[#22DFDC] text-sm">Day {phase.days}</p>
-                        <p className="text-white/60 text-sm mt-1 leading-relaxed max-w-prose">{phase.focus}</p>
+                        <p className="gradient-text text-sm">Day {phase.days}</p>
+                        <p className="text-white/70 text-sm mt-1 leading-relaxed max-w-prose">{phase.focus}</p>
                       </div>
                     </div>
                   ))}
@@ -187,8 +187,8 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
 
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-white">Daily Plan ({editedPlan.dailyPlans.length} days)</h2>
-            <p className="text-sm text-white/40">Drag to reorder • Click to edit</p>
+            <h2 className="text-2xl font-semibold gradient-text">Daily Plan ({editedPlan.dailyPlans.length} days)</h2>
+            <p className="text-sm text-white/50">Drag to reorder • Click to edit</p>
           </div>
 
           <div className="card-wrapper">
@@ -197,7 +197,7 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
                 {editedPlan.dailyPlans.map((day, index) => (
                   <div
                     key={day.day}
-                    className={`group flex items-start gap-4 py-6 border-t border-white/8 hover:bg-white/2 transition cursor-move ${
+                    className={`group flex items-start gap-4 py-6 border-t border-white/10 hover:bg-white/5 transition cursor-move ${
                       index === 0 ? 'border-t-0' : ''
                     } ${draggedIndex === index ? 'opacity-50' : ''}`}
                     draggable
@@ -205,7 +205,7 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
                   >
-                    <svg className="h-4 w-4 text-white/40 cursor-grab mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-4 w-4 text-white/50 cursor-grab mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9h8m-8 4h8" />
                     </svg>
                     
@@ -213,7 +213,7 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
                       {editingDay === index ? (
                         <div className="space-y-4">
                           <div className="flex items-center gap-2">
-                            <span className="text-[#22DFDC] text-sm font-medium">Day {day.day}</span>
+                            <span className="gradient-text text-sm font-medium">Day {day.day}</span>
                             <Input
                               value={day.theme}
                               onChange={(e) => handleDayEdit(index, 'theme', e.target.value)}
@@ -249,8 +249,8 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
                       ) : (
                         <div>
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[#22DFDC] text-sm font-medium">Day {day.day}</span>
-                            <h3 className="text-2xl font-semibold text-white">{day.theme}</h3>
+                            <span className="gradient-text text-sm font-medium">Day {day.day}</span>
+                            <h3 className="text-xl font-semibold text-white">{day.theme}</h3>
                             <Button
                               size="sm"
                               variant="ghost"
@@ -262,7 +262,7 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
                           </div>
                           <p className="text-white/80 mb-3 leading-relaxed max-w-prose">{day.learningObjective}</p>
                           {day.keyTakeaways.length > 0 && (
-                            <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+                            <p className="text-sm text-white/70 leading-relaxed max-w-prose">
                               Key Points: {day.keyTakeaways.join(' • ')}
                             </p>
                           )}
@@ -278,20 +278,16 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
 
         <div className="flex items-center justify-between pt-6">
           <Button 
-            variant="ghost" 
+            variant="outline" 
             onClick={onBack} 
-            className="text-white hover:bg-white/10 border-white/20"
+            className="text-white border-white/20 hover:bg-white/10"
           >
             Back to Form
           </Button>
           <Button 
             onClick={handleApproveAndGenerate}
             disabled={isGenerating}
-            className="px-8 py-4 text-lg rounded-xl font-medium text-white transition-all hover:scale-105 disabled:opacity-50"
-            style={{ 
-              background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
-              border: 'none'
-            }}
+            className="px-8 py-3 rounded-xl font-medium text-black transition-all hover:scale-105 disabled:opacity-50 bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]"
           >
             {isGenerating ? 'Starting Generation...' : 'Approve & Generate Content'}
           </Button>
