@@ -60,7 +60,7 @@ const AnimatedRays: React.FC<AnimatedRaysProps> = ({
       vec2 st = gl_FragCoord.xy / u_resolution.xy;
       
       // Position the ray source way above the screen so only downward rays are visible  
-      vec2 raySource = vec2(0.5, 4.0); // Center horizontally, much higher above screen
+      vec2 raySource = vec2(0.6, 4.0); // Slightly right of center horizontally, much higher above screen
       
       // Calculate direction from ray source to current pixel
       vec2 direction = st - raySource;
