@@ -763,35 +763,50 @@ export const SprintPreview: React.FC = () => {
 
   if (!sprintData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading sprint data...</p>
+      <div className="page-wrapper">
+        <div className="page-content">
+          <div className="max-w-4xl mx-auto">
+            <div className="card-wrapper">
+              <div className="card-content">
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
+                    <p className="text-white/70">Loading sprint data...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header with Generation Progress */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => navigate('/')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
+    <div className="page-wrapper">
+      <div className="page-content">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Header */}
+          <div className="flex items-center gap-4 mb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/')} 
+              className="flex items-center gap-2 text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="w-4 h-4" />
               Back to Home
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
+            <div className="centered-header">
+              <h1 className="text-2xl font-semibold gradient-text">
                 {sprintData.sprintTitle}
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-white/70 text-sm mt-1">
                 {sprintData.sprintDuration}-day sprint • Created by {sprintData.creatorInfo.name}
               </p>
               {isGenerating && (
                 <div className="flex items-center gap-2 mt-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm text-muted-foreground">
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span className="text-sm text-white/60">
                     Generating remaining content... {Math.round(generationProgress)}%
                   </span>
                 </div>
@@ -832,44 +847,48 @@ export const SprintPreview: React.FC = () => {
         </div>
 
         {/* Overview Card */}
-        <Card className="mb-8 border-primary/20 shadow-elegant">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Sprint Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">Category</Label>
-                <Badge variant="secondary" className="mt-1">{sprintData.sprintCategory}</Badge>
+        <div className="card-wrapper">
+          <div className="card-content">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
+                <Users className="w-4 h-4 text-black" />
               </div>
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">Duration</Label>
-                <p className="font-medium">{sprintData.sprintDuration} days</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">Total Lessons</Label>
-                <p className="font-medium">{sprintData.dailyLessons.length}</p>
+                <h2 className="text-xl font-semibold text-white">Sprint Overview</h2>
+                <p className="text-white/60 text-sm">Key details about your sprint</p>
               </div>
             </div>
-            <Separator className="my-4" />
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">Description</Label>
-              <p className="mt-1 text-foreground">{sprintData.sprintDescription}</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div>
+                <Label className="text-sm font-medium text-white/60">Category</Label>
+                <Badge variant="secondary" className="mt-1 bg-white/10 text-white border-white/20">{sprintData.sprintCategory}</Badge>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-white/60">Duration</Label>
+                <p className="font-medium text-white">{sprintData.sprintDuration} days</p>
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-white/60">Total Lessons</Label>
+                <p className="font-medium text-white">{sprintData.dailyLessons.length}</p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+            
+            <div className="border-t border-white/10 pt-6">
+              <Label className="text-sm font-medium text-white/60">Description</Label>
+              <p className="mt-1 text-white/80 leading-relaxed">{sprintData.sprintDescription}</p>
+            </div>
+          </div>
+        </div>
 
         {/* Content Tabs */}
         <Tabs defaultValue="lessons" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="lessons" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 bg-white/10 border border-white/20">
+            <TabsTrigger value="lessons" className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70">
               <FileText className="w-4 h-4" />
               Daily Lessons ({sprintData.dailyLessons.length})
             </TabsTrigger>
-            <TabsTrigger value="emails" className="flex items-center gap-2">
+            <TabsTrigger value="emails" className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70">
               <Mail className="w-4 h-4" />
               Email Sequences ({sprintData.emailSequence.length})
             </TabsTrigger>
@@ -878,21 +897,21 @@ export const SprintPreview: React.FC = () => {
           <TabsContent value="lessons" className="space-y-6">
             {/* Generation Progress Indicator */}
             {isGenerating && (
-              <Card className="border-blue-200 bg-blue-50">
-                <CardContent className="p-4">
+              <div className="card-wrapper">
+                <div className="card-content">
                   <div className="flex items-center gap-3">
-                    <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-blue-900">
+                      <p className="text-sm font-medium text-white">
                         Your lessons are being generated and will appear below one by one
                       </p>
-                      <p className="text-xs text-blue-700">
+                      <p className="text-xs text-white/60">
                         This may take a few minutes to create the entire sprint. Feel free to edit or tweak any content as it appears, and generate audio versions by pressing the "Generate Audio" button on each lesson.
                       </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
             
             {sprintData.dailyLessons.filter(lesson => lesson && lesson.title).map((lesson, index) => (
