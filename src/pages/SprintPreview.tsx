@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { orchestrateBatchGeneration, type BatchGenerationProgress } from "@/services/batchSprintGeneration";
 import { supabase } from '@/integrations/supabase/client';
 import { SprintPackageGenerator } from '@/services/sprintPackageGenerator';
+import { PillSwitcher } from '@/components/ui/pill-switcher';
 
 interface GeneratedContent {
   sprintId: string;
@@ -78,6 +79,7 @@ export const SprintPreview: React.FC = () => {
   const [isGeneratingPackage, setIsGeneratingPackage] = useState(false);
   const [packageProgress, setPackageProgress] = useState(0);
   const [regeneratingLessons, setRegeneratingLessons] = useState<Set<number>>(new Set());
+  const [activeTab, setActiveTab] = useState("lessons");
 
   // Simple markdown renderer for emails
   const renderMarkdown = (text: string) => {
@@ -908,17 +910,15 @@ export const SprintPreview: React.FC = () => {
         </div>
 
         {/* Content Tabs */}
-        <Tabs defaultValue="lessons" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-white/10 border border-white/20">
-            <TabsTrigger value="lessons" className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70">
-              <FileText className="w-4 h-4" />
-              Daily Lessons ({sprintData.dailyLessons.length})
-            </TabsTrigger>
-            <TabsTrigger value="emails" className="flex items-center gap-2 data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70">
-              <Mail className="w-4 h-4" />
-              Email Sequences ({sprintData.emailSequence.length})
-            </TabsTrigger>
-          </TabsList>
+        <div className="space-y-8">
+          <PillSwitcher 
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            lessonCount={sprintData.dailyLessons.length}
+            emailCount={sprintData.emailSequence.length}
+          />
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
           <TabsContent value="lessons" className="space-y-6">
             {/* Generation Progress Indicator */}
@@ -1146,6 +1146,7 @@ export const SprintPreview: React.FC = () => {
             ))}
           </TabsContent>
         </Tabs>
+        </div>
         </div>
       </div>
     </div>
