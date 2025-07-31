@@ -26,18 +26,19 @@ serve(async (req) => {
     console.log('Creating custom voice:', voiceName, 'with description:', voiceDescription);
 
     // Step 1: Generate TTS with the voice description to create a generation
-    const ttsResponse = await fetch('https://api.hume.ai/v0/tts/synthesize', {
+    const ttsResponse = await fetch('https://api.hume.ai/v0/tts/synthesize-json', {
       method: 'POST',
       headers: {
         'X-Hume-Api-Key': HUME_API_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        text: sampleText,
-        voice: {
-          description: voiceDescription
-        },
-        return_meta: true // This ensures we get the generation_id
+        utterances: [{
+          text: sampleText,
+          voice: {
+            description: voiceDescription
+          }
+        }]
       }),
     });
 
@@ -50,7 +51,7 @@ serve(async (req) => {
     const ttsData = await ttsResponse.json();
     console.log('TTS generation successful:', ttsData);
 
-    const generationId = ttsData.generation_id;
+    const generationId = ttsData.generations?.[0]?.generationId;
     
     if (!generationId) {
       throw new Error('No generation ID returned from TTS');
