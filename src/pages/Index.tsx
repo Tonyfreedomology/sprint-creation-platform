@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import AnimatedRays from '@/components/AnimatedRays';
 import { SprintCreationForm } from '@/components/SprintCreationForm';
+import RollingTextButton from '@/components/RollingTextButton';
 import { 
   Sparkles, 
   Users, 
@@ -195,17 +196,16 @@ const Index = () => {
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button
+                    <RollingTextButton
                       onClick={() => setShowForm(true)}
-                      className="px-8 py-4 text-lg rounded-xl font-medium text-white transition-all hover:scale-105"
+                      className="px-8 py-4 text-lg rounded-xl font-medium text-white transition-all hover:scale-105 flex items-center gap-2"
                       style={{ 
                         background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
                         border: 'none'
                       }}
                     >
                       Start Creating
-                      <ChevronRight className="w-5 h-5 ml-2 inline" />
-                    </button>
+                    </RollingTextButton>
                     
                     <button
                       onClick={() => window.location.href = '/package-results'}
