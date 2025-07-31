@@ -19,6 +19,7 @@ interface SprintFormData {
   contentGeneration: string;
   contentTypes: string[];
   toneStyle: string;
+  writingStyleAnalysis?: string;
   experience: string;
   goals: string;
   specialRequirements: string;
@@ -164,6 +165,7 @@ async function generateDailyScript(
   duration: number,
   personalizationData: string,
   teachingGoals: string,
+  formData: SprintFormData,
   apiKey: string,
   masterPlan?: any
 ): Promise<any> {
@@ -171,7 +173,14 @@ async function generateDailyScript(
   const previousDayPlan = masterPlan?.dailyPlans?.find((plan: any) => plan.day === day - 1);
   const nextDayPlan = masterPlan?.dailyPlans?.find((plan: any) => plan.day === day + 1);
 
+  // Use writing style analysis if available, otherwise fall back to general instructions
+  const styleGuidelines = formData.writingStyleAnalysis 
+    ? `CRITICAL WRITING STYLE REQUIREMENT: You must write this content using the following specific writing style analysis: ${formData.writingStyleAnalysis}. This style takes priority over all other tone instructions.`
+    : 'Write in an engaging, conversational tone that resonates with the target audience.';
+
   const prompt = `You are an expert life coach and content creator. Generate a comprehensive, flowing audio lesson script for day ${day} of ${duration} of a sprint called "${sprintTheme}".
+
+${styleGuidelines}
 
 Context:
 - Sprint Theme: ${sprintTheme}
@@ -220,17 +229,22 @@ async function generateDailyEmail(
   sprintTheme: string,
   day: number,
   dailyScript: any,
-  emailStyle: string,
-  creatorName: string,
+  formData: SprintFormData,
   apiKey: string
 ): Promise<any> {
+  // Use writing style analysis if available, otherwise fall back to toneStyle
+  const styleGuidelines = formData.writingStyleAnalysis 
+    ? `Use this specific writing style: ${formData.writingStyleAnalysis}`
+    : `Use this tone/style: ${formData.toneStyle}`;
+
   const prompt = `You are an expert email copywriter in the style of Jeff Walker - personal, casual, and compelling. Create a short, engaging email for day ${day} of the "${sprintTheme}" sprint.
 
 Context:
 - Sprint Theme: ${sprintTheme}
 - Day: ${day}
-- Creator Name: ${creatorName}
+- Creator Name: ${formData.creatorName}
 - Daily Lesson: ${JSON.stringify(dailyScript)}
+- Style Guidelines: ${styleGuidelines}
 
 Email Requirements:
 - Start with "Hey {{contact.firstname}}," 
@@ -297,6 +311,7 @@ async function handleRegeneration(regenerateDay: number, formData: SprintFormDat
       duration,
       personalizationData,
       formData.goals,
+      formData,
       openaiApiKey,
       masterPlan
     );
@@ -309,8 +324,7 @@ async function handleRegeneration(regenerateDay: number, formData: SprintFormDat
       formData.sprintTitle,
       regenerateDay,
       dailyScript,
-      formData.toneStyle,
-      formData.creatorName,
+      formData,
       openaiApiKey
     );
 
@@ -430,6 +444,7 @@ serve(async (req) => {
           duration,
           personalizationData,
           sprintData.goals,
+          sprintData,
           openaiApiKey,
           progress.master_plan
         );
@@ -442,8 +457,7 @@ serve(async (req) => {
           sprintData.sprintTitle,
           day,
           dailyScript,
-          sprintData.toneStyle,
-          sprintData.creatorName,
+          sprintData,
           openaiApiKey
         );
 

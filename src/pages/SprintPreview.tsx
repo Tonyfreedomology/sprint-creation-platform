@@ -21,7 +21,8 @@ import {
   Users,
   Loader2,
   Pause,
-  Package
+  Package,
+  RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { orchestrateBatchGeneration, type BatchGenerationProgress } from "@/services/batchSprintGeneration";
@@ -35,6 +36,7 @@ interface GeneratedContent {
   sprintDuration: string;
   sprintCategory: string;
   voiceStyle?: string;
+  writingStyleAnalysis?: string; // Add writing style analysis
   masterPlan?: any; // Add masterPlan property
   creatorInfo: {
     name: string;
@@ -258,6 +260,8 @@ export const SprintPreview: React.FC = () => {
         contentGeneration: 'ai',
         contentTypes: ['text', 'affirmations', 'exercises', 'challenges'],
         toneStyle: 'encouraging',
+        // CRITICAL: Include writing style analysis if available
+        writingStyleAnalysis: sprintData.writingStyleAnalysis,
         experience: 'intermediate',
         goals: '• Build strong masculine frame\n• Lead sexually with clarity and confidence\n• Increase intimacy and sexual frequency\n• Rewire approval-seeking habits\n• Establish daily habits of touch, eye contact, and pursuit',
         specialRequirements: '',
@@ -331,6 +335,8 @@ export const SprintPreview: React.FC = () => {
             contentGeneration: 'ai',
             contentTypes: ['text', 'affirmations', 'exercises', 'challenges'],
             toneStyle: 'encouraging',
+            // CRITICAL: Include writing style analysis if available
+            writingStyleAnalysis: sprintData.writingStyleAnalysis,
             experience: 'intermediate',
             goals: '• Build strong masculine frame\n• Lead sexually with clarity and confidence\n• Increase intimacy and sexual frequency\n• Rewire approval-seeking habits\n• Establish daily habits of touch, eye contact, and pursuit',
             specialRequirements: '',
@@ -813,49 +819,69 @@ export const SprintPreview: React.FC = () => {
               )}
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              onClick={generatePackage} 
-              disabled={isGeneratingPackage || isGenerating || sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)}
-              className="bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary"
-            >
-              {isGeneratingPackage ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Package className="w-4 h-4 mr-2" />
-              )}
-              {isGeneratingPackage 
-                ? `Publishing ${Math.round(packageProgress)}%` 
-                : sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)
-                  ? `Finalizing Sprint (${sprintData.dailyLessons.length}/${sprintData.sprintDuration})`
-                  : 'Publish Sprint'
-              }
-            </Button>
-            <Button variant="outline" onClick={saveSprint}>
-              <Save className="w-4 h-4 mr-2" />
-              Save as Document
-            </Button>
-            <Button variant="outline" onClick={downloadAllAudio} disabled={Object.keys(audioUrls).length === 0}>
-              <Volume2 className="w-4 h-4 mr-2" />
-              Download Audio
-            </Button>
-            <Button variant="outline" onClick={exportSprint}>
-              <Download className="w-4 h-4 mr-2" />
-              Export Data
-            </Button>
-          </div>
-        </div>
 
         {/* Overview Card */}
         <div className="card-wrapper">
           <div className="card-content">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
-                <Users className="w-4 h-4 text-black" />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
+                  <Users className="w-4 h-4 text-black" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white">Sprint Overview</h2>
+                  <p className="text-white/60 text-sm">Key details about your sprint</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-white">Sprint Overview</h2>
-                <p className="text-white/60 text-sm">Key details about your sprint</p>
+              
+              {/* Action buttons moved inside the card */}
+              <div className="flex gap-2">
+                <Button 
+                  onClick={generatePackage} 
+                  disabled={isGeneratingPackage || isGenerating || sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)}
+                  size="sm"
+                  className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-black hover:from-[#22EDB6] hover:to-[#22DFDC]"
+                  title={isGeneratingPackage 
+                    ? `Publishing ${Math.round(packageProgress)}%` 
+                    : sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)
+                      ? `Finalizing Sprint (${sprintData.dailyLessons.length}/${sprintData.sprintDuration})`
+                      : 'Publish Sprint'
+                  }
+                >
+                  {isGeneratingPackage ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Package className="w-4 h-4" />
+                  )}
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={saveSprint}
+                  className="text-white hover:bg-white/10"
+                  title="Save as Document"
+                >
+                  <Save className="w-4 h-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={downloadAllAudio} 
+                  disabled={Object.keys(audioUrls).length === 0}
+                  className="text-white hover:bg-white/10"
+                  title="Download Audio"
+                >
+                  <Volume2 className="w-4 h-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={exportSprint}
+                  className="text-white hover:bg-white/10"
+                  title="Export Data"
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
               </div>
             </div>
             
@@ -915,128 +941,132 @@ export const SprintPreview: React.FC = () => {
             )}
             
             {sprintData.dailyLessons.filter(lesson => lesson && lesson.title).map((lesson, index) => (
-              <Card key={lesson.day} className="border-primary/20 shadow-card">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="w-5 h-5" />
-                      {lesson.title}
-                    </CardTitle>
+              <div key={lesson.day} className="card-wrapper">
+                <div className="card-content">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
+                        <Calendar className="w-3 h-3 text-black" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white">{lesson.title}</h3>
+                    </div>
                     <div className="flex gap-2">
                       {audioUrls[lesson.day] && (
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => toggleAudio(lesson.day)}
                           disabled={generatingAudio[lesson.day]}
+                          className="text-white hover:bg-white/10"
+                          title={playingAudio[lesson.day] ? 'Pause Audio' : 'Play Audio'}
                         >
                           {playingAudio[lesson.day] ? (
-                            <Pause className="w-4 h-4 mr-2" />
+                            <Pause className="w-4 h-4" />
                           ) : (
-                            <Play className="w-4 h-4 mr-2" />
+                            <Play className="w-4 h-4" />
                           )}
-                          {playingAudio[lesson.day] ? 'Pause' : 'Play'} Audio
                         </Button>
                       )}
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => generateAudio(lesson.content, lesson.day)}
                         disabled={generatingAudio[lesson.day]}
+                        className="text-white hover:bg-white/10"
+                        title={generatingAudio[lesson.day] ? 'Generating Audio...' : 'Generate Audio'}
                       >
                         {generatingAudio[lesson.day] ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
-                          <Volume2 className="w-4 h-4 mr-2" />
+                          <Volume2 className="w-4 h-4" />
                         )}
-                        {generatingAudio[lesson.day] ? 'Generating...' : 'Generate Audio'}
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => regenerateLesson(index)}
                         disabled={regeneratingLessons.has(index)}
+                        className="text-white hover:bg-white/10"
+                        title={regeneratingLessons.has(index) ? 'Regenerating...' : 'Regenerate Lesson'}
                       >
                         {regeneratingLessons.has(index) ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
-                          <FileText className="w-4 h-4 mr-2" />
+                          <RefreshCw className="w-4 h-4" />
                         )}
-                        {regeneratingLessons.has(index) ? 'Regenerating...' : 'Regenerate'}
                       </Button>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => setEditingLesson(editingLesson === index ? null : index)}
+                        className="text-white hover:bg-white/10"
+                        title={editingLesson === index ? 'Done Editing' : 'Edit Lesson'}
                       >
-                        <Edit3 className="w-4 h-4 mr-2" />
-                        {editingLesson === index ? 'Done' : 'Edit'}
+                        <Edit3 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {editingLesson === index ? (
-                    <>
-                      <div>
-                        <Label htmlFor={`title-${index}`}>Title</Label>
-                        <Input
-                          id={`title-${index}`}
-                          value={lesson.title}
-                          onChange={(e) => handleLessonEdit(index, 'title', e.target.value)}
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`content-${index}`}>Content</Label>
-                        <Textarea
-                          id={`content-${index}`}
-                          value={lesson.content}
-                          onChange={(e) => handleLessonEdit(index, 'content', e.target.value)}
-                          rows={8}
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`exercise-${index}`}>Exercise</Label>
-                        <Textarea
-                          id={`exercise-${index}`}
-                          value={lesson.exercise}
-                          onChange={(e) => handleLessonEdit(index, 'exercise', e.target.value)}
-                          rows={4}
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`affirmation-${index}`}>Affirmation</Label>
-                        <Input
-                          id={`affirmation-${index}`}
-                          value={lesson.affirmation}
-                          onChange={(e) => handleLessonEdit(index, 'affirmation', e.target.value)}
-                          className="mt-1"
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div>
-                        <h4 className="font-semibold mb-2">Content</h4>
-                        <p className="text-foreground leading-relaxed">{lesson.content}</p>
-                      </div>
-                      <Separator />
-                      <div>
-                        <h4 className="font-semibold mb-2">Exercise</h4>
-                        <p className="text-foreground">{lesson.exercise}</p>
-                      </div>
-                      <Separator />
-                      <div>
-                        <h4 className="font-semibold mb-2">Affirmation</h4>
-                        <p className="text-foreground italic">"{lesson.affirmation}"</p>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
+                  <div className="space-y-4 mt-4">
+                    {editingLesson === index ? (
+                      <>
+                        <div>
+                          <Label htmlFor={`title-${index}`} className="text-white/60">Title</Label>
+                          <Input
+                            id={`title-${index}`}
+                            value={lesson.title}
+                            onChange={(e) => handleLessonEdit(index, 'title', e.target.value)}
+                            className="mt-1 bg-black/50 border-white/20 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`content-${index}`} className="text-white/60">Content</Label>
+                          <Textarea
+                            id={`content-${index}`}
+                            value={lesson.content}
+                            onChange={(e) => handleLessonEdit(index, 'content', e.target.value)}
+                            rows={8}
+                            className="mt-1 bg-black/50 border-white/20 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`exercise-${index}`} className="text-white/60">Exercise</Label>
+                          <Textarea
+                            id={`exercise-${index}`}
+                            value={lesson.exercise}
+                            onChange={(e) => handleLessonEdit(index, 'exercise', e.target.value)}
+                            rows={4}
+                            className="mt-1 bg-black/50 border-white/20 text-white"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`affirmation-${index}`} className="text-white/60">Affirmation</Label>
+                          <Input
+                            id={`affirmation-${index}`}
+                            value={lesson.affirmation}
+                            onChange={(e) => handleLessonEdit(index, 'affirmation', e.target.value)}
+                            className="mt-1 bg-black/50 border-white/20 text-white"
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <h4 className="font-semibold mb-2 text-white/80">Content</h4>
+                          <p className="text-white/80 leading-relaxed">{lesson.content}</p>
+                        </div>
+                        <div className="border-t border-white/10 pt-4">
+                          <h4 className="font-semibold mb-2 text-white/80">Exercise</h4>
+                          <p className="text-white/80">{lesson.exercise}</p>
+                        </div>
+                        <div className="border-t border-white/10 pt-4">
+                          <h4 className="font-semibold mb-2 text-white/80">Affirmation</h4>
+                          <p className="text-white/80 italic">"{lesson.affirmation}"</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
             ))}
           </TabsContent>
 
@@ -1116,6 +1146,7 @@ export const SprintPreview: React.FC = () => {
             ))}
           </TabsContent>
         </Tabs>
+        </div>
       </div>
     </div>
   );
