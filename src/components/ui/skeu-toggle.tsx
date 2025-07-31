@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { User, UserX } from 'lucide-react';
+import { User, UserCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SkeuToggleProps {
@@ -17,7 +17,7 @@ export function SkeuToggle({ value, onChange, className }: SkeuToggleProps) {
   };
 
   return (
-    <div className={cn("flex justify-center", className)}>
+    <div className={cn("flex flex-col items-center gap-3", className)}>
       {/* Toggle Container */}
       <motion.button
         className="relative w-20 h-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
@@ -65,9 +65,11 @@ export function SkeuToggle({ value, onChange, className }: SkeuToggleProps) {
             }}
           >
             {isOn ? (
-              <User className="w-4 h-4 text-pink-600" />
+              // Female symbol (♀) using CSS
+              <div className="w-4 h-4 flex items-center justify-center text-pink-600 font-bold text-lg">♀</div>
             ) : (
-              <User className="w-4 h-4 text-cyan-600" />
+              // Male symbol (♂) using CSS  
+              <div className="w-4 h-4 flex items-center justify-center text-cyan-600 font-bold text-lg">♂</div>
             )}
           </motion.div>
         </motion.div>
@@ -85,6 +87,22 @@ export function SkeuToggle({ value, onChange, className }: SkeuToggleProps) {
           }}
         />
       </motion.button>
+
+      {/* Subtle Labels */}
+      <div className="flex items-center gap-8">
+        <span className={cn(
+          "text-xs font-medium transition-colors duration-200",
+          !isOn ? "text-cyan-400" : "text-white/40"
+        )}>
+          Male
+        </span>
+        <span className={cn(
+          "text-xs font-medium transition-colors duration-200", 
+          isOn ? "text-pink-400" : "text-white/40"
+        )}>
+          Female
+        </span>
+      </div>
     </div>
   );
 }
