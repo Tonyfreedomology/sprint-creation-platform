@@ -591,13 +591,13 @@ export const SprintPreview: React.FC = () => {
         contentType = 'affirmation';
       }
       
-      const { data, error } = await supabase.functions.invoke('generate-audio-hume', {
+      const { data, error } = await supabase.functions.invoke('generate-audio-elevenlabs', {
         body: { 
           text, 
           voiceStyle: sprintData?.voiceStyle || 'warm-coach', // Use sprint voice style
           contentType: contentType,
           sprintId: sprintData?.sprintId, // For voice consistency
-          savedVoiceId: sprintVoiceId // Use existing voice if available
+          voiceId: sprintVoiceId // Use existing voice if available
         }
       });
 
@@ -605,9 +605,9 @@ export const SprintPreview: React.FC = () => {
         throw new Error(error.message);
       }
 
-      // If this is a new voice, save the voice ID for consistency
-      if (data.isNewVoice && data.newVoiceId) {
-        setSprintVoiceId(data.newVoiceId);
+      // Save the voice ID for consistency
+      if (data.voiceId && !sprintVoiceId) {
+        setSprintVoiceId(data.voiceId);
         console.log('Saved new voice ID for sprint:', data.newVoiceId);
       }
 

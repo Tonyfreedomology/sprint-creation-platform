@@ -119,15 +119,15 @@ export class SprintPackageGenerator {
           voiceStyle: 'warm-coach'
         };
 
-        // Only add savedVoiceId if it's defined
+        // Only add voiceId if it's defined
         if (sprintVoiceId) {
-          requestBody.savedVoiceId = sprintVoiceId;
+          requestBody.voiceId = sprintVoiceId;
         }
 
         console.log(`Generating audio for Day ${dayNumber} with request:`, requestBody);
 
-        // Generate audio using Hume
-        const audioResponse = await supabase.functions.invoke('generate-audio-hume', {
+        // Generate audio using ElevenLabs
+        const audioResponse = await supabase.functions.invoke('generate-audio-elevenlabs', {
           body: requestBody
         });
 
