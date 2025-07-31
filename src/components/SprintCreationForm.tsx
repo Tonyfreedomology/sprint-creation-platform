@@ -16,6 +16,7 @@ import { SprintReviewPage } from './SprintReviewPage';
 import { OpenAIKeyModal } from './OpenAIKeyModal';
 import { VoiceRecorder } from './VoiceRecorder';
 import StyledDropdown from './StyledDropdown';
+import { SkeuToggle } from '@/components/ui/skeu-toggle';
 import ConfettiButton from './ConfettiButton';
 import { supabase } from '@/integrations/supabase/client';
 import MasterPlanReview from '@/pages/MasterPlanReview';
@@ -534,21 +535,12 @@ export const SprintCreationForm: React.FC = () => {
                 <div className="space-y-4">
                   {/* Voice Gender Selection */}
                   <div>
-                    <Label className="text-white text-xs font-medium uppercase tracking-wide opacity-70">Voice Gender</Label>
-                    <RadioGroup 
-                      value={formData.voiceGender || 'female'} 
-                      onValueChange={(value) => handleInputChange('voiceGender', value)}
-                      className="flex gap-4 mt-2"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="male" id="male" />
-                        <Label htmlFor="male" className="text-white text-sm">Male</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="female" id="female" />
-                        <Label htmlFor="female" className="text-white text-sm">Female</Label>
-                      </div>
-                    </RadioGroup>
+                    <Label className="text-white text-xs font-medium uppercase tracking-wide opacity-70 mb-3 block">Voice Gender</Label>
+                    <SkeuToggle
+                      value={formData.voiceGender || 'female'}
+                      onChange={(value) => handleInputChange('voiceGender', value)}
+                      className="justify-center"
+                    />
                   </div>
 
                   {/* Voice Style */}
