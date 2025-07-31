@@ -17,8 +17,8 @@ export function PillSwitcher({ activeTab, onChange, lessonCount, emailCount }: P
     <div className="relative w-fit mx-auto">
       {/* Gradient border container */}
       <div className="p-[2px] rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
-        {/* Inner container with dark background */}
-        <div className="relative rounded-full bg-black/60 backdrop-blur-sm p-1 flex">
+        {/* Inner container with darker background to match lesson cards */}
+        <div className="relative rounded-full bg-gray-900/80 backdrop-blur-sm p-1 flex">
           {options.map((option) => (
             <button
               key={option.key}
