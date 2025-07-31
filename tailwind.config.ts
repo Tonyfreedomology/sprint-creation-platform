@@ -19,7 +19,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['Satoshi Variable', 'Inter', 'system-ui', 'sans-serif'],
+				sans: ['Satoshi Variable', 'Satoshi', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
