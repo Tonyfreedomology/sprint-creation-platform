@@ -534,12 +534,10 @@ export const SprintCreationForm: React.FC = () => {
                 <Label className="text-white text-sm font-medium mb-3 block">Voice Options</Label>
                 <div className="space-y-4">
                   {/* Voice Gender Selection */}
-                  <div>
-                    <Label className="text-white text-xs font-medium uppercase tracking-wide opacity-70 mb-3 block">Voice Gender</Label>
+                  <div className="flex justify-center">
                     <SkeuToggle
                       value={formData.voiceGender || 'female'}
                       onChange={(value) => handleInputChange('voiceGender', value)}
-                      className="justify-center"
                     />
                   </div>
 
