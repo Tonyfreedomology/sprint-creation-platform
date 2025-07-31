@@ -138,8 +138,8 @@ const Index = () => {
     <div className="min-h-screen relative" style={{ background: 'radial-gradient(circle at center, #060a0f 0%, #0f0f0f 70%, #080808 100%)' }}>
       {/* Animated Rays Background */}
       <AnimatedRays 
-        intensity={0.2} 
-        speed={0.3}
+        intensity={0.05} 
+        speed={0.2}
         color1="#22DFDC"
         color2="#22EDB6"
       />
