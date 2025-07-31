@@ -208,6 +208,7 @@ const Index = () => {
                       Start Creating
                     </RollingTextButton>
                     
+                    {/* Test Publish Page Button - Commented out
                     <button
                       onClick={() => window.location.href = '/package-results'}
                       className="px-8 py-4 text-lg rounded-full font-medium transition-all hover:scale-105 shadow-lg"
@@ -221,6 +222,7 @@ const Index = () => {
                     >
                       Test Publish Page
                     </button>
+                    */}
                   </div>
                   
                   <div className="flex items-center gap-6 text-sm" style={{ color: '#CFCFCF' }}>
