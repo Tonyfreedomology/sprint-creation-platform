@@ -278,9 +278,9 @@ export default function MasterPlanReview({ masterPlan, formData, sprintId, chann
 
         <div className="flex items-center justify-between pt-6">
           <Button 
-            variant="outline" 
+            variant="ghost" 
             onClick={onBack} 
-            className="text-white border-white/20 hover:bg-white/10"
+            className="text-white/80 hover:text-white hover:bg-white/10 border border-white/20"
           >
             Back to Form
           </Button>
