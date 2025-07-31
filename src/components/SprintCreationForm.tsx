@@ -840,23 +840,22 @@ export const SprintCreationForm: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-      {/* Loading Component */}
-      {isGenerating && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-[#1E1E1E] border border-[#22DFDC]/20 rounded-2xl p-8 text-center">
-            <div className="text-white text-xl mb-4">{generationStep}</div>
-            <div className="w-64 h-2 bg-[#22DFDC]/20 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] transition-all duration-300"
-                style={{ width: `${generationProgress}%` }}
-              />
+        {/* Loading Component */}
+        {isGenerating && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-[#1E1E1E] border border-[#22DFDC]/20 rounded-2xl p-8 text-center">
+              <div className="text-white text-xl mb-4">{generationStep}</div>
+              <div className="w-64 h-2 bg-[#22DFDC]/20 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] transition-all duration-300"
+                  style={{ width: `${generationProgress}%` }}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
