@@ -108,16 +108,12 @@ Best regards,
   const audioCount = Object.keys(audioFiles).length;
 
   return (
-    <div className="min-h-screen bg-cool-grey p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Main Container with Cyan Border */}
-        <div 
-          className="relative rounded-3xl p-8 md:p-12"
-          style={{
-            background: '#242424',
-            border: '2px solid #22DFDC'
-          }}
-        >
+    <div className="page-wrapper">
+      <div className="page-content">
+        <div className="max-w-7xl mx-auto">
+          {/* Main Container with Gradient Border */}
+          <div className="p-[2px] rounded-3xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
+            <div className="relative rounded-3xl bg-neutral-950/90 backdrop-blur-sm p-8 md:p-12">
           {/* Header Row */}
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-8">
             {/* Left: Back Button */}
@@ -144,108 +140,119 @@ Best regards,
             
             {/* Right: Status Pills */}
             <div className="flex flex-col gap-3">
-              <div 
-                className="px-4 py-2 rounded-lg text-sm transition-all hover:scale-105"
-                style={{
-                  background: '#242424',
-                  border: '1px solid #22DFDC',
-                  color: '#CFCFCF'
-                }}
-              >
-                Publishing Progress: 7 / 8
+              <div className="px-4 py-2 rounded-full backdrop-blur-sm bg-gradient-glassmorphic border border-primary/20 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Publishing Progress</span>
+                  <span className="text-primary font-medium">7 / 8</span>
+                </div>
               </div>
-              <div 
-                className="px-4 py-2 rounded-lg text-sm transition-all hover:scale-105"
-                style={{
-                  background: '#242424',
-                  border: '1px solid #22DFDC', 
-                  color: '#CFCFCF'
-                }}
-              >
-                16:07:24 5ah outro
+              <div className="px-4 py-2 rounded-full backdrop-blur-sm bg-gradient-glassmorphic border border-primary/20 text-sm">
+                <div className="text-muted-foreground">
+                  16:07:24 5ah outro
+                </div>
               </div>
             </div>
           </div>
           
           {/* Meta Cards */}
           <div className="flex flex-wrap gap-6 mb-8">
-            <div 
-              className="rounded-2xl p-6 min-w-[140px] transition-all hover:scale-105"
-              style={{
-                background: '#1a1a1a',
-                border: '1px solid #22DFDC'
-              }}
-            >
-              <div className="text-center">
-                <div className="text-lg font-medium text-cool-text-secondary mb-1">Duration</div>
-                <div className="text-2xl font-bold text-white">7 days</div>
+            <div className="bg-neutral-900/50 backdrop-blur-sm rounded-lg p-6 text-center border border-neutral-800/50 min-w-[140px] transition-all hover:scale-105">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-[#22DFDC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
+              <div className="text-white/60 text-sm font-medium mb-1">Duration</div>
+              <div className="text-[#22DFDC] text-xl font-semibold">7 days</div>
             </div>
-            <div 
-              className="rounded-2xl p-6 min-w-[140px] transition-all hover:scale-105"
-              style={{
-                background: '#1a1a1a',
-                border: '1px solid #22DFDC'
-              }}
-            >
-              <div className="text-center">
-                <div className="text-lg font-medium text-cool-text-secondary mb-1">Total lessons</div>
-                <div className="text-2xl font-bold text-white">7</div>
+            <div className="bg-neutral-900/50 backdrop-blur-sm rounded-lg p-6 text-center border border-neutral-800/50 min-w-[140px] transition-all hover:scale-105">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-[#22DFDC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
               </div>
+              <div className="text-white/60 text-sm font-medium mb-1">Total lessons</div>
+              <div className="text-[#22DFDC] text-xl font-semibold">7</div>
             </div>
           </div>
 
           {/* Sprint Overview Card */}
-          <div 
-            className="rounded-2xl p-6 mb-6 transition-all hover:scale-105"
-            style={{
-              background: '#1a1a1a',
-              border: '1px solid #22DFDC'
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full border border-cool-blue flex items-center justify-center">
-                  <span className="text-cool-blue text-sm">📋</span>
+          <div className="p-[2px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] mb-6">
+            <div className="rounded-xl bg-neutral-950/90 backdrop-blur-sm p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
+                    <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-semibold text-white">Sprint Overview</h2>
+                    <p className="text-white/60 text-sm">Key details about your sprint</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-white">Sprint Overview</h3>
-              </div>
-              <div className="flex gap-3">
-                <Button variant="ghost" className="text-cool-blue hover:bg-cool-blue/10 transition-all hover:scale-105">
-                  Lessons
-                </Button>
-                <Button variant="ghost" className="text-cool-text-secondary hover:bg-cool-text-secondary/10 transition-all hover:scale-105">
-                  Edit
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-white hover:bg-white/10"
+                    title="View Lessons"
+                  >
+                    Lessons
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-white hover:bg-white/10"
+                    title="Edit"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Lesson Cards */}
           <div className="space-y-4">
-            <div 
-              className="rounded-2xl p-6 transition-all hover:scale-105"
-              style={{
-                background: '#1a1a1a',
-                border: '1px solid #22DFDC'
-              }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold" style={{ color: '#22DFDC' }}>
-                  Day 1: Awakening Your Masculine Presence
-                </h3>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10 transition-all hover:scale-105">
-                    Generate Audio
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10 transition-all hover:scale-105">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-cool-text-secondary hover:bg-cool-text-secondary/10 transition-all hover:scale-105">
-                    <Edit className="h-4 w-4" />
-                  </Button>
+            <div className="p-[2px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
+              <div className="rounded-xl bg-neutral-950/90 backdrop-blur-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
+                      <span className="text-black text-xs font-bold">1</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-[#22DFDC]">
+                      Day 1: Awakening Your Masculine Presence
+                    </h3>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-white hover:bg-white/10"
+                      title="Generate Audio"
+                    >
+                      <Volume2 className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-white hover:bg-white/10"
+                      title="More Options"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-white hover:bg-white/10"
+                      title="Edit Lesson"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
               <div className="text-white">
                 <p className="mb-3">
                   Welcome to Day 1 of your sprint 'Magnetic— 7 Days to Lead Your Marriage with Confidence & Desire!'
@@ -261,7 +268,10 @@ Best regards,
                   Challenge your comforting lrabits tonight by spending ten minutes grounding yourself in
                   that presence with your wife.
                 </p>
+                </div>
               </div>
+            </div>
+          </div>
             </div>
           </div>
         </div>
