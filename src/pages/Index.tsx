@@ -198,10 +198,11 @@ const Index = () => {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <RollingTextButton
                       onClick={() => setShowForm(true)}
-                      className="px-8 py-4 text-lg rounded-xl font-medium text-white transition-all hover:scale-105 flex items-center gap-2"
+                      className="px-8 py-4 text-lg rounded-full font-medium text-white transition-all hover:scale-105 flex items-center gap-2 shadow-lg"
                       style={{ 
                         background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
-                        border: 'none'
+                        border: 'none',
+                        boxShadow: '0 0 20px rgba(34, 223, 220, 0.4), 0 4px 15px rgba(0, 0, 0, 0.2)'
                       }}
                     >
                       Start Creating
@@ -209,12 +210,13 @@ const Index = () => {
                     
                     <button
                       onClick={() => window.location.href = '/package-results'}
-                      className="px-8 py-4 text-lg rounded-xl font-medium transition-all hover:scale-105"
+                      className="px-8 py-4 text-lg rounded-full font-medium transition-all hover:scale-105 shadow-lg"
                       style={{ 
                         color: '#22DFDC',
                         border: '1px solid #22DFDC',
                         backgroundColor: 'rgba(34, 223, 220, 0.1)',
-                        backdropFilter: 'blur(10px)'
+                        backdropFilter: 'blur(10px)',
+                        boxShadow: '0 0 15px rgba(34, 223, 220, 0.2), 0 4px 10px rgba(0, 0, 0, 0.1)'
                       }}
                     >
                       Test Publish Page

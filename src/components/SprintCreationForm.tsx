@@ -16,6 +16,7 @@ import { SprintReviewPage } from './SprintReviewPage';
 import { OpenAIKeyModal } from './OpenAIKeyModal';
 import { VoiceRecorder } from './VoiceRecorder';
 import StyledDropdown from './StyledDropdown';
+import ConfettiButton from './ConfettiButton';
 import { supabase } from '@/integrations/supabase/client';
 import MasterPlanReview from '@/pages/MasterPlanReview';
 
@@ -849,14 +850,14 @@ export const SprintCreationForm: React.FC = () => {
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   ) : (
-                    <Button
+                    <ConfettiButton
                       onClick={handleSubmit}
                       disabled={!canProceed() || isSubmitting}
                       className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white hover:opacity-90"
                     >
                       {isSubmitting ? 'Creating...' : 'Create Sprint'}
                       <Sparkles className="w-4 h-4 ml-2" />
-                    </Button>
+                    </ConfettiButton>
                   )}
                 </div>
               </div>
