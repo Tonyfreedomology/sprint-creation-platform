@@ -15,6 +15,7 @@ import { SprintGenerationLoading } from './SprintGenerationLoading';
 import { SprintReviewPage } from './SprintReviewPage';
 import { OpenAIKeyModal } from './OpenAIKeyModal';
 import { VoiceRecorder } from './VoiceRecorder';
+import StyledDropdown from './StyledDropdown';
 import { supabase } from '@/integrations/supabase/client';
 import MasterPlanReview from '@/pages/MasterPlanReview';
 
@@ -474,24 +475,40 @@ export const SprintCreationForm: React.FC = () => {
           <div className="space-y-6">
             <div className="space-y-6">
               <div>
-                <Label className="text-white text-sm font-medium">Content Types (Select all that apply)</Label>
-                <div className="grid grid-cols-2 gap-3 mt-3">
-                  {[
-                    { id: 'written-lessons', label: 'Written Lessons' },
-                    { id: 'audio-lessons', label: 'Audio Lessons' },
-                    { id: 'daily-emails', label: 'Daily Emails' },
-                    { id: 'challenges', label: 'Challenges' },
-                  ].map((type) => (
-                    <div key={type.id} className="flex items-center space-x-2 p-3 border border-white/10 rounded-lg hover:bg-white/5 transition-colors">
-                      <Checkbox
-                        id={type.id}
-                        checked={formData.contentTypes.includes(type.id)}
-                        onCheckedChange={(checked) => handleContentTypeChange(type.id, checked as boolean)}
-                      />
-                      <Label htmlFor={type.id} className="text-sm cursor-pointer text-white">{type.label}</Label>
-                    </div>
-                  ))}
-                </div>
+                <Label className="text-white text-sm font-medium mb-3 block">Content Types</Label>
+                <StyledDropdown
+                  multiple
+                  options={[
+                    { 
+                      value: 'written-lessons', 
+                      label: 'Written Lessons',
+                      description: 'Daily text-based content and exercises',
+                      icon: <FileText className="w-4 h-4" />
+                    },
+                    { 
+                      value: 'audio-lessons', 
+                      label: 'Audio Lessons',
+                      description: 'Voice-narrated content for on-the-go learning',
+                      icon: <Brain className="w-4 h-4" />
+                    },
+                    { 
+                      value: 'daily-emails', 
+                      label: 'Daily Emails',
+                      description: 'Motivational emails to keep participants engaged',
+                      icon: <Heart className="w-4 h-4" />
+                    },
+                    { 
+                      value: 'challenges', 
+                      label: 'Daily Challenges',
+                      description: 'Action-oriented tasks and exercises',
+                      icon: <Sparkles className="w-4 h-4" />
+                    },
+                  ]}
+                  values={formData.contentTypes}
+                  onMultiChange={(values) => setFormData(prev => ({ ...prev, contentTypes: values }))}
+                  placeholder="Select content types..."
+                  className="mt-2"
+                />
               </div>
 
               <div>
