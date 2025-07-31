@@ -611,13 +611,17 @@ export const SprintPreview: React.FC = () => {
         contentType = 'affirmation';
       }
       
+      // Use cloned voice if available, otherwise use voice style
+      const voiceToUse = sprintVoiceId || sprintData?.voiceId;
+      console.log('Audio generation - using voice ID:', voiceToUse, 'sprintVoiceId:', sprintVoiceId, 'sprintData.voiceId:', sprintData?.voiceId);
+      
       const { data, error } = await supabase.functions.invoke('generate-audio-elevenlabs', {
         body: { 
           text, 
           voiceStyle: sprintData?.voiceStyle || 'warm-coach', // Use sprint voice style
           contentType: contentType,
           sprintId: sprintData?.sprintId, // For voice consistency
-          voiceId: sprintVoiceId // Use existing voice if available
+          voiceId: voiceToUse // Use cloned voice first, then fall back to voice style
         }
       });
 
@@ -631,11 +635,15 @@ export const SprintPreview: React.FC = () => {
         console.log('Saved new voice ID for sprint:', data.newVoiceId);
       }
 
-      // Convert base64 audio to blob URL (Hume returns WAV format)
-      const audioBlob = new Blob(
-        [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))], 
-        { type: 'audio/wav' }
-      );
+      // Convert base64 audio to blob URL (ElevenLabs returns MP3 format)
+      // Handle large base64 strings safely by processing in chunks
+      const base64Audio = data.audioContent;
+      const binaryString = atob(base64Audio);
+      const audioBytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        audioBytes[i] = binaryString.charCodeAt(i);
+      }
+      const audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       
       // Create audio element
