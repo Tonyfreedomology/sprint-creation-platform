@@ -890,9 +890,9 @@ export const SprintPreview: React.FC = () => {
                 </div>
               </div>
               
-              {/* Stats grid */}
+              {/* Stats grid with individual cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="text-center">
+                <div className="bg-slate-900/50 backdrop-blur-sm rounded-lg p-6 text-center border border-slate-800/50">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 flex items-center justify-center mx-auto mb-3">
                     <svg className="w-6 h-6 text-[#22DFDC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -901,14 +901,14 @@ export const SprintPreview: React.FC = () => {
                   <div className="text-white/60 text-sm font-medium mb-1">Category</div>
                   <div className="text-[#22DFDC] text-xl font-semibold">{sprintData.sprintCategory}</div>
                 </div>
-                <div className="text-center">
+                <div className="bg-slate-900/50 backdrop-blur-sm rounded-lg p-6 text-center border border-slate-800/50">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 flex items-center justify-center mx-auto mb-3">
                     <Calendar className="w-6 h-6 text-[#22DFDC]" />
                   </div>
                   <div className="text-white/60 text-sm font-medium mb-1">Duration</div>
                   <div className="text-[#22DFDC] text-xl font-semibold">{sprintData.sprintDuration} days</div>
                 </div>
-                <div className="text-center">
+                <div className="bg-slate-900/50 backdrop-blur-sm rounded-lg p-6 text-center border border-slate-800/50">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 flex items-center justify-center mx-auto mb-3">
                     <svg className="w-6 h-6 text-[#22DFDC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -917,6 +917,12 @@ export const SprintPreview: React.FC = () => {
                   <div className="text-white/60 text-sm font-medium mb-1">Total Lessons</div>
                   <div className="text-[#22DFDC] text-xl font-semibold">{sprintData.dailyLessons.length}</div>
                 </div>
+              </div>
+              
+              {/* Gradient glowing line */}
+              <div className="relative mb-8">
+                <div className="h-[1px] bg-gradient-to-r from-transparent via-[#22DFDC] to-transparent opacity-60"></div>
+                <div className="absolute inset-0 h-[1px] bg-gradient-to-r from-transparent via-[#22DFDC] to-transparent blur-sm opacity-40"></div>
               </div>
               
               {/* Description */}
