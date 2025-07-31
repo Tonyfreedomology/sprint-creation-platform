@@ -55,7 +55,7 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
       type={type}
       onClick={handleClick}
       disabled={disabled}
-      className={`px-8 py-4 text-lg rounded-full font-medium text-white transition-all hover:scale-105 shadow-lg ${className}`}
+      className={`px-6 py-3 text-base rounded-full font-medium text-white transition-all hover:scale-105 shadow-lg flex items-center justify-center gap-2 ${className}`}
       style={{
         background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
         border: 'none',
