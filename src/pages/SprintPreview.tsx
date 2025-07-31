@@ -823,90 +823,112 @@ export const SprintPreview: React.FC = () => {
           </div>
 
         {/* Overview Card */}
-        <div className="card-wrapper">
-          <div className="card-content">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
-                  <Users className="w-4 h-4 text-black" />
+        <div className="relative">
+          {/* Gradient border container */}
+          <div className="p-[2px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
+            {/* Inner container with dark background */}
+            <div className="rounded-xl bg-black/60 backdrop-blur-sm p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
+                    <Users className="w-5 h-5 text-black" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-semibold text-white">Sprint Overview</h2>
+                    <p className="text-white/60 text-sm">Key details about your sprint</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white">Sprint Overview</h2>
-                  <p className="text-white/60 text-sm">Key details about your sprint</p>
+                
+                {/* Action buttons */}
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={generatePackage} 
+                    disabled={isGeneratingPackage || isGenerating || sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)}
+                    size="sm"
+                    className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-black hover:from-[#22EDB6] hover:to-[#22DFDC]"
+                    title={isGeneratingPackage 
+                      ? `Publishing ${Math.round(packageProgress)}%` 
+                      : sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)
+                        ? `Finalizing Sprint (${sprintData.dailyLessons.length}/${sprintData.sprintDuration})`
+                        : 'Publish Sprint'
+                    }
+                  >
+                    {isGeneratingPackage ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Package className="w-4 h-4" />
+                    )}
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={saveSprint}
+                    className="text-white hover:bg-white/10"
+                    title="Save as Document"
+                  >
+                    <Save className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={downloadAllAudio} 
+                    disabled={Object.keys(audioUrls).length === 0}
+                    className="text-white hover:bg-white/10"
+                    title="Download Audio"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={exportSprint}
+                    className="text-white hover:bg-white/10"
+                    title="Export Data"
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
               
-              {/* Action buttons moved inside the card */}
-              <div className="flex gap-2">
-                <Button 
-                  onClick={generatePackage} 
-                  disabled={isGeneratingPackage || isGenerating || sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)}
-                  size="sm"
-                  className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-black hover:from-[#22EDB6] hover:to-[#22DFDC]"
-                  title={isGeneratingPackage 
-                    ? `Publishing ${Math.round(packageProgress)}%` 
-                    : sprintData.dailyLessons.length < parseInt(sprintData.sprintDuration)
-                      ? `Finalizing Sprint (${sprintData.dailyLessons.length}/${sprintData.sprintDuration})`
-                      : 'Publish Sprint'
-                  }
-                >
-                  {isGeneratingPackage ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Package className="w-4 h-4" />
-                  )}
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={saveSprint}
-                  className="text-white hover:bg-white/10"
-                  title="Save as Document"
-                >
-                  <Save className="w-4 h-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={downloadAllAudio} 
-                  disabled={Object.keys(audioUrls).length === 0}
-                  className="text-white hover:bg-white/10"
-                  title="Download Audio"
-                >
-                  <Volume2 className="w-4 h-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={exportSprint}
-                  className="text-white hover:bg-white/10"
-                  title="Export Data"
-                >
-                  <Download className="w-4 h-4" />
-                </Button>
+              {/* Stats grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-6 h-6 text-[#22DFDC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </div>
+                  <div className="text-white/60 text-sm font-medium mb-1">Category</div>
+                  <div className="text-[#22DFDC] text-xl font-semibold">{sprintData.sprintCategory}</div>
+                </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 flex items-center justify-center mx-auto mb-3">
+                    <Calendar className="w-6 h-6 text-[#22DFDC]" />
+                  </div>
+                  <div className="text-white/60 text-sm font-medium mb-1">Duration</div>
+                  <div className="text-[#22DFDC] text-xl font-semibold">{sprintData.sprintDuration} days</div>
+                </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-6 h-6 text-[#22DFDC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                  </div>
+                  <div className="text-white/60 text-sm font-medium mb-1">Total Lessons</div>
+                  <div className="text-[#22DFDC] text-xl font-semibold">{sprintData.dailyLessons.length}</div>
+                </div>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div>
-                <Label className="text-sm font-medium text-white/60">Category</Label>
-                <Badge variant="secondary" className="mt-1 bg-white/10 text-white border-white/20">{sprintData.sprintCategory}</Badge>
+              
+              {/* Description */}
+              <div className="border-t border-white/10 pt-6">
+                <div className="text-white/60 text-sm font-medium mb-3">Description</div>
+                <p className="text-white/80 leading-relaxed">{sprintData.sprintDescription}</p>
               </div>
-              <div>
-                <Label className="text-sm font-medium text-white/60">Duration</Label>
-                <p className="font-medium text-white">{sprintData.sprintDuration} days</p>
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-white/60">Total Lessons</Label>
-                <p className="font-medium text-white">{sprintData.dailyLessons.length}</p>
-              </div>
-            </div>
-            
-            <div className="border-t border-white/10 pt-6">
-              <Label className="text-sm font-medium text-white/60">Description</Label>
-              <p className="mt-1 text-white/80 leading-relaxed">{sprintData.sprintDescription}</p>
             </div>
           </div>
+          
+          {/* Glow effect */}
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#22DFDC]/20 to-[#22EDB6]/20 blur-sm -z-10" />
         </div>
 
         {/* Content Tabs */}
@@ -1072,14 +1094,25 @@ export const SprintPreview: React.FC = () => {
 
           <TabsContent value="emails" className="space-y-6">
             {Array.from(new Set(sprintData.emailSequence.map(email => email.day))).map(day => (
-              <Card key={day} className="border-primary/20 shadow-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Mail className="w-5 h-5" />
-                    Day {day} Emails
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+              <div key={day} className="card-wrapper">
+                <div className="card-content">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
+                        <Mail className="w-3 h-3 text-black" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white">Day {day} Emails</h3>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingEmail(editingEmail === `${day}` ? null : `${day}`)}
+                      className="text-white hover:bg-white/10"
+                      title="Edit"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </Button>
+                  </div>
                   <div className="space-y-4">
                     {sprintData.emailSequence
                       .filter(email => email.day === day)
@@ -1087,62 +1120,51 @@ export const SprintPreview: React.FC = () => {
                         const globalIndex = sprintData.emailSequence.findIndex(
                           e => e.day === email.day && e.type === email.type
                         );
-                        const isEditing = editingEmail === `${day}-${email.type}`;
+                        const isEditing = editingEmail === `${day}`;
                         
-                        return (
-                          <div key={`${day}-${email.type}`} className="border rounded-lg p-4">
+                         return (
+                          <div key={`${day}-${email.type}`} className="border border-white/10 rounded-lg p-4">
                             <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline">{email.type}</Badge>
-                                <span className="text-sm text-muted-foreground">
-                                  Send at {email.send_time}
-                                </span>
+                              <div className="text-white/60 text-sm font-medium">
+                                Subject: {email.subject}
                               </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setEditingEmail(isEditing ? null : `${day}-${email.type}`)}
-                              >
-                                <Edit3 className="w-4 h-4 mr-2" />
-                                {isEditing ? 'Done' : 'Edit'}
-                              </Button>
                             </div>
                             
                             {isEditing ? (
                               <div className="space-y-3">
                                 <div>
-                                  <Label>Subject</Label>
+                                  <Label className="text-white/60">Subject</Label>
                                   <Input
                                     value={email.subject}
                                     onChange={(e) => handleEmailEdit(globalIndex, 'subject', e.target.value)}
-                                    className="mt-1"
+                                    className="mt-1 bg-black/50 border-white/20 text-white"
                                   />
                                 </div>
                                 <div>
-                                  <Label>Content</Label>
+                                  <Label className="text-white/60">Content</Label>
                                   <Textarea
                                     value={email.content}
                                     onChange={(e) => handleEmailEdit(globalIndex, 'content', e.target.value)}
                                     rows={6}
-                                    className="mt-1"
+                                    className="mt-1 bg-black/50 border-white/20 text-white"
                                   />
                                 </div>
                               </div>
                             ) : (
-                              <>
-                                <h5 className="font-semibold mb-2">Subject: {email.subject}</h5>
+                              <div className="space-y-3">
+                                <h5 className="font-semibold text-white mb-2">{email.subject}</h5>
                                 <div 
-                                  className="text-foreground leading-relaxed whitespace-pre-wrap"
+                                  className="text-white/80 leading-relaxed whitespace-pre-wrap"
                                   dangerouslySetInnerHTML={{ __html: renderMarkdown(email.content) }}
                                 />
-                              </>
+                              </div>
                             )}
                           </div>
                         );
                       })}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </TabsContent>
         </Tabs>
