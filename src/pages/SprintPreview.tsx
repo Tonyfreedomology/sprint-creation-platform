@@ -25,10 +25,11 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { orchestrateBatchGeneration, type BatchGenerationProgress } from "@/services/batchSprintGeneration";
-import { supabase } from '@/integrations/supabase/client';
-import { SprintPackageGenerator } from '@/services/sprintPackageGenerator';
 import { PillSwitcher } from '@/components/ui/pill-switcher';
+import { AudioPlayer } from '@/components/ui/audio-player';
+import { supabase } from '@/integrations/supabase/client';
+import { orchestrateBatchGeneration, type BatchGenerationProgress } from "@/services/batchSprintGeneration";
+import { SprintPackageGenerator } from '@/services/sprintPackageGenerator';
 
 interface GeneratedContent {
   sprintId: string;
@@ -1091,6 +1092,25 @@ export const SprintPreview: React.FC = () => {
                           <p className="text-white/80 italic">"{lesson.affirmation}"</p>
                         </div>
                       </>
+                    )}
+                    
+                    {/* Audio Player */}
+                    {audioUrls[lesson.day] && (
+                      <div className="mt-6 pt-4 border-t border-white/10">
+                        <AudioPlayer
+                          audioUrl={audioUrls[lesson.day]}
+                          title={`Day ${lesson.day} Audio`}
+                          isPlaying={playingAudio[lesson.day]}
+                          onPlayToggle={() => toggleAudio(lesson.day)}
+                          onDownload={() => {
+                            const link = document.createElement('a');
+                            link.href = audioUrls[lesson.day];
+                            link.download = `Day_${lesson.day}_${lesson.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.mp3`;
+                            link.click();
+                          }}
+                          className="w-full"
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
