@@ -159,9 +159,16 @@ export const SprintPreview: React.FC = () => {
       if (sprintId && channelName) {
         console.log('Setting up sprint preview from URL params:', { sprintId, channelName, voiceId: extractedVoiceId });
         
+        // Try to get voice ID from localStorage first
+        const storedVoiceId = localStorage.getItem(`sprint_voice_${sprintId}`);
+        const voiceIdToUse = extractedVoiceId || storedVoiceId;
+        
         // Set the voice ID immediately if available
-        if (extractedVoiceId) {
-          setSprintVoiceId(extractedVoiceId);
+        if (voiceIdToUse) {
+          setSprintVoiceId(voiceIdToUse);
+          console.log('Using voice ID:', voiceIdToUse);
+        } else {
+          console.log('No voice ID found for sprint:', sprintId);
         }
         
         // Create initial sprint data structure
@@ -636,14 +643,37 @@ export const SprintPreview: React.FC = () => {
       }
 
       // Convert base64 audio to blob URL (ElevenLabs returns MP3 format)
-      // Handle large base64 strings safely by processing in chunks
-      const base64Audio = data.audioContent;
-      const binaryString = atob(base64Audio);
-      const audioBytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        audioBytes[i] = binaryString.charCodeAt(i);
+      // Handle large base64 strings safely by processing in chunks to avoid atob limitations
+      function base64ToArrayBuffer(base64: string): ArrayBuffer {
+        const chunkSize = 32768; // Process in 32KB chunks
+        const chunks: Uint8Array[] = [];
+        
+        for (let i = 0; i < base64.length; i += chunkSize) {
+          const chunk = base64.slice(i, i + chunkSize);
+          const binaryString = atob(chunk);
+          const bytes = new Uint8Array(binaryString.length);
+          
+          for (let j = 0; j < binaryString.length; j++) {
+            bytes[j] = binaryString.charCodeAt(j);
+          }
+          chunks.push(bytes);
+        }
+        
+        // Combine all chunks
+        const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        
+        for (const chunk of chunks) {
+          result.set(chunk, offset);
+          offset += chunk.length;
+        }
+        
+        return result.buffer;
       }
-      const audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
+      
+      const audioBuffer = base64ToArrayBuffer(data.audioContent);
+      const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       
       // Create audio element

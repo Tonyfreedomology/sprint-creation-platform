@@ -302,14 +302,20 @@ export const SprintCreationForm: React.FC = () => {
        if (formData.voiceRecordingBlob || formData.voiceSampleFile) {
          setGenerationStep('Creating voice clone...');
          console.log('Voice sample detected, creating voice clone...');
-         clonedVoiceId = await createVoiceClone(formData, newSprintId);
-       }
+          clonedVoiceId = await createVoiceClone(formData, newSprintId);
+          
+          // Store voice ID in localStorage for later retrieval
+          if (clonedVoiceId) {
+            localStorage.setItem(`sprint_voice_${newSprintId}`, clonedVoiceId);
+            console.log('Stored voice ID in localStorage:', clonedVoiceId);
+          }
+        }
 
-       // Update form data with cloned voice ID
-       const updatedFormData = {
-         ...formData,
-         voiceId: clonedVoiceId || undefined,
-       };
+        // Update form data with cloned voice ID
+        const updatedFormData = {
+          ...formData,
+          voiceId: clonedVoiceId || undefined,
+        };
        
        // Set up channel to listen for master plan completion
        const channel = supabase.channel(newChannelName);
