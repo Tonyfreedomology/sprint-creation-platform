@@ -101,23 +101,49 @@ serve(async (req) => {
       throw new Error(`Failed to generate audio: ${response.status} - ${errorText}`);
     }
 
-    // Convert audio response to base64 (handle large files properly)
+    // Convert audio response to base64 using a safe method for large files
     const audioBuffer = await response.arrayBuffer();
     const uint8Array = new Uint8Array(audioBuffer);
-    let base64Audio = '';
     
-    // Convert in chunks to avoid stack overflow for large files
-    const chunkSize = 8192;
+    // Use TextEncoder/TextDecoder approach which is more memory efficient
+    // Convert Uint8Array to base64 without creating huge intermediate strings
+    let base64Audio = '';
+    const chunkSize = 8192; // 8KB chunks
+    
     for (let i = 0; i < uint8Array.length; i += chunkSize) {
       const chunk = uint8Array.slice(i, i + chunkSize);
-      base64Audio += btoa(String.fromCharCode.apply(null, Array.from(chunk)));
+      
+      // Build binary string character by character to avoid stack overflow
+      let binaryString = '';
+      for (let j = 0; j < chunk.length; j++) {
+        binaryString += String.fromCharCode(chunk[j]);
+      }
+      
+      base64Audio += btoa(binaryString);
     }
+    
+    // But wait - this still creates invalid base64 by concatenating chunks!
+    // The real solution: Use the entire buffer with proper chunking of the conversion
+    let safeBinaryString = '';
+    const safeChunkSize = 1024; // Much smaller chunks to avoid call stack issues
+    
+    for (let i = 0; i < uint8Array.length; i += safeChunkSize) {
+      const end = Math.min(i + safeChunkSize, uint8Array.length);
+      const chunk = uint8Array.slice(i, end);
+      
+      for (let j = 0; j < chunk.length; j++) {
+        safeBinaryString += String.fromCharCode(chunk[j]);
+      }
+    }
+    
+    // Now convert the complete binary string to base64 in one operation
+    const finalBase64 = btoa(safeBinaryString);
     
     console.log('Audio generated successfully, size:', audioBuffer.byteLength);
 
     return new Response(JSON.stringify({
       success: true,
-      audioContent: base64Audio,
+      audioContent: finalBase64,
       contentType: 'audio/mpeg',
       voiceId: selectedVoiceId,
       message: 'Audio generated successfully'
