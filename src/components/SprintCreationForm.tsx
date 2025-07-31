@@ -125,6 +125,7 @@ export const SprintCreationForm: React.FC = () => {
   const [channelName, setChannelName] = useState('');
   const [isAnalyzingWritingStyle, setIsAnalyzingWritingStyle] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [isCreatingVoiceClone, setIsCreatingVoiceClone] = useState(false);
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
@@ -204,6 +205,56 @@ export const SprintCreationForm: React.FC = () => {
     }
   };
 
+  const createVoiceClone = async (formData: SprintFormData, sprintId: string): Promise<string | null> => {
+    if (!formData.voiceRecordingBlob && !formData.voiceSampleFile) {
+      return null;
+    }
+
+    setIsCreatingVoiceClone(true);
+    
+    try {
+      const audioFile = formData.voiceSampleFile || formData.voiceRecordingBlob;
+      if (!audioFile) return null;
+
+      console.log('Creating voice clone for sprint:', sprintId);
+      
+      const cloneFormData = new FormData();
+      cloneFormData.append('audio', audioFile);
+      cloneFormData.append('voiceName', `${formData.creatorName}_${sprintId}`);
+      
+      const { data, error } = await supabase.functions.invoke('clone-voice-hume', {
+        body: cloneFormData,
+      });
+      
+      if (error) {
+        console.error('Voice cloning error:', error);
+        throw new Error(error.message || 'Failed to create voice clone');
+      }
+      
+      if (data.success) {
+        console.log('Voice clone created successfully:', data.voiceId);
+        toast({
+          title: "Voice clone created",
+          description: `Successfully cloned voice: ${data.voiceName}`,
+        });
+        return data.voiceId;
+      } else {
+        throw new Error(data.error || 'Voice cloning failed');
+      }
+      
+    } catch (error: any) {
+      console.error('Voice cloning error:', error);
+      toast({
+        title: "Voice cloning failed",
+        description: error.message || "Failed to create voice clone. Using default voice instead.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setIsCreatingVoiceClone(false);
+    }
+  };
+
   const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -226,41 +277,55 @@ export const SprintCreationForm: React.FC = () => {
     setGenerationProgress(0);
     setGenerationStep('Creating master plan...');
     
-    try {
-      // Create unique identifiers
-      const newSprintId = `sprint_${Date.now()}`;
-      const newChannelName = `sprint-generation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      setSprintId(newSprintId);
-      setChannelName(newChannelName);
-      
-      // Set up channel to listen for master plan completion
-      const channel = supabase.channel(newChannelName);
-      
-      channel
-        .on('broadcast', { event: 'structure-generation-started' }, () => {
-          setGenerationStep('Creating master plan...');
-        })
-        .on('broadcast', { event: 'structure-generated' }, (payload) => {
-          console.log('Master plan generated:', payload.payload);
-          setIsGenerating(false);
-          supabase.removeChannel(channel);
-          
-          // Navigate to master plan review page
-          const masterPlanData = encodeURIComponent(JSON.stringify(payload.payload.structure));
-          const formDataEncoded = encodeURIComponent(JSON.stringify(formData));
-          navigate(`/master-plan-review?masterPlan=${masterPlanData}&formData=${formDataEncoded}&sprintId=${newSprintId}&channelName=${newChannelName}`);
-        })
-        .subscribe();
-      
-      // Start master plan generation only
-      const { error: structuredError } = await supabase.functions.invoke('generate-sprint-structured', {
-        body: {
-          formData: formData,
-          sprintId: newSprintId,
-          channelName: newChannelName,
-          phase: 'master-plan-only'
-        }
-      });
+     try {
+       // Create unique identifiers
+       const newSprintId = `sprint_${Date.now()}`;
+       const newChannelName = `sprint-generation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+       setSprintId(newSprintId);
+       setChannelName(newChannelName);
+       
+       // Step 1: Create voice clone if voice sample is provided
+       let clonedVoiceId: string | null = null;
+       if (formData.voiceRecordingBlob || formData.voiceSampleFile) {
+         setGenerationStep('Creating voice clone...');
+         console.log('Voice sample detected, creating voice clone...');
+         clonedVoiceId = await createVoiceClone(formData, newSprintId);
+       }
+
+       // Update form data with cloned voice ID
+       const updatedFormData = {
+         ...formData,
+         voiceId: clonedVoiceId || undefined,
+       };
+       
+       // Set up channel to listen for master plan completion
+       const channel = supabase.channel(newChannelName);
+       
+       channel
+         .on('broadcast', { event: 'structure-generation-started' }, () => {
+           setGenerationStep('Creating master plan...');
+         })
+         .on('broadcast', { event: 'structure-generated' }, (payload) => {
+           console.log('Master plan generated:', payload.payload);
+           setIsGenerating(false);
+           supabase.removeChannel(channel);
+           
+           // Navigate to master plan review page with updated form data
+           const masterPlanData = encodeURIComponent(JSON.stringify(payload.payload.structure));
+           const formDataEncoded = encodeURIComponent(JSON.stringify(updatedFormData));
+           navigate(`/master-plan-review?masterPlan=${masterPlanData}&formData=${formDataEncoded}&sprintId=${newSprintId}&channelName=${newChannelName}`);
+         })
+         .subscribe();
+       
+       // Start master plan generation only
+       const { error: structuredError } = await supabase.functions.invoke('generate-sprint-structured', {
+         body: {
+           formData: updatedFormData,
+           sprintId: newSprintId,
+           channelName: newChannelName,
+           phase: 'master-plan-only'
+         }
+       });
       
       if (structuredError) {
         throw new Error(structuredError.message || 'Failed to start master plan generation');
@@ -692,7 +757,7 @@ export const SprintCreationForm: React.FC = () => {
                   <div><strong className="text-white">Content Types:</strong> {formData.contentTypes.join(', ') || 'None selected'}</div>
                   <div><strong className="text-white">Tone:</strong> {formData.toneStyle}</div>
                   <div><strong className="text-white">Participants:</strong> {formData.participantEmails ? formData.participantEmails.split(',').length : 0} people</div>
-                   <div><strong className="text-white">Voice Sample:</strong> {formData.voiceSampleFile ? 'Uploaded' : 'None'}</div>
+                   <div><strong className="text-white">Voice Sample:</strong> {formData.voiceSampleFile || formData.voiceRecordingBlob ? 'Ready' : 'None'}</div>
                    <div><strong className="text-white">Writing Style:</strong> {formData.writingStyleFile ? 'Uploaded' : 'None'}</div>
                 </div>
               </div>
@@ -856,16 +921,23 @@ export const SprintCreationForm: React.FC = () => {
         </div>
 
         {/* Loading Component */}
-        {isGenerating && (
+        {(isGenerating || isCreatingVoiceClone) && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-[#1E1E1E] border border-[#22DFDC]/20 rounded-2xl p-8 text-center">
-              <div className="text-white text-xl mb-4">{generationStep}</div>
+              <div className="text-white text-xl mb-4">
+                {isCreatingVoiceClone ? 'Creating voice clone...' : generationStep}
+              </div>
               <div className="w-64 h-2 bg-[#22DFDC]/20 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] transition-all duration-300"
                   style={{ width: `${generationProgress}%` }}
                 />
               </div>
+              {isCreatingVoiceClone && (
+                <p className="text-white/70 text-sm mt-3">
+                  Processing your voice sample with Hume AI...
+                </p>
+              )}
             </div>
           </div>
         )}
