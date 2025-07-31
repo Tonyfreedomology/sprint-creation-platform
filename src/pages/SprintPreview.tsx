@@ -914,7 +914,7 @@ export const SprintPreview: React.FC = () => {
         {/* Overview Card */}
         <div className="relative">
           {/* Gradient border container */}
-          <div className="p-[2px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
+          <div className="p-[1px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
             {/* Inner container with darker background to match lesson cards */}
             <div className="rounded-xl bg-neutral-950/90 backdrop-blur-sm p-8">
               <div className="flex items-center justify-between mb-8">

@@ -40,7 +40,6 @@ interface SprintFormData {
   toneStyle: string;
   
   // Additional Info
-  experience: string;
   goals: string;
   specialRequirements: string;
   
@@ -51,7 +50,6 @@ interface SprintFormData {
   voiceRecordingBlob: Blob | null;
   writingStyleFile: File | null;
   writingStyleAnalysis?: string;
-  participantEmails: string;
 }
 
 interface GeneratedContent {
@@ -80,32 +78,30 @@ interface GeneratedContent {
 }
 
 const initialFormData: SprintFormData = {
-  // Creator information - prefilled for testing
-  creatorName: 'Tony',
-  creatorEmail: 'tony@freedomology.com',
-  creatorBio: "I'm a creator, coach, and co-founder at Freedomology—on a mission to help people build lives full of purpose, energy, and deep alignment. I've led teams, built brands, and walked with people through real transformation in their health, relationships, and mindset. I'm creating this sprint because I've seen firsthand how much power there is in structured momentum—and I'm all in on making change stick.",
+  // Creator information
+  creatorName: '',
+  creatorEmail: '',
+  creatorBio: '',
 
-  // Sprint details - prefilled for testing
-  sprintTitle: 'Magnetic – 7 Days to Lead Your Marriage with Confidence & Desire',
-  sprintDescription: 'This sprint is for married men who want to reignite desire, reclaim their masculine presence, and lead with confidence in the bedroom and beyond. Through daily challenges, reflections, and practices, you\'ll learn how to embody sexual leadership, deepen connection, and create a relationship that pulses with attraction and trust.',
-  sprintDuration: '7',
-  sprintCategory: 'relationships',
+  // Sprint details
+  sprintTitle: '',
+  sprintDescription: '',
+  sprintDuration: '',
+  sprintCategory: '',
   
-  // Target audience and content - prefilled for testing
-  targetAudience: 'Married men, Christian husbands, dads in their 30s and 40s, recovering nice guys',
+  // Target audience and content
+  targetAudience: '',
   contentGeneration: 'ai',
-  contentTypes: ['written-lessons', 'audio-lessons', 'daily-emails', 'challenges'],
+  contentTypes: [],
   toneStyle: '',
-  experience: 'intermediate',
-  goals: '• Build strong masculine frame\n• Lead sexually with clarity and confidence\n• Increase intimacy and sexual frequency\n• Rewire approval-seeking habits\n• Establish daily habits of touch, eye contact, and pursuit',
+  goals: '',
   specialRequirements: '',
-  voiceStyle: 'warm-coach',
+  voiceStyle: '',
   voiceGender: 'female',
   voiceSampleFile: null,
   voiceRecordingBlob: null,
   writingStyleFile: null,
   writingStyleAnalysis: undefined,
-  participantEmails: 'tony@freedomology.com',
 };
 
 export const SprintCreationForm: React.FC = () => {
@@ -434,21 +430,6 @@ export const SprintCreationForm: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="experience" className="text-white text-sm font-medium">Your Experience Level</Label>
-                <StyledDropdown
-                  options={[
-                    { value: 'beginner', label: 'Beginner', description: 'New to creating content' },
-                    { value: 'intermediate', label: 'Intermediate', description: 'Some experience with courses/content' },
-                    { value: 'advanced', label: 'Advanced', description: 'Experienced creator/coach' },
-                    { value: 'expert', label: 'Expert', description: 'Industry professional' },
-                  ]}
-                  value={formData.experience}
-                  onChange={(value) => handleInputChange('experience', value)}
-                  placeholder="Select your experience level"
-                  className="mt-2"
-                />
-              </div>
             </div>
           </div>
         );
@@ -741,30 +722,6 @@ export const SprintCreationForm: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="specialRequirements" className="text-white text-sm font-medium">Special Requirements</Label>
-                <Textarea
-                  id="specialRequirements"
-                  placeholder="Any specific requests, special considerations, or additional information..."
-                  value={formData.specialRequirements}
-                  onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="participantEmails" className="text-white text-sm font-medium">Participant Email List</Label>
-                <Textarea
-                  id="participantEmails"
-                  placeholder="Enter participant emails separated by commas:&#10;example1@email.com, example2@email.com, example3@email.com"
-                  value={formData.participantEmails}
-                  onChange={(e) => handleInputChange('participantEmails', e.target.value)}
-                  className="mt-2 min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
-                />
-                <p className="text-sm text-white/70 mt-1">
-                  List all participant emails who will receive the daily sprint content
-                </p>
-              </div>
 
               <div className="bg-[#1E1E1E]/50 p-6 rounded-lg border border-white/10">
                 <h3 className="font-semibold text-lg mb-3 text-white">Sprint Summary</h3>
@@ -775,7 +732,7 @@ export const SprintCreationForm: React.FC = () => {
                   <div><strong className="text-white">Content Generation:</strong> {formData.contentGeneration}</div>
                   <div><strong className="text-white">Content Types:</strong> {formData.contentTypes.join(', ') || 'None selected'}</div>
                   <div><strong className="text-white">Tone:</strong> {formData.toneStyle}</div>
-                  <div><strong className="text-white">Participants:</strong> {formData.participantEmails ? formData.participantEmails.split(',').length : 0} people</div>
+                  
                    <div><strong className="text-white">Voice Sample:</strong> {formData.voiceSampleFile || formData.voiceRecordingBlob ? 'Ready' : 'None'}</div>
                    <div><strong className="text-white">Writing Style:</strong> {formData.writingStyleFile ? 'Uploaded' : 'None'}</div>
                 </div>
@@ -798,7 +755,7 @@ export const SprintCreationForm: React.FC = () => {
       case 3:
         return formData.contentGeneration && formData.contentTypes.length > 0;
       case 4:
-        return formData.participantEmails.trim(); // Require at least some participant emails
+        return true; // No longer require participant emails
       default:
         return false;
     }

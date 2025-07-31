@@ -177,7 +177,7 @@ Best regards,
           </div>
 
           {/* Sprint Overview Card */}
-          <div className="p-[2px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] mb-6">
+          <div className="p-[1px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] mb-6">
             <div className="rounded-xl bg-neutral-950/90 backdrop-blur-sm p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -215,7 +215,7 @@ Best regards,
 
           {/* Lesson Cards */}
           <div className="space-y-4">
-            <div className="p-[2px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
+            <div className="p-[1px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
               <div className="rounded-xl bg-neutral-950/90 backdrop-blur-sm p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
