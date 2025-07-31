@@ -948,7 +948,7 @@ export const SprintCreationForm: React.FC = () => {
               </div>
               {isCreatingVoiceClone && (
                 <p className="text-white/70 text-sm mt-3">
-                  Processing your voice sample with Hume AI...
+                  Processing your voice sample with ElevenLabs AI...
                 </p>
               )}
             </div>

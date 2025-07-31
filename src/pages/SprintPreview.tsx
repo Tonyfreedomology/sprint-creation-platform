@@ -580,7 +580,7 @@ export const SprintPreview: React.FC = () => {
       
       toast({
         title: "Generating Audio",
-        description: "Creating expressive audio with Hume AI...",
+        description: "Creating expressive audio with ElevenLabs...",
       });
       
       // Determine content type based on text content
