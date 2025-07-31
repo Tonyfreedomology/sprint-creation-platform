@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import AnimatedRays from '@/components/AnimatedRays';
 import { SprintCreationForm } from '@/components/SprintCreationForm';
 import { 
   Sparkles, 
@@ -135,6 +136,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative" style={{ background: 'radial-gradient(circle at center, #060a0f 0%, #0f0f0f 70%, #080808 100%)' }}>
+      {/* Animated Rays Background */}
+      <AnimatedRays 
+        intensity={0.2} 
+        speed={0.3}
+        color1="#22DFDC"
+        color2="#22EDB6"
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16">
         <div className="container mx-auto px-4">
