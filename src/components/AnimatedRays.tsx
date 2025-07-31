@@ -59,47 +59,50 @@ const AnimatedRays: React.FC<AnimatedRaysProps> = ({
     void main() {
       vec2 st = gl_FragCoord.xy / u_resolution.xy;
       
-      // Ray source is at the top center of the screen
-      vec2 raySource = vec2(0.5, 1.2);
+      // Create vertical columns of light coming down from the top
+      float x = st.x;
+      float y = st.y;
       
-      // Calculate direction from ray source to current pixel
-      vec2 direction = st - raySource;
-      float distance = length(direction);
-      
-      // Normalize direction for angle calculation
-      vec2 normalizedDir = normalize(direction);
-      
-      // Calculate angle for ray pattern
-      float angle = atan(normalizedDir.x, normalizedDir.y);
-      
-      // Create multiple ray beams streaming downward
+      // Create multiple vertical ray columns
       float rays = 0.0;
       
-      // Main ray pattern
-      rays += sin(angle * 12.0 + u_time * 1.0) * 0.5 + 0.5;
-      rays *= sin(angle * 6.0 + u_time * 0.8) * 0.3 + 0.7;
+      // Main vertical ray beams - create several columns across the width
+      for(int i = 0; i < 8; i++) {
+        float columnPos = float(i) / 7.0; // Position from 0 to 1 across width
+        float columnWidth = 0.08; // Width of each ray column
+        
+        // Distance from current pixel to the ray column center
+        float distFromColumn = abs(x - columnPos);
+        
+        // Create a soft falloff for the ray column
+        if(distFromColumn < columnWidth) {
+          float intensity = smoothstep(columnWidth, 0.0, distFromColumn);
+          
+          // Add animated movement within the column
+          float wave = sin(y * 15.0 - u_time * 3.0 + float(i) * 2.0) * 0.3 + 0.7;
+          float movement = sin(y * 8.0 - u_time * 2.0 + float(i) * 1.5) * 0.2 + 0.8;
+          
+          rays += intensity * wave * movement;
+        }
+      }
       
-      // Secondary ray pattern for more complexity
-      rays += sin(angle * 24.0 - u_time * 1.5) * 0.2 + 0.8;
+      // Add some organic noise for more natural movement
+      float n = noise(vec2(x * 12.0, y * 4.0 - u_time * 0.8));
+      rays += n * 0.1;
       
-      // Add animated noise for organic movement
-      float n = noise(st * 8.0 + u_time * 0.2);
-      rays += n * 0.15;
+      // Fade out towards the bottom and strengthen at the top
+      float verticalFade = smoothstep(0.0, 0.8, 1.0 - y); // Stronger at top, weaker at bottom
       
-      // Create falloff based on distance from ray source
-      float falloff = 1.0 / (1.0 + distance * distance * 0.8);
-      
-      // Fade out at edges and bottom
-      float edgeFade = smoothstep(0.0, 0.1, st.x) * smoothstep(1.0, 0.9, st.x);
-      float bottomFade = smoothstep(0.0, 0.3, st.y);
+      // Subtle side fading to make it less harsh at edges
+      float sideFade = smoothstep(0.0, 0.1, x) * smoothstep(1.0, 0.9, x);
       
       // Combine everything
-      float intensity = rays * falloff * edgeFade * bottomFade * u_intensity;
+      float finalIntensity = rays * verticalFade * sideFade * u_intensity;
       
-      // Mix colors based on distance from source
-      vec3 color = mix(u_color1, u_color2, distance * 0.5);
+      // Mix colors based on vertical position (top to bottom gradient)
+      vec3 color = mix(u_color1, u_color2, y);
       
-      gl_FragColor = vec4(color, intensity);
+      gl_FragColor = vec4(color, finalIntensity);
     }
   `;
 
