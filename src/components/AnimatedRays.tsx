@@ -59,8 +59,8 @@ const AnimatedRays: React.FC<AnimatedRaysProps> = ({
     void main() {
       vec2 st = gl_FragCoord.xy / u_resolution.xy;
       
-      // Position the ray source way above the screen so only downward rays are visible
-      vec2 raySource = vec2(0.5, 1.8); // Center horizontally, way above screen
+      // Position the ray source way above the screen so only downward rays are visible  
+      vec2 raySource = vec2(0.5, 4.0); // Center horizontally, much higher above screen
       
       // Calculate direction from ray source to current pixel
       vec2 direction = st - raySource;
@@ -126,8 +126,8 @@ const AnimatedRays: React.FC<AnimatedRaysProps> = ({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // Create geometry and material
-    const geometry = new THREE.PlaneGeometry(2, 2);
+    // Create geometry and material - much bigger scale
+    const geometry = new THREE.PlaneGeometry(6, 6);
     const material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
