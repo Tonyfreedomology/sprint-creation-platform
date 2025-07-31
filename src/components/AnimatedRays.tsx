@@ -43,7 +43,7 @@ const AnimatedRays: React.FC<AnimatedRaysProps> = ({
     }
   `;
 
-  // Fragment shader for animated rays
+  // Fragment shader for downward streaming rays
   const fragmentShader = `
     uniform vec2 u_resolution;
     uniform float u_time;
@@ -58,30 +58,46 @@ const AnimatedRays: React.FC<AnimatedRaysProps> = ({
 
     void main() {
       vec2 st = gl_FragCoord.xy / u_resolution.xy;
-      vec2 center = vec2(0.5, 0.5);
       
-      // Create radial distance from center
-      float dist = distance(st, center);
+      // Ray source is at the top center of the screen
+      vec2 raySource = vec2(0.5, 1.2);
       
-      // Create angle from center
-      float angle = atan(st.y - center.y, st.x - center.x);
+      // Calculate direction from ray source to current pixel
+      vec2 direction = st - raySource;
+      float distance = length(direction);
       
-      // Create animated rays
-      float rays = sin(angle * 8.0 + u_time * 2.0) * 0.5 + 0.5;
-      rays *= sin(angle * 16.0 + u_time * 1.5) * 0.3 + 0.7;
+      // Normalize direction for angle calculation
+      vec2 normalizedDir = normalize(direction);
       
-      // Add some noise for organic feel
-      float n = noise(st * 10.0 + u_time * 0.1);
-      rays += n * 0.1;
+      // Calculate angle for ray pattern
+      float angle = atan(normalizedDir.x, normalizedDir.y);
       
-      // Create falloff from center
-      float falloff = 1.0 - smoothstep(0.0, 1.0, dist);
+      // Create multiple ray beams streaming downward
+      float rays = 0.0;
+      
+      // Main ray pattern
+      rays += sin(angle * 12.0 + u_time * 1.0) * 0.5 + 0.5;
+      rays *= sin(angle * 6.0 + u_time * 0.8) * 0.3 + 0.7;
+      
+      // Secondary ray pattern for more complexity
+      rays += sin(angle * 24.0 - u_time * 1.5) * 0.2 + 0.8;
+      
+      // Add animated noise for organic movement
+      float n = noise(st * 8.0 + u_time * 0.2);
+      rays += n * 0.15;
+      
+      // Create falloff based on distance from ray source
+      float falloff = 1.0 / (1.0 + distance * distance * 0.8);
+      
+      // Fade out at edges and bottom
+      float edgeFade = smoothstep(0.0, 0.1, st.x) * smoothstep(1.0, 0.9, st.x);
+      float bottomFade = smoothstep(0.0, 0.3, st.y);
       
       // Combine everything
-      float intensity = rays * falloff * u_intensity;
+      float intensity = rays * falloff * edgeFade * bottomFade * u_intensity;
       
-      // Mix colors based on distance
-      vec3 color = mix(u_color1, u_color2, dist);
+      // Mix colors based on distance from source
+      vec3 color = mix(u_color1, u_color2, distance * 0.5);
       
       gl_FragColor = vec4(color, intensity);
     }
