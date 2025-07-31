@@ -38,6 +38,7 @@ interface GeneratedContent {
   sprintDuration: string;
   sprintCategory: string;
   voiceStyle?: string;
+  voiceId?: string; // Add voice ID for cloned voices
   writingStyleAnalysis?: string; // Add writing style analysis
   masterPlan?: any; // Add masterPlan property
   creatorInfo: {
@@ -141,9 +142,27 @@ export const SprintPreview: React.FC = () => {
       const searchParams = new URLSearchParams(location.search);
       const sprintId = searchParams.get('id');
       const channelName = searchParams.get('channel');
+      const formDataString = searchParams.get('formData');
+      
+      // Extract voice ID from form data if available
+      let extractedVoiceId = null;
+      if (formDataString) {
+        try {
+          const formData = JSON.parse(decodeURIComponent(formDataString));
+          extractedVoiceId = formData.voiceId;
+          console.log('Extracted voice ID from URL:', extractedVoiceId);
+        } catch (error) {
+          console.error('Error parsing form data from URL:', error);
+        }
+      }
       
       if (sprintId && channelName) {
-        console.log('Setting up sprint preview from URL params:', { sprintId, channelName });
+        console.log('Setting up sprint preview from URL params:', { sprintId, channelName, voiceId: extractedVoiceId });
+        
+        // Set the voice ID immediately if available
+        if (extractedVoiceId) {
+          setSprintVoiceId(extractedVoiceId);
+        }
         
         // Create initial sprint data structure
         const initialData: GeneratedContent = {
@@ -152,6 +171,7 @@ export const SprintPreview: React.FC = () => {
           sprintDescription: '',
           sprintDuration: '21',
           sprintCategory: '',
+          voiceId: extractedVoiceId, // Include voice ID
           creatorInfo: {
             name: '',
             email: '',

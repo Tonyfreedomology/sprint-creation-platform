@@ -101,9 +101,17 @@ serve(async (req) => {
       throw new Error(`Failed to generate audio: ${response.status} - ${errorText}`);
     }
 
-    // Convert audio response to base64
+    // Convert audio response to base64 (handle large files properly)
     const audioBuffer = await response.arrayBuffer();
-    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
+    const uint8Array = new Uint8Array(audioBuffer);
+    let base64Audio = '';
+    
+    // Convert in chunks to avoid stack overflow for large files
+    const chunkSize = 8192;
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+      const chunk = uint8Array.slice(i, i + chunkSize);
+      base64Audio += btoa(String.fromCharCode.apply(null, Array.from(chunk)));
+    }
     
     console.log('Audio generated successfully, size:', audioBuffer.byteLength);
 
