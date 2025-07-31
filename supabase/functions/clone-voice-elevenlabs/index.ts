@@ -27,13 +27,13 @@ serve(async (req) => {
 
     console.log('Creating voice clone:', voiceName, 'with audio file:', audioFile.name);
 
-    // Create form data for ElevenLabs API
+    // Create form data for ElevenLabs IVC API
     const elevenlabsFormData = new FormData();
     elevenlabsFormData.append('name', voiceName);
     elevenlabsFormData.append('files', audioFile);
 
     // Call ElevenLabs IVC (Instant Voice Cloning) API
-    const response = await fetch('https://api.elevenlabs.io/v1/voices/ivc/create', {
+    const response = await fetch('https://api.elevenlabs.io/v1/voices/add', {
       method: 'POST',
       headers: {
         'xi-api-key': ELEVENLABS_API_KEY,
