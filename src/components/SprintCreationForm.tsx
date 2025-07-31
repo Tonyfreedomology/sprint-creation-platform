@@ -765,78 +765,83 @@ export const SprintCreationForm: React.FC = () => {
 
   // Show form by default
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      {/* Form Container */}
-      <div className="max-w-[540px] mx-auto">
-        {/* Gradient Border Container */}
-        <div className="p-[1px] bg-gradient-to-tr from-[#22DFDC] to-[#22EDB6] rounded-2xl">
-          <div className="bg-[#0F0F0F] rounded-2xl p-8">
-            
-            {/* Step Header */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#22EDB6] flex items-center justify-center text-[#242424]">
-                  {React.createElement(getStepIcon(), { className: "w-5 h-5" })}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-white">
-                    {getStepTitle()}
-                  </h3>
-                  <p className="text-xs text-[#CFCFCF] uppercase tracking-wide mt-0.5">
-                    STEP {currentStep} OF {totalSteps}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-semibold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
-                    {Math.round(progress)}%
+    <div className="page-wrapper">
+      <div className="page-content">
+        <div className="max-w-4xl mx-auto">
+          {/* Form Container */}
+          <div className="max-w-[540px] mx-auto">
+            {/* Card with radial gradients */}
+            <div className="card-wrapper">
+              <div className="card-content">
+                
+                {/* Step Header */}
+                <div className="mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-[#22EDB6] flex items-center justify-center text-[#242424]">
+                      {React.createElement(getStepIcon(), { className: "w-5 h-5" })}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-white">
+                        {getStepTitle()}
+                      </h3>
+                      <p className="text-xs text-[#CFCFCF] uppercase tracking-wide mt-0.5">
+                        STEP {currentStep} OF {totalSteps}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
+                        {Math.round(progress)}%
+                      </div>
+                    </div>
                   </div>
+                  
+                  {/* Thin divider */}
+                  <div className="h-px bg-[#22DFDC]/20 mt-6"></div>
+                </div>
+
+                {/* Form Content */}
+                <div className="space-y-6">
+                  {renderStep()}
+                </div>
+
+                {/* Navigation */}
+                <div className="flex justify-between mt-8">
+                  <Button
+                    variant="ghost"
+                    onClick={prevStep}
+                    disabled={currentStep === 1}
+                    className="text-[#CFCFCF] hover:text-white hover:bg-[#22DFDC]/10"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+                  
+                  {currentStep < totalSteps ? (
+                    <Button
+                      onClick={nextStep}
+                      disabled={!canProceed()}
+                      className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white hover:opacity-90"
+                    >
+                      Next
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={!canProceed() || isSubmitting}
+                      className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white hover:opacity-90"
+                    >
+                      {isSubmitting ? 'Creating...' : 'Create Sprint'}
+                      <Sparkles className="w-4 h-4 ml-2" />
+                    </Button>
+                  )}
                 </div>
               </div>
-              
-              {/* Thin divider */}
-              <div className="h-px bg-[#22DFDC]/20 mt-6"></div>
-            </div>
-
-            {/* Form Content */}
-            <div className="space-y-6">
-              {renderStep()}
-            </div>
-
-            {/* Navigation */}
-            <div className="flex justify-between mt-8">
-              <Button
-                variant="ghost"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-                className="text-[#CFCFCF] hover:text-white hover:bg-[#22DFDC]/10"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-              
-              {currentStep < totalSteps ? (
-                <Button
-                  onClick={nextStep}
-                  disabled={!canProceed()}
-                  className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white hover:opacity-90"
-                >
-                  Next
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!canProceed() || isSubmitting}
-                  className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white hover:opacity-90"
-                >
-                  {isSubmitting ? 'Creating...' : 'Create Sprint'}
-                  <Sparkles className="w-4 h-4 ml-2" />
-                </Button>
-              )}
             </div>
           </div>
         </div>
       </div>
+    </div>
 
       {/* Loading Component */}
       {isGenerating && (
