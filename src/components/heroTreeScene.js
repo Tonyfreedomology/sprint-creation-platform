@@ -36,8 +36,9 @@ import * as THREE from 'three';
 function addBranch(parent, depth, length, radius, material) {
   if (depth <= 0) return;
 
-  // Create the cylinder geometry for this segment with more detail
-  const geometry = new THREE.CylinderGeometry(radius * 0.3, radius, length, 12);
+  // Create the cylinder geometry for this segment. The base is slightly
+  // thicker than the top to give a natural taper.
+  const geometry = new THREE.CylinderGeometry(radius * 0.4, radius, length, 8);
   const branchMesh = new THREE.Mesh(geometry, material);
 
   // Position the mesh so that its base sits at the parent's origin and
@@ -45,31 +46,26 @@ function addBranch(parent, depth, length, radius, material) {
   branchMesh.position.y = length / 2;
   parent.add(branchMesh);
 
-  // Create more organic branching with varied parameters
-  const childLength = length * (0.65 + Math.random() * 0.1); // Add some variation
-  const childRadius = radius * (0.6 + Math.random() * 0.1);
+  // Determine child parameters. Each subsequent generation shrinks in
+  // length and radius to give the impression of tapering limbs.
+  const childLength = length * 0.7;
+  const childRadius = radius * 0.65;
 
-  // Create 2-4 child branches for more organic look
-  const numChildren = depth > 3 ? 2 + Math.floor(Math.random() * 2) : 2;
-  
-  for (let i = 0; i < numChildren; i++) {
-    const child = new THREE.Group();
-    child.position.y = length;
-    
-    // More varied angles for organic branching
-    const angleStep = (Math.PI * 2) / numChildren;
-    const angle = angleStep * i + (Math.random() - 0.5) * 0.5;
-    const tilt = -10 - Math.random() * 20; // Random tilt between -10 and -30 degrees
-    
-    child.rotation.set(
-      THREE.MathUtils.degToRad(tilt), 
-      angle, 
-      THREE.MathUtils.degToRad((Math.random() - 0.5) * 20)
-    );
-    
-    branchMesh.add(child);
-    addBranch(child, depth - 1, childLength, childRadius, material);
-  }
+  // Left child branch
+  const left = new THREE.Group();
+  left.position.y = length;
+  // Rotate slightly forward/back and left
+  left.rotation.set(THREE.MathUtils.degToRad(-15), 0, THREE.MathUtils.degToRad(30));
+  branchMesh.add(left);
+  addBranch(left, depth - 1, childLength, childRadius, material);
+
+  // Right child branch
+  const right = new THREE.Group();
+  right.position.y = length;
+  // Rotate slightly forward/back and right
+  right.rotation.set(THREE.MathUtils.degToRad(-15), 0, THREE.MathUtils.degToRad(-30));
+  branchMesh.add(right);
+  addBranch(right, depth - 1, childLength, childRadius, material);
 }
 
 /**
@@ -116,8 +112,8 @@ export function initHeroScene(container) {
     roughness: 0.4,
   });
 
-  // Build a beautiful, fully grown tree from the start
-  addBranch(treeGroup, 6, 1.2, 0.12, branchMaterial);
+  // Build a beautiful tree with the original simpler design
+  addBranch(treeGroup, 5, 1, 0.1, branchMaterial);
 
   // Create glowing spherical motes instead of points
   const moteCount = 150;
