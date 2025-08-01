@@ -115,36 +115,40 @@ export function initHeroScene(container) {
   // Build a beautiful tree with the original simpler design
   addBranch(treeGroup, 5, 1, 0.1, branchMaterial);
 
-  // Create glowing spherical motes instead of points
-  const moteCount = 150;
-  const motes = [];
+  // Create efficient instanced particles instead of individual meshes
+  const particleCount = 75;
+  const particleGeometry = new THREE.SphereGeometry(0.03, 8, 8);
+  const particleMaterial = new THREE.MeshBasicMaterial({
+    color: new THREE.Color(0x22dfdc),
+    transparent: true,
+    opacity: 0.8
+  });
   
-  for (let i = 0; i < moteCount; i++) {
-    const moteGeometry = new THREE.SphereGeometry(0.02, 8, 6);
-    const moteMaterial = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(0x29c991),
-      transparent: true,
-      opacity: 0.8
-    });
+  const instancedParticles = new THREE.InstancedMesh(particleGeometry, particleMaterial, particleCount);
+  scene.add(instancedParticles);
+  
+  // Store particle data for animation
+  const particleData = [];
+  const dummy = new THREE.Object3D();
+  
+  for (let i = 0; i < particleCount; i++) {
+    const x = (Math.random() - 0.5) * 5 + 1.5; // Cluster around tree
+    const y = Math.random() * 6 - 1;
+    const z = (Math.random() - 0.5) * 5;
+    const speed = Math.random() * 0.0025 + 0.001;
+    const phase = Math.random() * Math.PI * 2;
     
-    const mote = new THREE.Mesh(moteGeometry, moteMaterial);
-    
-    // Position particles around the tree
-    const x = (Math.random() - 0.2) * 3 + 1.5; // Cluster around new tree position
-    const y = Math.random() * 5;
-    const z = (Math.random() - 0.5) * 3;
-    mote.position.set(x, y, z);
-    
-    // Add glow effect with a point light
-    const glowLight = new THREE.PointLight(0x29c991, 0.3, 2);
-    mote.add(glowLight);
-    
-    scene.add(mote);
-    motes.push({
-      mesh: mote,
+    particleData.push({
       originalPosition: { x, y, z },
-      phase: Math.random() * Math.PI * 2
+      speed,
+      phase,
+      currentY: y
     });
+    
+    // Set initial matrix
+    dummy.position.set(x, y, z);
+    dummy.updateMatrix();
+    instancedParticles.setMatrixAt(i, dummy.matrix);
   }
 
   // Set up the renderer with transparent background
@@ -195,19 +199,26 @@ export function initHeroScene(container) {
     treeGroup.rotation.x = THREE.MathUtils.clamp(mouseY * 0.2, -0.3, 0.3);
     treeGroup.rotation.z = THREE.MathUtils.clamp(-mouseX * 0.2, -0.3, 0.3);
 
-    // Animate the glowing motes with more organic movement
-    motes.forEach((mote, index) => {
-      const time = elapsed + mote.phase;
+    // Animate the efficient instanced particles
+    particleData.forEach((particle, i) => {
+      const time = elapsed + particle.phase;
       
-      // More organic floating motion
-      mote.mesh.position.x = mote.originalPosition.x + Math.sin(time * 0.4) * 0.4;
-      mote.mesh.position.y = mote.originalPosition.y + Math.sin(time * 0.2) * 0.3;
-      mote.mesh.position.z = mote.originalPosition.z + Math.cos(time * 0.3) * 0.4;
+      // Slow upward drift with wrapping
+      particle.currentY += particle.speed;
+      if (particle.currentY > 6) {
+        particle.currentY = -1;
+      }
       
-      // Gentle pulsing glow effect
-      const pulseIntensity = 0.7 + Math.sin(time * 1.5) * 0.3;
-      mote.mesh.material.opacity = pulseIntensity;
+      // Gentle floating motion
+      const x = particle.originalPosition.x + Math.sin(time * 0.4) * 0.3;
+      const y = particle.currentY + Math.sin(time * 0.2) * 0.2;
+      const z = particle.originalPosition.z + Math.cos(time * 0.3) * 0.3;
+      
+      dummy.position.set(x, y, z);
+      dummy.updateMatrix();
+      instancedParticles.setMatrixAt(i, dummy.matrix);
     });
+    instancedParticles.instanceMatrix.needsUpdate = true;
 
     renderer.render(scene, camera);
   }
@@ -219,11 +230,9 @@ export function initHeroScene(container) {
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('resize', handleResize);
     
-    // Dispose mote geometries and materials
-    motes.forEach(mote => {
-      if (mote.mesh.geometry) mote.mesh.geometry.dispose();
-      if (mote.mesh.material) mote.mesh.material.dispose();
-    });
+    // Dispose instanced particle resources
+    particleGeometry.dispose();
+    particleMaterial.dispose();
     
     // Dispose tree materials
     branchMaterial.dispose();
