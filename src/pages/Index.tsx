@@ -24,36 +24,85 @@ import heroImage from '@/assets/hero-image.jpg';
 const Index = () => {
   const [showForm, setShowForm] = React.useState(false);
 
-  const features = [
+  const benefits = [
+    {
+      icon: <CheckCircle className="w-6 h-6" />,
+      title: "Zero code",
+      description: "Focus on your program, not web design."
+    },
     {
       icon: <Brain className="w-6 h-6" />,
-      title: "AI-Powered Content",
-      description: "Let AI generate scripts, lessons, and exercises based on your expertise"
+      title: "AI-generated content",
+      description: "Daily prompts, check-ins, and resources written for you."
     },
     {
       icon: <Users className="w-6 h-6" />,
-      title: "Community-Driven",
-      description: "Built-in community features to keep participants engaged and accountable"
+      title: "Community built-in",
+      description: "Automatic discussion forums and accountability groups."
+    }
+  ];
+
+  const howItWorks = [
+    {
+      step: "1",
+      title: "Pick a goal",
+      description: "Health, relationships, mindset—choose the change you're here to guide."
     },
     {
-      icon: <Target className="w-6 h-6" />,
-      title: "Habit Formation",
-      description: "Scientifically-backed daily practices that create lasting transformation"
+      step: "2", 
+      title: "Let the AI do the heavy lifting",
+      description: "Our engine drafts daily emails, journaling prompts and tasks that keep participants engaged."
+    },
+    {
+      step: "3",
+      title: "Launch and lead",
+      description: "Invite people in, track their progress and cheer them on. We handle delivery, reminders and community chat."
+    }
+  ];
+
+  const features = [
+    {
+      icon: <Brain className="w-6 h-6" />,
+      title: "Habit science built in",
+      description: "Our system uses proven habit-forming frameworks so your participants see progress fast."
     },
     {
       icon: <Zap className="w-6 h-6" />,
-      title: "Automated Delivery",
-      description: "Smart automation handles emails, reminders, and content delivery"
+      title: "Automated delivery",
+      description: "Content drips out on schedule—no manual sendouts."
+    },
+    {
+      icon: <Users className="w-6 h-6" />,
+      title: "Built-in community",
+      description: "Discussion forums and group coaching tools foster accountability."
     },
     {
       icon: <Star className="w-6 h-6" />,
-      title: "Gamification",
-      description: "Streaks, badges, and rewards keep participants motivated"
+      title: "Analytics that matter",
+      description: "See completion rates, engagement scores and feedback at a glance."
+    }
+  ];
+
+  const creatorBenefits = [
+    {
+      icon: <DollarSign className="w-6 h-6" />,
+      title: "Recurring revenue",
+      description: "Once your sprint is live, people can join anytime."
     },
     {
       icon: <Clock className="w-6 h-6" />,
-      title: "Flexible Duration",
-      description: "Create sprints from 7 to 40 days based on your content and goals"
+      title: "Evergreen content", 
+      description: "Update once; your sprint keeps selling itself."
+    },
+    {
+      icon: <Target className="w-6 h-6" />,
+      title: "Focus on coaching",
+      description: "We handle tech, you handle transformation."
+    },
+    {
+      icon: <Users className="w-6 h-6" />,
+      title: "Build an audience",
+      description: "Participants become fans who join your next sprint or coaching offer."
     }
   ];
 
@@ -86,15 +135,15 @@ const Index = () => {
 
   const testimonials = [
     {
-      name: "Sarah Johnson",
-      role: "Wellness Coach",
-      content: "Creating my first sprint was incredibly easy. The AI helped me structure 21 days of content in just hours!",
+      name: "Sarah J.",
+      role: "Relationship Coach",
+      content: "I used to cobble together spreadsheets and email blasts. With this platform, my 40-day marriage-reset sprint got over 200 sign-ups and 97% completion.",
       rating: 5
     },
     {
-      name: "Marcus Chen",
-      role: "Financial Advisor",
-      content: "My 'Money Mindset' sprint has helped over 500 people transform their relationship with money.",
+      name: "Mark D.",
+      role: "Personal Trainer",
+      content: "As a fitness trainer, I launched a 21-day strength sprint and watched my clients actually finish the program for once.",
       rating: 5
     },
     {
@@ -180,22 +229,21 @@ const Index = () => {
                     }}
                   >
                     <Sparkles className="w-4 h-4 mr-2 inline" />
-                    Transform Lives Through Sprints
+                    Change Lives Through Sprints
                   </div>
                   
                   <h1 className="text-5xl md:text-[72px] leading-[1.1] font-bold text-white">
-                    Create{' '}
+                    Build{' '}
                     <span 
                       className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent"
                     >
-                      Powerful Sprints
+                      life-changing
                     </span>
-                    {' '}That Change Lives
+                    {' '}30-day sprints
                   </h1>
                   
                   <p className="text-xl leading-relaxed max-w-[48ch]" style={{ color: '#CFCFCF', opacity: 0.9 }}>
-                    Join Freedomology and turn your expertise into transformational 21-40 day experiences. 
-                    Our AI-powered platform helps you create engaging, habit-forming sprints that deliver real results.
+                    Mate, you've got knowledge that could change someone's life. Our AI-powered platform helps you turn that expertise into guided 21–40-day journeys that break bad habits, build good ones and get real results. No coding, no tech headaches—just you and your mission.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -208,7 +256,7 @@ const Index = () => {
                         boxShadow: '0 0 20px rgba(34, 223, 220, 0.4), 0 4px 15px rgba(0, 0, 0, 0.2)'
                       }}
                     >
-                      Start Creating
+                      Start my sprint
                     </RollingTextButton>
                     
                     {/* Test Publish Page Button - Commented out
@@ -228,40 +276,78 @@ const Index = () => {
                     */}
                   </div>
                   
-                  <div className="flex items-center gap-6 text-sm" style={{ color: '#CFCFCF' }}>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
-                      No coding required
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
-                      AI-powered content
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4" style={{ color: '#22EDB6' }} />
-                      Community included
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                    {benefits.map((benefit, index) => (
+                      <div key={index} className="flex items-center gap-2" style={{ color: '#CFCFCF' }}>
+                        <div style={{ color: '#22EDB6' }}>
+                          {benefit.icon}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-white">{benefit.title}</div>
+                          <div className="opacity-70">{benefit.description}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Features Section */}
-          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px]">
+          {/* Why It Matters Section */}
+          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
+            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+              <h2 className="text-4xl font-bold mb-6 text-white text-center">
+                Why It <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Matters</span>
+              </h2>
+              <p className="text-xl leading-relaxed text-center max-w-4xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.9 }}>
+                Building a new habit is hard. Doing it alone is even harder. Our sprints bring people together in a focused, bite-size challenge so they actually stick with it. Think of it as your own 30-day bootcamp—built once, sold again and again.
+              </p>
+            </div>
+          </div>
+
+          {/* How It Works Section */}
+          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
             <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold mb-4 text-white">
-                  Everything You Need to Create{' '}
-                  <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Amazing</span>
+                  How It <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Works</span>
                 </h2>
                 <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.7 }}>
-                  From AI-powered content creation to automated delivery and community building, 
-                  we've got every aspect covered.
+                  Three easy steps to launch your life-changing sprint
                 </p>
               </div>
           
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-3 gap-8">
+                {howItWorks.map((step, index) => (
+                  <div key={index} className="text-center group">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-6 mx-auto group-hover:scale-110 transition-transform"
+                      style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
+                    >
+                      {step.step}
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
+                    <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                      {step.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Features at a Glance Section */}
+          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
+            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold mb-4 text-white">
+                  Features at a{' '}
+                  <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Glance</span>
+                </h2>
+              </div>
+          
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {features.map((feature, index) => (
                   <div
                     key={index}
@@ -280,6 +366,99 @@ const Index = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Social Proof Section */}
+          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
+            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold mb-4 text-white">
+                  Social <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Proof</span>
+                </h2>
+              </div>
+          
+              <div className="grid md:grid-cols-3 gap-8">
+                {testimonials.map((testimonial, index) => (
+                  <div
+                    key={index}
+                    className="rounded-xl bg-[#1E1E1E]/70 backdrop-blur-md border border-transparent p-6"
+                  >
+                    <div className="flex mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="w-5 h-5 fill-[#22EDB6] text-[#22EDB6]" />
+                      ))}
+                    </div>
+                    <p className="text-base mb-6" style={{ color: '#CFCFCF', opacity: 0.9 }}>
+                      "{testimonial.content}"
+                    </p>
+                    <div>
+                      <p className="font-semibold text-white">{testimonial.name}</p>
+                      <p className="text-sm" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                        {testimonial.role}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Why You'll Love It Section */}
+          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
+            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold mb-4 text-white">
+                  Why You'll <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Love It</span>
+                </h2>
+                <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                  Creator benefits that make this platform irresistible
+                </p>
+              </div>
+          
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {creatorBenefits.map((benefit, index) => (
+                  <div
+                    key={index}
+                    className="rounded-xl bg-[#1E1E1E]/70 backdrop-blur-md border border-transparent hover:border-[#22DFDC] transition-all duration-300 p-6 group hover:scale-105"
+                  >
+                    <div 
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform"
+                      style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
+                    >
+                      {benefit.icon}
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-3">{benefit.title}</h3>
+                    <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                      {benefit.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Closing CTA Section */}
+          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
+            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30 text-center">
+              <h2 className="text-4xl font-bold mb-6 text-white">
+                Ready to make your expertise a{' '}
+                <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">catalyst for change?</span>
+              </h2>
+              <p className="text-xl leading-relaxed mb-8 max-w-4xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.9 }}>
+                Stop sitting on that brilliant idea. Build your sprint today and watch lives transform—including yours.
+              </p>
+              <RollingTextButton
+                onClick={() => setShowForm(true)}
+                className="px-8 py-4 text-lg rounded-full font-medium text-white transition-all hover:scale-105 flex items-center gap-2 shadow-lg mx-auto"
+                style={{ 
+                  background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',
+                  border: 'none',
+                  boxShadow: '0 0 20px rgba(34, 223, 220, 0.4), 0 4px 15px rgba(0, 0, 0, 0.2)'
+                }}
+              >
+                Get started now (it's free)
+              </RollingTextButton>
             </div>
           </div>
         </div>
