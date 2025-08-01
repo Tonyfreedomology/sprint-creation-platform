@@ -117,6 +117,7 @@ export function initHeroScene(container) {
 
   // Create efficient instanced particles instead of individual meshes
   const particleCount = 75;
+  const trailLength = 8; // Number of trail segments per particle
   const particleGeometry = new THREE.SphereGeometry(0.0075, 8, 8); // 50% smaller than 0.015
   const particleMaterial = new THREE.MeshBasicMaterial({
     color: new THREE.Color(0x22dfdc),
@@ -125,8 +126,19 @@ export function initHeroScene(container) {
     opacity: 1.0
   });
   
+  // Main particles
   const instancedParticles = new THREE.InstancedMesh(particleGeometry, particleMaterial, particleCount);
   scene.add(instancedParticles);
+  
+  // Trail particles with transparent material
+  const trailMaterial = new THREE.MeshBasicMaterial({
+    color: new THREE.Color(0x22dfdc),
+    emissive: new THREE.Color(0x22dfdc),
+    transparent: true,
+    opacity: 0.5
+  });
+  const instancedTrails = new THREE.InstancedMesh(particleGeometry, trailMaterial, particleCount * trailLength);
+  scene.add(instancedTrails);
   
   // Store particle data for animation
   const particleData = [];
@@ -143,13 +155,23 @@ export function initHeroScene(container) {
       originalPosition: { x, y, z },
       speed,
       phase,
-      currentY: y
+      currentY: y,
+      trail: Array(trailLength).fill().map(() => ({ x, y, z })) // Initialize trail positions
     });
     
-    // Set initial matrix
+    // Set initial matrix for main particle
     dummy.position.set(x, y, z);
     dummy.updateMatrix();
     instancedParticles.setMatrixAt(i, dummy.matrix);
+    
+    // Set initial matrices for trail particles
+    for (let j = 0; j < trailLength; j++) {
+      const trailIndex = i * trailLength + j;
+      dummy.position.set(x, y, z);
+      dummy.scale.setScalar(0.7 - (j * 0.08)); // Trail gets smaller towards the back
+      dummy.updateMatrix();
+      instancedTrails.setMatrixAt(trailIndex, dummy.matrix);
+    }
   }
 
   // Set up the renderer with transparent background
@@ -232,11 +254,34 @@ export function initHeroScene(container) {
         y += normalizedY * repulsionStrength;
       }
       
+      // Update trail positions (shift older positions back)
+      for (let j = particle.trail.length - 1; j > 0; j--) {
+        particle.trail[j] = { ...particle.trail[j - 1] };
+      }
+      particle.trail[0] = { x, y, z };
+      
+      // Update main particle
       dummy.position.set(x, y, z);
+      dummy.scale.setScalar(1);
       dummy.updateMatrix();
       instancedParticles.setMatrixAt(i, dummy.matrix);
+      
+      // Update trail particles
+      for (let j = 0; j < trailLength; j++) {
+        const trailIndex = i * trailLength + j;
+        const trailPos = particle.trail[j];
+        const opacity = (1 - j / trailLength) * 0.6; // Fade trail opacity
+        const scale = 0.8 - (j * 0.08); // Trail gets smaller towards the back
+        
+        dummy.position.set(trailPos.x, trailPos.y, trailPos.z);
+        dummy.scale.setScalar(scale);
+        dummy.updateMatrix();
+        instancedTrails.setMatrixAt(trailIndex, dummy.matrix);
+      }
     });
+    
     instancedParticles.instanceMatrix.needsUpdate = true;
+    instancedTrails.instanceMatrix.needsUpdate = true;
 
     renderer.render(scene, camera);
   }
@@ -251,6 +296,7 @@ export function initHeroScene(container) {
     // Dispose instanced particle resources
     particleGeometry.dispose();
     particleMaterial.dispose();
+    trailMaterial.dispose();
     
     // Dispose tree materials
     branchMaterial.dispose();
