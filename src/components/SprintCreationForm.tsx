@@ -49,6 +49,7 @@ interface SprintFormData {
   voiceSampleFile: File | null;
   voiceRecordingBlob: Blob | null;
   writingStyleFile: File | null;
+  writingStyleText?: string;
   writingStyleAnalysis?: string;
 }
 
@@ -101,6 +102,7 @@ const initialFormData: SprintFormData = {
   voiceSampleFile: null,
   voiceRecordingBlob: null,
   writingStyleFile: null,
+  writingStyleText: '',
   writingStyleAnalysis: undefined,
 };
 
@@ -611,12 +613,17 @@ export const SprintCreationForm: React.FC = () => {
                     <p className="text-xs text-white/50 mb-3">
                       Upload 30-60 seconds of you speaking if you want the AI to clone your voice for audio summaries
                     </p>
-                    <div className="flex gap-3">
-                      <label htmlFor="voiceSample" className="flex-1 cursor-pointer">
-                        <div className="border border-white/20 rounded-full px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
-                          <span className="text-white/70 text-sm">
-                            {formData.voiceSampleFile ? formData.voiceSampleFile.name : 'Choose audio file...'}
-                          </span>
+                    <div className="flex gap-3 items-center">
+                      <Button
+                        type="button"
+                        onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+                        className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-6 py-3 text-sm rounded-full flex-1"
+                      >
+                        {showVoiceRecorder ? 'Cancel Recording' : 'Record Voice'}
+                      </Button>
+                      <label htmlFor="voiceSample" className="cursor-pointer">
+                        <div className="border border-white/20 rounded-full p-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
+                          <Upload className="w-5 h-5 text-white/70" />
                         </div>
                         <Input
                           id="voiceSample"
@@ -626,14 +633,12 @@ export const SprintCreationForm: React.FC = () => {
                           className="hidden"
                         />
                       </label>
-                      <Button
-                        type="button"
-                        onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                        className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-4 py-2 text-sm rounded-full"
-                      >
-                        {showVoiceRecorder ? 'Cancel' : 'Record'}
-                      </Button>
                     </div>
+                    {formData.voiceSampleFile && (
+                      <p className="text-[#22DFDC] text-sm">
+                        Uploaded: {formData.voiceSampleFile.name}
+                      </p>
+                    )}
                     
                     {/* Voice Recorder Component */}
                     {showVoiceRecorder && (
@@ -662,27 +667,41 @@ export const SprintCreationForm: React.FC = () => {
                   )}
                 </Label>
                 <p className="text-xs text-white/50 mb-3">
-                  Upload a short text file if you have a specific writing style you want us to mimic
+                  Paste some text below or upload a document to help us match your writing style
                 </p>
-                <label htmlFor="writingStyle" className="cursor-pointer block">
-                  <div className="border border-white/20 rounded-full px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors flex items-center gap-3">
-                    <FileText className="w-4 h-4 text-white/50" />
-                    <span className="text-white/70 text-sm flex-1">
-                      {formData.writingStyleFile ? formData.writingStyleFile.name : 'Choose document...'}
-                    </span>
-                    {isAnalyzingWritingStyle && (
-                      <div className="w-4 h-4 border-2 border-[#22DFDC] border-t-transparent rounded-full animate-spin"></div>
-                    )}
-                  </div>
-                  <Input
-                    id="writingStyle"
-                    type="file"
-                    accept=".txt,.docx,.pdf"
-                    onChange={handleWritingStyleFileChange}
-                    className="hidden"
-                    disabled={isAnalyzingWritingStyle}
+                
+                <div className="space-y-3">
+                  <Textarea
+                    placeholder="Paste a sample of your writing here (emails, blog posts, etc.) to help us match your style..."
+                    value={formData.writingStyleText || ''}
+                    onChange={(e) => handleInputChange('writingStyleText', e.target.value)}
+                    className="min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-2xl px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                   />
-                </label>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="text-center text-white/50 text-xs uppercase tracking-wider">— OR —</div>
+                    <label htmlFor="writingStyle" className="cursor-pointer">
+                      <div className="border border-white/20 rounded-full p-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
+                        <FileText className="w-5 h-5 text-white/70" />
+                      </div>
+                      <Input
+                        id="writingStyle"
+                        type="file"
+                        accept=".txt,.docx,.pdf"
+                        onChange={handleWritingStyleFileChange}
+                        className="hidden"
+                        disabled={isAnalyzingWritingStyle}
+                      />
+                    </label>
+                  </div>
+                  
+                  {formData.writingStyleFile && (
+                    <p className="text-[#22DFDC] text-sm">
+                      Uploaded: {formData.writingStyleFile.name}
+                    </p>
+                  )}
+                </div>
+                
                 {formData.writingStyleAnalysis && (
                   <div className="mt-3 p-3 bg-[#22DFDC]/10 border border-[#22DFDC]/20 rounded-lg">
                     <p className="text-xs text-[#22DFDC] font-medium mb-1">Style Analysis Complete</p>
