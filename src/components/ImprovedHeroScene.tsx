@@ -122,14 +122,8 @@ export function ImprovedHeroScene() {
     <Canvas
       camera={{ position: [0, 0, 12], fov: 45 }}
       dpr={[1, 1.5]}
-      // Only update the canvas when the scene changes; this saves
-      // resources when the hero is off screen
-      frameloop="demand"
-      // Set a dark base colour to match the marketing site
-      gl={{ antialias: true, alpha: false }}
+      style={{ background: '#01070a' }}
     >
-      {/* Background gradient using a large radial spread */}
-      <color attach="background" args={['#01070a']} />
       {/* Soft ambient light and a high key point light */}
       <ambientLight intensity={0.2} />
       <pointLight position={[5, 10, 5]} intensity={1.5} color={'#22dfdc'} />
@@ -137,16 +131,6 @@ export function ImprovedHeroScene() {
       <Spiral colour="#22EDB6" />
       {/* A handful of floating particles using Instanced geometry */}
       <FloatingParticles />
-      {/* Optional environment map to add reflections on the arrows */}
-      <Environment preset="city" />
-      {/* Bloom effect to give the arrows a glowing halo */}
-      <EffectComposer multisampling={2}>
-        <Bloom 
-          intensity={0.6} 
-          luminanceThreshold={0.15} 
-          luminanceSmoothing={0.9} 
-        />
-      </EffectComposer>
     </Canvas>
   );
 }
