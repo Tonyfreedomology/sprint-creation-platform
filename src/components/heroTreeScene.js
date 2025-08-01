@@ -85,9 +85,33 @@ export function initHeroScene(container) {
   const width = container.clientWidth;
   const height = container.clientHeight;
 
-  // Create the scene and set a black space-like background
+  // Create the scene and set a dark radial gradient background
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x000000);
+  
+  // Create a dark radial gradient background using a large sphere
+  const gradientGeometry = new THREE.SphereGeometry(50, 32, 32);
+  const gradientMaterial = new THREE.ShaderMaterial({
+    uniforms: {},
+    vertexShader: `
+      varying vec3 vWorldPosition;
+      void main() {
+        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = worldPosition.xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vWorldPosition;
+      void main() {
+        float distance = length(vWorldPosition) / 50.0;
+        vec3 color = mix(vec3(0.02, 0.06, 0.12), vec3(0.0, 0.0, 0.0), distance);
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `,
+    side: THREE.BackSide
+  });
+  const gradientSphere = new THREE.Mesh(gradientGeometry, gradientMaterial);
+  scene.add(gradientSphere);
 
   // Set up a camera. A perspective camera with a medium field of view
   // gives depth to the composition. Position it so that the entire tree
@@ -186,9 +210,7 @@ export function initHeroScene(container) {
     mouseY = (y / height) * 2 - 1;
 
     // Find the "get started" button and calculate distance
-    const button = document.querySelector('[data-testid="get-started-button"]') || 
-                   document.querySelector('button:has-text("Get started free")') ||
-                   document.querySelector('button');
+    const button = document.querySelector('[data-testid="get-started-button"]');
     
     if (button) {
       const buttonRect = button.getBoundingClientRect();
@@ -201,22 +223,36 @@ export function initHeroScene(container) {
       );
       
       // Convert distance to proximity (closer = higher value)
-      const maxDistance = 300; // pixels
+      const maxDistance = 400; // pixels - increased for easier triggering
       buttonProximity = Math.max(0, 1 - (distance / maxDistance));
       
-      // Determine target tree depth based on proximity
-      if (buttonProximity > 0.8) {
+      // Determine target tree depth based on proximity with smoother transitions
+      if (buttonProximity > 0.7) {
         targetTreeDepth = 6;
-      } else if (buttonProximity > 0.6) {
+      } else if (buttonProximity > 0.5) {
+        targetTreeDepth = 5;
+      } else if (buttonProximity > 0.3) {
+        targetTreeDepth = 4;
+      } else if (buttonProximity > 0.15) {
+        targetTreeDepth = 3;
+      } else if (buttonProximity > 0.05) {
+        targetTreeDepth = 2;
+      } else {
+        targetTreeDepth = 1;
+      }
+    } else {
+      // Fallback: use general mouse position to grow tree
+      const centerDistance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+      buttonProximity = Math.max(0, 1 - centerDistance);
+      
+      if (buttonProximity > 0.6) {
         targetTreeDepth = 5;
       } else if (buttonProximity > 0.4) {
         targetTreeDepth = 4;
       } else if (buttonProximity > 0.2) {
         targetTreeDepth = 3;
-      } else if (buttonProximity > 0.1) {
-        targetTreeDepth = 2;
       } else {
-        targetTreeDepth = 1;
+        targetTreeDepth = 2;
       }
     }
   }
@@ -303,8 +339,10 @@ export function initHeroScene(container) {
       if (mote.mesh.material) mote.mesh.material.dispose();
     });
     
-    // Dispose tree materials
+    // Dispose tree materials and gradient background
     branchMaterial.dispose();
+    gradientMaterial.dispose();
+    gradientGeometry.dispose();
     renderer.dispose();
     
     // Remove the canvas from the container
