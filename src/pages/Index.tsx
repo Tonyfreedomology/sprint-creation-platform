@@ -243,7 +243,7 @@ const Index = () => {
                   </h1>
                   
                   <p className="text-xl leading-relaxed max-w-[48ch]" style={{ color: '#CFCFCF', opacity: 0.9 }}>
-                    Mate, you've got knowledge that could change someone's life. Our AI-powered platform helps you turn that expertise into guided 21–40-day journeys that break bad habits, build good ones and get real results. No coding, no tech headaches—just you and your mission.
+                    You've got knowledge that could change someone's life. Our AI-powered platform helps you turn that expertise into guided 21–40-day journeys that break bad habits, build good ones and get real results. No coding, no tech headaches—just you and your mission.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-4">
