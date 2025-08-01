@@ -447,9 +447,8 @@ export const SprintCreationForm: React.FC = () => {
               <p className="text-white/70">Tell us about the transformation you want to create</p>
             </div>
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="sprintTitle" className="text-white text-sm font-medium">Give your sprint a catchy, benefit-driven name *</Label>
-                <p className="text-xs text-white/50 mb-2">e.g., "30 Days to Better Habits" or "21 Days to Unshakeable Self-Worth"</p>
+               <div>
+                 <Label htmlFor="sprintTitle" className="text-white text-sm font-medium">Give your sprint a catchy, benefit-driven name *</Label>
                 <Input
                   id="sprintTitle"
                   placeholder="e.g., 'Enough.' - 21 Days to Unshakeable Self-Worth"
@@ -471,9 +470,9 @@ export const SprintCreationForm: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="sprintDuration" className="text-white text-sm font-medium">Pick a length that fits the habit you're building</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col">
+                  <Label htmlFor="sprintDuration" className="text-white text-sm font-medium mb-2">Pick a length that fits the habit you're building</Label>
                   <StyledDropdown
                     options={[
                       { value: '7', label: '7 Days' },
@@ -485,12 +484,11 @@ export const SprintCreationForm: React.FC = () => {
                     value={formData.sprintDuration}
                     onChange={(value) => handleInputChange('sprintDuration', value)}
                     placeholder="Select duration"
-                    className="mt-2"
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="sprintCategory" className="text-white text-sm font-medium">Category</Label>
+                <div className="flex flex-col">
+                  <Label htmlFor="sprintCategory" className="text-white text-sm font-medium mb-2">Category</Label>
                   <StyledDropdown
                     options={[
                       { 
@@ -517,7 +515,6 @@ export const SprintCreationForm: React.FC = () => {
                     value={formData.sprintCategory}
                     onChange={(value) => handleInputChange('sprintCategory', value)}
                     placeholder="Select category"
-                    className="mt-2"
                   />
                 </div>
               </div>

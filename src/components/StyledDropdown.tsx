@@ -103,7 +103,7 @@ const StyledDropdown: React.FC<StyledDropdownProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-2 bg-[#2a2a2a] border-[#22DFDC]/30 rounded shadow-xl z-50 overflow-hidden"
+            className="absolute top-full left-0 right-0 mt-2 bg-[#2a2a2a] border border-[#22DFDC]/30 rounded-lg shadow-xl z-50 overflow-hidden"
           >
             <div className="py-2">
               {options.map((option, index) => (
