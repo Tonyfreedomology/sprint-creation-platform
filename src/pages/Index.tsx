@@ -263,6 +263,7 @@ const Index = () => {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <RollingTextButton
                       onClick={() => setShowForm(true)}
+                      data-testid="get-started-button"
                       className="px-8 py-4 text-lg rounded-full font-medium text-white transition-all hover:scale-105 flex items-center gap-2 shadow-lg"
                       style={{ 
                         background: 'linear-gradient(135deg, #22DFDC, #22EDB6)',

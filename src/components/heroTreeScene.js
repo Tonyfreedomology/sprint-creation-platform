@@ -85,10 +85,9 @@ export function initHeroScene(container) {
   const width = container.clientWidth;
   const height = container.clientHeight;
 
-  // Create the scene and set a dark background. The deep green/black tone
-  // echoes the existing design of the Lovable platform.
+  // Create the scene and set a black space-like background
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x031a13);
+  scene.background = new THREE.Color(0x000000);
 
   // Set up a camera. A perspective camera with a medium field of view
   // gives depth to the composition. Position it so that the entire tree
@@ -101,8 +100,7 @@ export function initHeroScene(container) {
   scene.add(ambient);
 
   // Create the fractal tree as a group. We'll animate this group's scale
-  // over time to simulate growth and respond to mouse movement by altering
-  // its rotation.
+  // over time and based on cursor proximity to the "get started" button
   const treeGroup = new THREE.Group();
   scene.add(treeGroup);
 
@@ -115,33 +113,58 @@ export function initHeroScene(container) {
     metalness: 0.1,
     roughness: 0.5,
   });
-  // Build the tree recursively. Adjust depth to control complexity (5–6 is
-  // plenty for performance and aesthetics).
-  addBranch(treeGroup, 5, 1, 0.1, branchMaterial);
 
-  // Create a field of floating particles around the tree. These points
-  // evoke stars or motes of knowledge and will slowly rotate, providing
-  // a sense of dynamism and depth. Their random distribution ensures a
-  // natural, organic look.
-  const starCount = 700;
-  const starPositions = new Float32Array(starCount * 3);
-  for (let i = 0; i < starCount; i++) {
-    const x = (Math.random() - 0.5) * 10;
-    const y = Math.random() * 6;
-    const z = (Math.random() - 0.5) * 10;
-    starPositions.set([x, y, z], i * 3);
+  // Track tree depth based on cursor proximity to button
+  let currentTreeDepth = 1;
+  let targetTreeDepth = 1;
+
+  // Function to rebuild tree with specified depth
+  function rebuildTree(depth) {
+    // Clear existing tree
+    while (treeGroup.children.length > 0) {
+      const child = treeGroup.children[0];
+      treeGroup.remove(child);
+      if (child.geometry) child.geometry.dispose();
+    }
+    
+    // Build new tree with specified depth
+    addBranch(treeGroup, depth, 1, 0.1, branchMaterial);
   }
-  const starGeometry = new THREE.BufferGeometry();
-  starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-  const starMaterial = new THREE.PointsMaterial({
-    color: new THREE.Color(0x29c991),
-    size: 0.05,
-    transparent: true,
-    opacity: 0.7,
-    depthWrite: false,
-  });
-  const stars = new THREE.Points(starGeometry, starMaterial);
-  scene.add(stars);
+
+  // Build initial tree with minimal depth
+  rebuildTree(1);
+
+  // Create glowing spherical motes instead of points
+  const moteCount = 150;
+  const motes = [];
+  
+  for (let i = 0; i < moteCount; i++) {
+    const moteGeometry = new THREE.SphereGeometry(0.02, 8, 6);
+    const moteMaterial = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(0x29c991),
+      transparent: true,
+      opacity: 0.8
+    });
+    
+    const mote = new THREE.Mesh(moteGeometry, moteMaterial);
+    
+    // Random position around the tree
+    const x = (Math.random() - 0.5) * 8;
+    const y = Math.random() * 5;
+    const z = (Math.random() - 0.5) * 8;
+    mote.position.set(x, y, z);
+    
+    // Add glow effect with a point light
+    const glowLight = new THREE.PointLight(0x29c991, 0.3, 2);
+    mote.add(glowLight);
+    
+    scene.add(mote);
+    motes.push({
+      mesh: mote,
+      originalPosition: { x, y, z },
+      phase: Math.random() * Math.PI * 2
+    });
+  }
 
   // Set up the renderer. Use a high pixel ratio for crisp rendering on
   // high‑DPI displays. Append the renderer's canvas to the container.
@@ -150,16 +173,52 @@ export function initHeroScene(container) {
   renderer.setSize(width, height);
   container.appendChild(renderer.domElement);
 
-  // Track mouse movement for interactive rotation. We'll map mouse
-  // coordinates to small rotations on the x and z axes of the treeGroup.
+  // Track mouse movement for interactive rotation and button proximity
   let mouseX = 0;
   let mouseY = 0;
+  let buttonProximity = 0;
+
   function handleMouseMove(event) {
     const rect = container.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     mouseX = (x / width) * 2 - 1;
     mouseY = (y / height) * 2 - 1;
+
+    // Find the "get started" button and calculate distance
+    const button = document.querySelector('[data-testid="get-started-button"]') || 
+                   document.querySelector('button:has-text("Get started free")') ||
+                   document.querySelector('button');
+    
+    if (button) {
+      const buttonRect = button.getBoundingClientRect();
+      const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+      const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+      
+      const distance = Math.sqrt(
+        Math.pow(event.clientX - buttonCenterX, 2) + 
+        Math.pow(event.clientY - buttonCenterY, 2)
+      );
+      
+      // Convert distance to proximity (closer = higher value)
+      const maxDistance = 300; // pixels
+      buttonProximity = Math.max(0, 1 - (distance / maxDistance));
+      
+      // Determine target tree depth based on proximity
+      if (buttonProximity > 0.8) {
+        targetTreeDepth = 6;
+      } else if (buttonProximity > 0.6) {
+        targetTreeDepth = 5;
+      } else if (buttonProximity > 0.4) {
+        targetTreeDepth = 4;
+      } else if (buttonProximity > 0.2) {
+        targetTreeDepth = 3;
+      } else if (buttonProximity > 0.1) {
+        targetTreeDepth = 2;
+      } else {
+        targetTreeDepth = 1;
+      }
+    }
   }
   window.addEventListener('mousemove', handleMouseMove);
 
@@ -183,9 +242,22 @@ export function initHeroScene(container) {
   function animate() {
     requestAnimationFrame(animate);
     const elapsed = (Date.now() - startTime) / 1000;
+    
     // Ease out growth: start quickly then slow as it approaches full size
     growth = Math.min(maxGrowth, 1 - Math.exp(-2 * elapsed));
-    treeGroup.scale.set(growth, growth, growth);
+    
+    // Smoothly transition tree depth based on button proximity
+    if (currentTreeDepth !== targetTreeDepth) {
+      const depthDiff = targetTreeDepth - currentTreeDepth;
+      if (Math.abs(depthDiff) > 0) {
+        currentTreeDepth = targetTreeDepth;
+        rebuildTree(currentTreeDepth);
+      }
+    }
+    
+    // Scale tree based on both time and proximity
+    const proximityScale = 0.7 + (buttonProximity * 0.5); // Scale from 0.7 to 1.2
+    treeGroup.scale.set(growth * proximityScale, growth * proximityScale, growth * proximityScale);
 
     // Use mouse movement to gently tilt the tree. Multipliers control
     // sensitivity. Limit the rotation so it remains subtle.
@@ -196,8 +268,24 @@ export function initHeroScene(container) {
     // motion independent of the cursor.
     treeGroup.rotation.y += 0.003;
 
-    // Spin the star field slowly to create parallax and depth
-    stars.rotation.y += 0.0005;
+    // Animate the glowing motes
+    motes.forEach((mote, index) => {
+      const time = elapsed + mote.phase;
+      
+      // Gentle floating motion
+      mote.mesh.position.x = mote.originalPosition.x + Math.sin(time * 0.5) * 0.3;
+      mote.mesh.position.y = mote.originalPosition.y + Math.sin(time * 0.3) * 0.2;
+      mote.mesh.position.z = mote.originalPosition.z + Math.cos(time * 0.4) * 0.3;
+      
+      // Pulsing glow effect
+      const pulseIntensity = 0.8 + Math.sin(time * 2) * 0.2;
+      mote.mesh.material.opacity = pulseIntensity;
+      
+      // Make motes more active when cursor is near button
+      if (buttonProximity > 0.5) {
+        mote.mesh.position.y += Math.sin(time * 3) * 0.1 * buttonProximity;
+      }
+    });
 
     renderer.render(scene, camera);
   }
@@ -208,11 +296,17 @@ export function initHeroScene(container) {
   return function cleanup() {
     window.removeEventListener('mousemove', handleMouseMove);
     window.removeEventListener('resize', handleResize);
-    // Dispose geometries and materials to free GPU memory
-    starGeometry.dispose();
-    starMaterial.dispose();
+    
+    // Dispose mote geometries and materials
+    motes.forEach(mote => {
+      if (mote.mesh.geometry) mote.mesh.geometry.dispose();
+      if (mote.mesh.material) mote.mesh.material.dispose();
+    });
+    
+    // Dispose tree materials
     branchMaterial.dispose();
     renderer.dispose();
+    
     // Remove the canvas from the container
     if (renderer.domElement && renderer.domElement.parentNode) {
       renderer.domElement.parentNode.removeChild(renderer.domElement);
