@@ -117,12 +117,12 @@ export function initHeroScene(container) {
 
   // Create efficient instanced particles instead of individual meshes
   const particleCount = 75;
-  const particleGeometry = new THREE.SphereGeometry(0.015, 8, 8); // 50% smaller
+  const particleGeometry = new THREE.SphereGeometry(0.0075, 8, 8); // 50% smaller than 0.015
   const particleMaterial = new THREE.MeshBasicMaterial({
     color: new THREE.Color(0x22dfdc),
-    emissive: new THREE.Color(0x0a4d4a), // Add glow effect
+    emissive: new THREE.Color(0x22dfdc), // Stronger glow - full color emissive
     transparent: true,
-    opacity: 0.9
+    opacity: 1.0
   });
   
   const instancedParticles = new THREE.InstancedMesh(particleGeometry, particleMaterial, particleCount);
