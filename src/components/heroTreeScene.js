@@ -36,9 +36,8 @@ import * as THREE from 'three';
 function addBranch(parent, depth, length, radius, material) {
   if (depth <= 0) return;
 
-  // Create the cylinder geometry for this segment. The base is slightly
-  // thicker than the top to give a natural taper.
-  const geometry = new THREE.CylinderGeometry(radius * 0.4, radius, length, 8);
+  // Create the cylinder geometry for this segment with more detail
+  const geometry = new THREE.CylinderGeometry(radius * 0.3, radius, length, 12);
   const branchMesh = new THREE.Mesh(geometry, material);
 
   // Position the mesh so that its base sits at the parent's origin and
@@ -46,26 +45,31 @@ function addBranch(parent, depth, length, radius, material) {
   branchMesh.position.y = length / 2;
   parent.add(branchMesh);
 
-  // Determine child parameters. Each subsequent generation shrinks in
-  // length and radius to give the impression of tapering limbs.
-  const childLength = length * 0.7;
-  const childRadius = radius * 0.65;
+  // Create more organic branching with varied parameters
+  const childLength = length * (0.65 + Math.random() * 0.1); // Add some variation
+  const childRadius = radius * (0.6 + Math.random() * 0.1);
 
-  // Left child branch
-  const left = new THREE.Group();
-  left.position.y = length;
-  // Rotate slightly forward/back and left
-  left.rotation.set(THREE.MathUtils.degToRad(-15), 0, THREE.MathUtils.degToRad(30));
-  branchMesh.add(left);
-  addBranch(left, depth - 1, childLength, childRadius, material);
-
-  // Right child branch
-  const right = new THREE.Group();
-  right.position.y = length;
-  // Rotate slightly forward/back and right
-  right.rotation.set(THREE.MathUtils.degToRad(-15), 0, THREE.MathUtils.degToRad(-30));
-  branchMesh.add(right);
-  addBranch(right, depth - 1, childLength, childRadius, material);
+  // Create 2-4 child branches for more organic look
+  const numChildren = depth > 3 ? 2 + Math.floor(Math.random() * 2) : 2;
+  
+  for (let i = 0; i < numChildren; i++) {
+    const child = new THREE.Group();
+    child.position.y = length;
+    
+    // More varied angles for organic branching
+    const angleStep = (Math.PI * 2) / numChildren;
+    const angle = angleStep * i + (Math.random() - 0.5) * 0.5;
+    const tilt = -10 - Math.random() * 20; // Random tilt between -10 and -30 degrees
+    
+    child.rotation.set(
+      THREE.MathUtils.degToRad(tilt), 
+      angle, 
+      THREE.MathUtils.degToRad((Math.random() - 0.5) * 20)
+    );
+    
+    branchMesh.add(child);
+    addBranch(child, depth - 1, childLength, childRadius, material);
+  }
 }
 
 /**
@@ -109,28 +113,11 @@ export function initHeroScene(container) {
     color: new THREE.Color(0x34e7a8),
     emissive: new THREE.Color(0x1fae6b),
     metalness: 0.1,
-    roughness: 0.5,
+    roughness: 0.4,
   });
 
-  // Track tree depth based on cursor proximity to button
-  let currentTreeDepth = 1;
-  let targetTreeDepth = 1;
-
-  // Function to rebuild tree with specified depth
-  function rebuildTree(depth) {
-    // Clear existing tree
-    while (treeGroup.children.length > 0) {
-      const child = treeGroup.children[0];
-      treeGroup.remove(child);
-      if (child.geometry) child.geometry.dispose();
-    }
-    
-    // Build new tree with specified depth
-    addBranch(treeGroup, depth, 1, 0.1, branchMaterial);
-  }
-
-  // Build initial tree with minimal depth
-  rebuildTree(1);
+  // Build a beautiful, fully grown tree from the start
+  addBranch(treeGroup, 6, 1.2, 0.12, branchMaterial);
 
   // Create glowing spherical motes instead of points
   const moteCount = 150;
@@ -171,10 +158,9 @@ export function initHeroScene(container) {
   renderer.setSize(width, height);
   container.appendChild(renderer.domElement);
 
-  // Track mouse movement for interactive rotation and button proximity
+  // Track mouse movement for gentle swaying
   let mouseX = 0;
   let mouseY = 0;
-  let buttonProximity = 0;
 
   function handleMouseMove(event) {
     const rect = container.getBoundingClientRect();
@@ -182,44 +168,6 @@ export function initHeroScene(container) {
     const y = event.clientY - rect.top;
     mouseX = (x / width) * 2 - 1;
     mouseY = (y / height) * 2 - 1;
-
-    // Find the "get started" button specifically
-    const button = document.querySelector('[data-testid="get-started-button"]');
-    
-    if (button) {
-      const buttonRect = button.getBoundingClientRect();
-      const buttonCenterX = buttonRect.left + buttonRect.width / 2;
-      const buttonCenterY = buttonRect.top + buttonRect.height / 2;
-      
-      // Calculate distance from cursor to button center
-      const distance = Math.sqrt(
-        Math.pow(event.clientX - buttonCenterX, 2) + 
-        Math.pow(event.clientY - buttonCenterY, 2)
-      );
-      
-      // Convert distance to proximity (closer = higher value)
-      const maxDistance = 300; // pixels - distance threshold
-      buttonProximity = Math.max(0, 1 - (distance / maxDistance));
-      
-      // Determine target tree depth based on proximity to button only
-      if (buttonProximity > 0.6) {
-        targetTreeDepth = 6;
-      } else if (buttonProximity > 0.4) {
-        targetTreeDepth = 5;
-      } else if (buttonProximity > 0.25) {
-        targetTreeDepth = 4;
-      } else if (buttonProximity > 0.1) {
-        targetTreeDepth = 3;
-      } else if (buttonProximity > 0.05) {
-        targetTreeDepth = 2;
-      } else {
-        targetTreeDepth = 1;
-      }
-    } else {
-      // If button not found, keep tree at minimum
-      buttonProximity = 0;
-      targetTreeDepth = 1;
-    }
   }
   window.addEventListener('mousemove', handleMouseMove);
 
@@ -234,58 +182,38 @@ export function initHeroScene(container) {
   }
   window.addEventListener('resize', handleResize);
 
-  // Animate growth by gradually scaling the tree group up to its full size.
+  // Animate the beautiful tree with gentle swaying
   let growth = 0.0;
   const maxGrowth = 1.0;
-  // Store the start time to create smooth motion
   const startTime = Date.now();
 
   function animate() {
     requestAnimationFrame(animate);
     const elapsed = (Date.now() - startTime) / 1000;
     
-    // Ease out growth: start quickly then slow as it approaches full size
-    growth = Math.min(maxGrowth, 1 - Math.exp(-2 * elapsed));
-    
-    // Smoothly transition tree depth based on button proximity
-    if (currentTreeDepth !== targetTreeDepth) {
-      const depthDiff = targetTreeDepth - currentTreeDepth;
-      if (Math.abs(depthDiff) > 0) {
-        currentTreeDepth = targetTreeDepth;
-        rebuildTree(currentTreeDepth);
-      }
-    }
-    
-    // Scale tree based on both time and proximity
-    const proximityScale = 0.7 + (buttonProximity * 0.5); // Scale from 0.7 to 1.2
-    treeGroup.scale.set(growth * proximityScale, growth * proximityScale, growth * proximityScale);
+    // Ease in the tree scale on initial load
+    growth = Math.min(maxGrowth, 1 - Math.exp(-3 * elapsed));
+    treeGroup.scale.set(growth, growth, growth);
 
-    // Use mouse movement to gently tilt the tree. Multipliers control
-    // sensitivity. Limit the rotation so it remains subtle.
-    treeGroup.rotation.x = THREE.MathUtils.clamp(mouseY * 0.3, -0.5, 0.5);
-    treeGroup.rotation.z = THREE.MathUtils.clamp(-mouseX * 0.3, -0.5, 0.5);
+    // Gentle swaying based on mouse movement
+    treeGroup.rotation.x = THREE.MathUtils.clamp(mouseY * 0.2, -0.3, 0.3);
+    treeGroup.rotation.z = THREE.MathUtils.clamp(-mouseX * 0.2, -0.3, 0.3);
 
-    // Slowly rotate the entire tree about its vertical axis for added
-    // motion independent of the cursor.
-    treeGroup.rotation.y += 0.003;
+    // Subtle automatic rotation for life-like movement
+    treeGroup.rotation.y += 0.002;
 
-    // Animate the glowing motes
+    // Animate the glowing motes with more organic movement
     motes.forEach((mote, index) => {
       const time = elapsed + mote.phase;
       
-      // Gentle floating motion
-      mote.mesh.position.x = mote.originalPosition.x + Math.sin(time * 0.5) * 0.3;
-      mote.mesh.position.y = mote.originalPosition.y + Math.sin(time * 0.3) * 0.2;
-      mote.mesh.position.z = mote.originalPosition.z + Math.cos(time * 0.4) * 0.3;
+      // More organic floating motion
+      mote.mesh.position.x = mote.originalPosition.x + Math.sin(time * 0.4) * 0.4;
+      mote.mesh.position.y = mote.originalPosition.y + Math.sin(time * 0.2) * 0.3;
+      mote.mesh.position.z = mote.originalPosition.z + Math.cos(time * 0.3) * 0.4;
       
-      // Pulsing glow effect
-      const pulseIntensity = 0.8 + Math.sin(time * 2) * 0.2;
+      // Gentle pulsing glow effect
+      const pulseIntensity = 0.7 + Math.sin(time * 1.5) * 0.3;
       mote.mesh.material.opacity = pulseIntensity;
-      
-      // Make motes more active when cursor is near button
-      if (buttonProximity > 0.5) {
-        mote.mesh.position.y += Math.sin(time * 3) * 0.1 * buttonProximity;
-      }
     });
 
     renderer.render(scene, camera);
