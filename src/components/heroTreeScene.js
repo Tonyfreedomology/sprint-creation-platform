@@ -183,7 +183,7 @@ export function initHeroScene(container) {
     mouseX = (x / width) * 2 - 1;
     mouseY = (y / height) * 2 - 1;
 
-    // Find the "get started" button and calculate distance
+    // Find the "get started" button specifically
     const button = document.querySelector('[data-testid="get-started-button"]');
     
     if (button) {
@@ -191,23 +191,24 @@ export function initHeroScene(container) {
       const buttonCenterX = buttonRect.left + buttonRect.width / 2;
       const buttonCenterY = buttonRect.top + buttonRect.height / 2;
       
+      // Calculate distance from cursor to button center
       const distance = Math.sqrt(
         Math.pow(event.clientX - buttonCenterX, 2) + 
         Math.pow(event.clientY - buttonCenterY, 2)
       );
       
       // Convert distance to proximity (closer = higher value)
-      const maxDistance = 400; // pixels - increased for easier triggering
+      const maxDistance = 300; // pixels - distance threshold
       buttonProximity = Math.max(0, 1 - (distance / maxDistance));
       
-      // Determine target tree depth based on proximity with smoother transitions
-      if (buttonProximity > 0.7) {
+      // Determine target tree depth based on proximity to button only
+      if (buttonProximity > 0.6) {
         targetTreeDepth = 6;
-      } else if (buttonProximity > 0.5) {
+      } else if (buttonProximity > 0.4) {
         targetTreeDepth = 5;
-      } else if (buttonProximity > 0.3) {
+      } else if (buttonProximity > 0.25) {
         targetTreeDepth = 4;
-      } else if (buttonProximity > 0.15) {
+      } else if (buttonProximity > 0.1) {
         targetTreeDepth = 3;
       } else if (buttonProximity > 0.05) {
         targetTreeDepth = 2;
@@ -215,19 +216,9 @@ export function initHeroScene(container) {
         targetTreeDepth = 1;
       }
     } else {
-      // Fallback: use general mouse position to grow tree
-      const centerDistance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
-      buttonProximity = Math.max(0, 1 - centerDistance);
-      
-      if (buttonProximity > 0.6) {
-        targetTreeDepth = 5;
-      } else if (buttonProximity > 0.4) {
-        targetTreeDepth = 4;
-      } else if (buttonProximity > 0.2) {
-        targetTreeDepth = 3;
-      } else {
-        targetTreeDepth = 2;
-      }
+      // If button not found, keep tree at minimum
+      buttonProximity = 0;
+      targetTreeDepth = 1;
     }
   }
   window.addEventListener('mousemove', handleMouseMove);
