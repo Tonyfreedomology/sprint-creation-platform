@@ -314,7 +314,7 @@ const Index = () => {
             <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
               Why It Matters
             </h2>
-            <p className="text-xl leading-relaxed" style={{ color: '#CFCFCF', opacity: 0.9 }}>
+            <p className="text-xl leading-relaxed text-white">
               Building a new habit is hard. Doing it alone is even harder. Our sprints bring people together in a focused, bite-size challenge so they actually stick with it. Think of it as your own 30-day bootcamp—built once, sold again and again.
             </p>
           </div>
@@ -325,7 +325,7 @@ const Index = () => {
               <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
                 How It Works
               </h2>
-              <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+              <p className="text-xl max-w-3xl mx-auto text-white">
                 Three easy steps to launch your life-changing sprint
               </p>
             </div>
@@ -340,7 +340,7 @@ const Index = () => {
                     {step.step}
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
-                  <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                  <p className="text-base text-white">
                     {step.description}
                   </p>
                 </div>
@@ -369,7 +369,7 @@ const Index = () => {
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                  <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                  <p className="text-base text-white">
                     {feature.description}
                   </p>
                 </div>
@@ -396,7 +396,7 @@ const Index = () => {
                       <Star key={i} className="w-5 h-5 fill-[#22EDB6] text-[#22EDB6]" />
                     ))}
                   </div>
-                  <p className="text-base mb-4" style={{ color: '#CFCFCF', opacity: 0.9 }}>
+                  <p className="text-base mb-4 text-white">
                     "{testimonial.content}"
                   </p>
                   <div className="mb-4 p-3 rounded-lg bg-[#22DFDC]/10 border border-[#22DFDC]/20">
@@ -406,7 +406,7 @@ const Index = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-white">{testimonial.name}</p>
-                    <p className="text-sm" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                    <p className="text-sm text-white">
                       {testimonial.role}
                     </p>
                   </div>
