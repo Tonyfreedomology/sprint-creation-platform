@@ -211,9 +211,26 @@ export function initHeroScene(container) {
       }
       
       // Gentle floating motion
-      const x = particle.originalPosition.x + Math.sin(time * 0.4) * 0.3;
-      const y = particle.currentY + Math.sin(time * 0.2) * 0.2;
-      const z = particle.originalPosition.z + Math.cos(time * 0.3) * 0.3;
+      let x = particle.originalPosition.x + Math.sin(time * 0.4) * 0.3;
+      let y = particle.currentY + Math.sin(time * 0.2) * 0.2;
+      let z = particle.originalPosition.z + Math.cos(time * 0.3) * 0.3;
+      
+      // Mouse repulsion effect
+      const mouseWorldX = mouseX * 2.5 + 1.5; // Convert normalized mouse to world coords
+      const mouseWorldY = -mouseY * 3 + 2; // Invert Y and scale
+      
+      const distanceX = x - mouseWorldX;
+      const distanceY = y - mouseWorldY;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      
+      if (distance < 1.5) { // Repulsion radius
+        const repulsionStrength = (1.5 - distance) * 0.3;
+        const normalizedX = distanceX / distance;
+        const normalizedY = distanceY / distance;
+        
+        x += normalizedX * repulsionStrength;
+        y += normalizedY * repulsionStrength;
+      }
       
       dummy.position.set(x, y, z);
       dummy.updateMatrix();
