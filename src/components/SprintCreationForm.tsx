@@ -613,7 +613,7 @@ export const SprintCreationForm: React.FC = () => {
                     </p>
                     <div className="flex gap-3">
                       <label htmlFor="voiceSample" className="flex-1 cursor-pointer">
-                        <div className="border border-white/20 rounded-lg px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
+                        <div className="border border-white/20 rounded-full px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
                           <span className="text-white/70 text-sm">
                             {formData.voiceSampleFile ? formData.voiceSampleFile.name : 'Choose audio file...'}
                           </span>
@@ -629,7 +629,7 @@ export const SprintCreationForm: React.FC = () => {
                       <Button
                         type="button"
                         onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                        className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-4 py-2 text-sm"
+                        className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-4 py-2 text-sm rounded-full"
                       >
                         {showVoiceRecorder ? 'Cancel' : 'Record'}
                       </Button>
@@ -637,7 +637,7 @@ export const SprintCreationForm: React.FC = () => {
                     
                     {/* Voice Recorder Component */}
                     {showVoiceRecorder && (
-                      <div className="mt-4 p-4 border border-white/10 rounded-lg bg-[#1E1E1E]/20">
+                      <div className="mt-4 p-4 border border-white/10 rounded-2xl bg-[#1E1E1E]/20">
                         <VoiceRecorder 
                           onRecordingComplete={handleVoiceRecordingComplete}
                           maxDuration={60}
@@ -665,7 +665,7 @@ export const SprintCreationForm: React.FC = () => {
                   Upload a short text file if you have a specific writing style you want us to mimic
                 </p>
                 <label htmlFor="writingStyle" className="cursor-pointer block">
-                  <div className="border border-white/20 rounded-lg px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors flex items-center gap-3">
+                  <div className="border border-white/20 rounded-full px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors flex items-center gap-3">
                     <FileText className="w-4 h-4 text-white/50" />
                     <span className="text-white/70 text-sm flex-1">
                       {formData.writingStyleFile ? formData.writingStyleFile.name : 'Choose document...'}
