@@ -85,47 +85,21 @@ export function initHeroScene(container) {
   const width = container.clientWidth;
   const height = container.clientHeight;
 
-  // Create the scene and set a dark radial gradient background
+  // Create the scene with transparent background
   const scene = new THREE.Scene();
-  
-  // Create a dark radial gradient background using a large sphere
-  const gradientGeometry = new THREE.SphereGeometry(50, 32, 32);
-  const gradientMaterial = new THREE.ShaderMaterial({
-    uniforms: {},
-    vertexShader: `
-      varying vec3 vWorldPosition;
-      void main() {
-        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-        vWorldPosition = worldPosition.xyz;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      varying vec3 vWorldPosition;
-      void main() {
-        float distance = length(vWorldPosition) / 50.0;
-        vec3 color = mix(vec3(0.02, 0.06, 0.12), vec3(0.0, 0.0, 0.0), distance);
-        gl_FragColor = vec4(color, 1.0);
-      }
-    `,
-    side: THREE.BackSide
-  });
-  const gradientSphere = new THREE.Mesh(gradientGeometry, gradientMaterial);
-  scene.add(gradientSphere);
+  // No background - let the page background show through
 
-  // Set up a camera. A perspective camera with a medium field of view
-  // gives depth to the composition. Position it so that the entire tree
-  // fits within view.
+  // Set up a camera positioned to show the tree on the right side
   const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-  camera.position.set(0, 2.5, 5);
+  camera.position.set(2, 2.5, 5); // Moved camera to the right
 
   // Add a gentle ambient light so the tree is visible without harsh shadows.
   const ambient = new THREE.AmbientLight(0x406e5c, 1.2);
   scene.add(ambient);
 
-  // Create the fractal tree as a group. We'll animate this group's scale
-  // over time and based on cursor proximity to the "get started" button
+  // Create the fractal tree as a group positioned on the right side
   const treeGroup = new THREE.Group();
+  treeGroup.position.x = 1.5; // Move tree to the right
   scene.add(treeGroup);
 
   // Define a material with emissive properties to make the tree glow. The
@@ -172,10 +146,10 @@ export function initHeroScene(container) {
     
     const mote = new THREE.Mesh(moteGeometry, moteMaterial);
     
-    // Random position around the tree
-    const x = (Math.random() - 0.5) * 8;
+    // Random position around the tree (biased toward right side)
+    const x = (Math.random() - 0.3) * 6 + 1.5; // Bias toward right side
     const y = Math.random() * 5;
-    const z = (Math.random() - 0.5) * 8;
+    const z = (Math.random() - 0.5) * 6;
     mote.position.set(x, y, z);
     
     // Add glow effect with a point light
@@ -190,9 +164,9 @@ export function initHeroScene(container) {
     });
   }
 
-  // Set up the renderer. Use a high pixel ratio for crisp rendering on
-  // high‑DPI displays. Append the renderer's canvas to the container.
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  // Set up the renderer with transparent background
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setClearColor(0x000000, 0); // Transparent background
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height);
   container.appendChild(renderer.domElement);
@@ -339,10 +313,8 @@ export function initHeroScene(container) {
       if (mote.mesh.material) mote.mesh.material.dispose();
     });
     
-    // Dispose tree materials and gradient background
+    // Dispose tree materials
     branchMaterial.dispose();
-    gradientMaterial.dispose();
-    gradientGeometry.dispose();
     renderer.dispose();
     
     // Remove the canvas from the container
