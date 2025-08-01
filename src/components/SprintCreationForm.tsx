@@ -617,12 +617,12 @@ export const SprintCreationForm: React.FC = () => {
                       <Button
                         type="button"
                         onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                        className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-4 py-3 text-sm rounded-full"
+                        className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white px-4 py-3 text-sm rounded-full hover:opacity-90"
                       >
                         {showVoiceRecorder ? 'Cancel Recording' : 'Record Voice'}
                       </Button>
                       <label htmlFor="voiceSample" className="cursor-pointer">
-                        <div className="w-full border border-white/20 rounded-full px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors text-center">
+                        <div className="w-full h-full border border-white/20 rounded-full px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors text-center flex items-center justify-center">
                           <span className="text-white/70 text-sm">Upload File</span>
                         </div>
                         <Input
