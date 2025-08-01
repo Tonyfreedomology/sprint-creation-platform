@@ -683,9 +683,6 @@ export const SprintCreationForm: React.FC = () => {
                     disabled={isAnalyzingWritingStyle}
                   />
                 </label>
-                <p className="text-xs text-white/50 mt-2">
-                  Upload a .txt document for AI to analyze and learn your writing style
-                </p>
                 {formData.writingStyleAnalysis && (
                   <div className="mt-3 p-3 bg-[#22DFDC]/10 border border-[#22DFDC]/20 rounded-lg">
                     <p className="text-xs text-[#22DFDC] font-medium mb-1">Style Analysis Complete</p>
