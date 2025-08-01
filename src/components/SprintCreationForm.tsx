@@ -470,9 +470,10 @@ export const SprintCreationForm: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 <div className="flex flex-col">
-                  <Label htmlFor="sprintDuration" className="text-white text-sm font-medium mb-2">Pick a length that fits the habit you're building</Label>
+                  <Label htmlFor="sprintDuration" className="text-white text-sm font-medium mb-2">Pick a length that fits your habit *</Label>
+                  <p className="text-xs text-white/50 mb-2">Choose a duration that matches the complexity of the habit you're building</p>
                   <StyledDropdown
                     options={[
                       { value: '7', label: '7 Days' },
@@ -488,7 +489,8 @@ export const SprintCreationForm: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col">
-                  <Label htmlFor="sprintCategory" className="text-white text-sm font-medium mb-2">Category</Label>
+                  <Label htmlFor="sprintCategory" className="text-white text-sm font-medium mb-2">Category *</Label>
+                  <p className="text-xs text-white/50 mb-2">What area of life does this sprint focus on?</p>
                   <StyledDropdown
                     options={[
                       { 
