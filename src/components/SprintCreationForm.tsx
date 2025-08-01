@@ -97,7 +97,7 @@ const initialFormData: SprintFormData = {
   goals: '',
   specialRequirements: '',
   voiceStyle: '',
-  voiceGender: 'female',
+  voiceGender: 'male',
   voiceSampleFile: null,
   voiceRecordingBlob: null,
   writingStyleFile: null,
