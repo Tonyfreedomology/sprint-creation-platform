@@ -33,8 +33,8 @@ const Index = () => {
     },
     {
       icon: <Brain className="w-6 h-6" />,
-      title: "AI-generated content",
-      description: "Daily prompts, check-ins, and resources written for you."
+      title: "Powered by AI",
+      description: "Go from ideas to full scripts in seconds—no writer's block."
     },
     {
       icon: <Users className="w-6 h-6" />,
