@@ -613,17 +613,17 @@ export const SprintCreationForm: React.FC = () => {
                     <p className="text-xs text-white/50 mb-3">
                       Upload 30-60 seconds of you speaking if you want the AI to clone your voice for audio summaries
                     </p>
-                    <div className="flex gap-3 items-center">
+                    <div className="grid grid-cols-2 gap-3">
                       <Button
                         type="button"
                         onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                        className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-6 py-3 text-sm rounded-full flex-1"
+                        className="bg-[#22DFDC] hover:bg-[#22DFDC]/80 text-white px-4 py-3 text-sm rounded-full"
                       >
                         {showVoiceRecorder ? 'Cancel Recording' : 'Record Voice'}
                       </Button>
                       <label htmlFor="voiceSample" className="cursor-pointer">
-                        <div className="border border-white/20 rounded-full p-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
-                          <Upload className="w-5 h-5 text-white/70" />
+                        <div className="w-full border border-white/20 rounded-full px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors text-center">
+                          <span className="text-white/70 text-sm">Upload File</span>
                         </div>
                         <Input
                           id="voiceSample"
@@ -660,38 +660,38 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <Label className="text-white text-sm font-medium">
-                    Writing Style Sample (Optional)
-                    {isAnalyzingWritingStyle && (
-                      <span className="ml-2 text-xs text-[#22DFDC]">Analyzing...</span>
-                    )}
-                  </Label>
-                  <label htmlFor="writingStyle" className="cursor-pointer">
-                    <div className="border border-white/20 rounded-full p-2 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
-                      <Upload className="w-4 h-4 text-white/70" />
-                    </div>
-                    <Input
-                      id="writingStyle"
-                      type="file"
-                      accept=".txt,.docx,.pdf"
-                      onChange={handleWritingStyleFileChange}
-                      className="hidden"
-                      disabled={isAnalyzingWritingStyle}
-                    />
-                  </label>
-                </div>
+                <Label className="text-white text-sm font-medium mb-3 block">
+                  Writing Style Sample (Optional)
+                  {isAnalyzingWritingStyle && (
+                    <span className="ml-2 text-xs text-[#22DFDC]">Analyzing...</span>
+                  )}
+                </Label>
                 <p className="text-xs text-white/50 mb-3">
-                  Paste some text below or upload a document using the icon above
+                  Paste some text below or click the upload icon to add a document
                 </p>
                 
                 <div className="space-y-3">
-                  <Textarea
-                    placeholder="Paste a sample of your writing here (emails, blog posts, etc.) to help us match your style..."
-                    value={formData.writingStyleText || ''}
-                    onChange={(e) => handleInputChange('writingStyleText', e.target.value)}
-                    className="min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-2xl px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
-                  />
+                  <div className="relative">
+                    <Textarea
+                      placeholder="Paste a sample of your writing here (emails, blog posts, etc.) to help us match your style..."
+                      value={formData.writingStyleText || ''}
+                      onChange={(e) => handleInputChange('writingStyleText', e.target.value)}
+                      className="min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-2xl px-4 py-3 pr-12 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
+                    />
+                    <label htmlFor="writingStyle" className="absolute bottom-3 right-3 cursor-pointer group">
+                      <div className="border border-white/20 rounded-full p-2 bg-[#1E1E1E]/50 hover:bg-[#22DFDC]/20 transition-colors">
+                        <Upload className="w-4 h-4 text-white/70 group-hover:text-[#22DFDC]" />
+                      </div>
+                      <Input
+                        id="writingStyle"
+                        type="file"
+                        accept=".txt,.docx,.pdf"
+                        onChange={handleWritingStyleFileChange}
+                        className="hidden"
+                        disabled={isAnalyzingWritingStyle}
+                      />
+                    </label>
+                  </div>
                   
                   {formData.writingStyleFile && (
                     <p className="text-[#22DFDC] text-sm">
