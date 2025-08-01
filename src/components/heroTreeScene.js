@@ -91,7 +91,7 @@ export function initHeroScene(container) {
 
   // Set up a camera positioned to show the tree on the right side
   const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-  camera.position.set(2, 2.5, 5); // Moved camera to the right
+  camera.position.set(3.5, 2.5, 5); // Moved camera further to the right
 
   // Add a gentle ambient light so the tree is visible without harsh shadows.
   const ambient = new THREE.AmbientLight(0x406e5c, 1.2);
@@ -99,7 +99,7 @@ export function initHeroScene(container) {
 
   // Create the fractal tree as a group positioned on the right side
   const treeGroup = new THREE.Group();
-  treeGroup.position.x = 1.5; // Move tree to the right
+  treeGroup.position.x = 3; // Move tree further to the right
   scene.add(treeGroup);
 
   // Define a material with emissive properties to make the tree glow. The
@@ -146,10 +146,10 @@ export function initHeroScene(container) {
     
     const mote = new THREE.Mesh(moteGeometry, moteMaterial);
     
-    // Random position around the tree (biased toward right side)
-    const x = (Math.random() - 0.3) * 6 + 1.5; // Bias toward right side
+    // Random position around the tree (concentrated on right side)
+    const x = (Math.random() - 0.2) * 4 + 2.5; // Concentrated on right side
     const y = Math.random() * 5;
-    const z = (Math.random() - 0.5) * 6;
+    const z = (Math.random() - 0.5) * 4;
     mote.position.set(x, y, z);
     
     // Add glow effect with a point light
