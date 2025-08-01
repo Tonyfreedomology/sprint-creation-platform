@@ -310,117 +310,108 @@ const Index = () => {
           </div>
 
           {/* Why It Matters Section */}
-          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-white/10">
-              <h2 className="text-4xl font-bold mb-6 text-white text-center">
-                Why It <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Matters</span>
-              </h2>
-              <p className="text-xl leading-relaxed text-center max-w-4xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.9 }}>
-                Building a new habit is hard. Doing it alone is even harder. Our sprints bring people together in a focused, bite-size challenge so they actually stick with it. Think of it as your own 30-day bootcamp—built once, sold again and again.
-              </p>
-            </div>
+          <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-12 text-center max-w-4xl mx-auto border border-white/10 mb-32">
+            <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
+              Why It Matters
+            </h2>
+            <p className="text-xl leading-relaxed" style={{ color: '#CFCFCF', opacity: 0.9 }}>
+              Building a new habit is hard. Doing it alone is even harder. Our sprints bring people together in a focused, bite-size challenge so they actually stick with it. Think of it as your own 30-day bootcamp—built once, sold again and again.
+            </p>
           </div>
 
           {/* How It Works Section */}
-          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-white/10">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold mb-4 text-white">
-                  How It <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Works</span>
-                </h2>
-                <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.7 }}>
-                  Three easy steps to launch your life-changing sprint
-                </p>
-              </div>
-          
-              <div className="grid md:grid-cols-3 gap-8">
-                {howItWorks.map((step, index) => (
-                  <div key={index} className="text-center group">
-                    <div 
-                      className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-6 mx-auto group-hover:scale-110 transition-transform"
-                      style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
-                    >
-                      {step.step}
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
-                    <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
-                      {step.description}
-                    </p>
+          <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-12 max-w-6xl mx-auto border border-white/10 mb-32">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
+                How It Works
+              </h2>
+              <p className="text-xl max-w-3xl mx-auto" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                Three easy steps to launch your life-changing sprint
+              </p>
+            </div>
+        
+            <div className="grid md:grid-cols-3 gap-8">
+              {howItWorks.map((step, index) => (
+                <div key={index} className="text-center group">
+                  <div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-6 mx-auto group-hover:scale-110 transition-transform"
+                    style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
+                  >
+                    {step.step}
                   </div>
-                ))}
-              </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
+                  <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                    {step.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Features at a Glance Section */}
-          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-white/10">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold mb-4 text-white">
-                  Features at a{' '}
-                  <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Glance</span>
-                </h2>
-              </div>
-          
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {features.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="rounded-xl bg-[#1E1E1E]/70 backdrop-blur-md border border-transparent hover:border-[#22DFDC] transition-all duration-300 p-6 group hover:scale-105"
+          <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-12 max-w-6xl mx-auto border border-white/10 mb-32">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
+                Features at a Glance
+              </h2>
+            </div>
+        
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl bg-[#1E1E1E]/70 backdrop-blur-md border border-transparent hover:border-[#22DFDC] transition-all duration-300 p-6 group hover:scale-105"
+                >
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform"
+                    style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
                   >
-                    <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform"
-                      style={{ background: 'linear-gradient(135deg, #22DFDC, #22EDB6)' }}
-                    >
-                      {feature.icon}
-                    </div>
-                    <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                    <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
-                      {feature.description}
-                    </p>
+                    {feature.icon}
                   </div>
-                ))}
-              </div>
+                  <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                  <p className="text-base" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Social Proof Section */}
-          <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-black/40 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold mb-4 text-white">
-                  Social <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Proof</span>
-                </h2>
-              </div>
-          
-              <div className="grid md:grid-cols-3 gap-8">
-                {testimonials.slice(0, 6).map((testimonial, index) => (
-                  <div
-                    key={index}
-                    className="rounded-xl bg-[#1E1E1E]/70 backdrop-blur-md border border-transparent p-6"
-                  >
-                    <div className="flex mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-[#22EDB6] text-[#22EDB6]" />
-                      ))}
-                    </div>
-                    <p className="text-base mb-4" style={{ color: '#CFCFCF', opacity: 0.9 }}>
-                      "{testimonial.content}"
-                    </p>
-                    <div className="mb-4 p-3 rounded-lg bg-[#22DFDC]/10 border border-[#22DFDC]/20">
-                      <p className="text-sm font-medium text-[#22DFDC]">
-                        📈 {testimonial.results}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-white">{testimonial.name}</p>
-                      <p className="text-sm" style={{ color: '#CFCFCF', opacity: 0.7 }}>
-                        {testimonial.role}
-                      </p>
-                    </div>
+          <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-12 max-w-6xl mx-auto border border-white/10 mb-32">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
+                Social Proof
+              </h2>
+            </div>
+        
+            <div className="grid md:grid-cols-3 gap-8">
+              {testimonials.slice(0, 6).map((testimonial, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl bg-[#1E1E1E]/70 backdrop-blur-md border border-transparent p-6"
+                >
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-[#22EDB6] text-[#22EDB6]" />
+                    ))}
                   </div>
-                ))}
-              </div>
+                  <p className="text-base mb-4" style={{ color: '#CFCFCF', opacity: 0.9 }}>
+                    "{testimonial.content}"
+                  </p>
+                  <div className="mb-4 p-3 rounded-lg bg-[#22DFDC]/10 border border-[#22DFDC]/20">
+                    <p className="text-sm font-medium text-[#22DFDC]">
+                      📈 {testimonial.results}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white">{testimonial.name}</p>
+                    <p className="text-sm" style={{ color: '#CFCFCF', opacity: 0.7 }}>
+                      {testimonial.role}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
