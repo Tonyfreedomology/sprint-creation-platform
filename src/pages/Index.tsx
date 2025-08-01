@@ -311,7 +311,7 @@ const Index = () => {
 
           {/* Why It Matters Section */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-black/40 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+            <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-white/10">
               <h2 className="text-4xl font-bold mb-6 text-white text-center">
                 Why It <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Matters</span>
               </h2>
@@ -323,7 +323,7 @@ const Index = () => {
 
           {/* How It Works Section */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-black/40 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+            <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-white/10">
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold mb-4 text-white">
                   How It <span className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">Works</span>
@@ -354,7 +354,7 @@ const Index = () => {
 
           {/* Features at a Glance Section */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-black/40 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
+            <div className="relative bg-black/20 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-white/10">
               <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold mb-4 text-white">
                   Features at a{' '}
