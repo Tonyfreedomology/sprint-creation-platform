@@ -20,7 +20,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import heroImage from '@/assets/hero-image.jpg';
-import { OptimizedThreeScene } from '@/components/OptimizedThreeScene';
+import { HeroTreeScene } from '@/components/HeroTreeScene';
 
 const Index = () => {
   const [showForm, setShowForm] = React.useState(false);
@@ -227,8 +227,8 @@ const Index = () => {
           {/* Hero Container with Gradient Border */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
             <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30 overflow-hidden">
-              {/* Optimized Three.js Scene Background */}
-              <OptimizedThreeScene className="rounded-3xl" />
+              {/* Three.js Tree Scene Background */}
+              <HeroTreeScene className="rounded-3xl" />
 
               {/* Content Overlay */}
               <div className="relative z-10 flex items-center min-h-[600px]">
