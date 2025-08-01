@@ -407,7 +407,7 @@ export const SprintCreationForm: React.FC = () => {
                   placeholder="Enter your full name"
                   value={formData.creatorName}
                   onChange={(e) => handleInputChange('creatorName', e.target.value)}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-full px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
@@ -419,7 +419,7 @@ export const SprintCreationForm: React.FC = () => {
                   placeholder="your.email@example.com"
                   value={formData.creatorEmail}
                   onChange={(e) => handleInputChange('creatorEmail', e.target.value)}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-full px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
                 <p className="text-xs text-white/50 mt-1">We respect your privacy and never share your email</p>
               </div>
@@ -431,7 +431,7 @@ export const SprintCreationForm: React.FC = () => {
                   placeholder="Tell us why you're creating this sprint—this helps us personalize your content..."
                   value={formData.creatorBio}
                   onChange={(e) => handleInputChange('creatorBio', e.target.value)}
-                  className="mt-2 min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-2xl px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
@@ -454,7 +454,7 @@ export const SprintCreationForm: React.FC = () => {
                   placeholder="e.g., 'Enough.' - 21 Days to Unshakeable Self-Worth"
                   value={formData.sprintTitle}
                   onChange={(e) => handleInputChange('sprintTitle', e.target.value)}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-full px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
@@ -466,7 +466,7 @@ export const SprintCreationForm: React.FC = () => {
                   placeholder="Describe what participants will learn, experience, and achieve in this sprint..."
                   value={formData.sprintDescription}
                   onChange={(e) => handleInputChange('sprintDescription', e.target.value)}
-                  className="mt-2 min-h-[120px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 min-h-[120px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-2xl px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
@@ -528,7 +528,7 @@ export const SprintCreationForm: React.FC = () => {
                   placeholder="e.g., Working mothers, New entrepreneurs, College students..."
                   value={formData.targetAudience}
                   onChange={(e) => handleInputChange('targetAudience', e.target.value)}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-full px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
 
@@ -539,7 +539,7 @@ export const SprintCreationForm: React.FC = () => {
                   placeholder="What specific outcomes do you want participants to achieve?"
                   value={formData.goals}
                   onChange={(e) => handleInputChange('goals', e.target.value)}
-                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
+                  className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-2xl px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
               </div>
             </div>

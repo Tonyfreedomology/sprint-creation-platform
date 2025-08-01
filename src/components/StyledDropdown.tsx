@@ -80,7 +80,7 @@ const StyledDropdown: React.FC<StyledDropdownProps> = ({
       <motion.button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 flex items-center justify-between text-left transition-all duration-200 hover:border-[#22DFDC]/50 focus:outline-none focus:border-[#22DFDC] group"
+        className="w-full bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded-full px-4 py-3 flex items-center justify-between text-left transition-all duration-200 hover:border-[#22DFDC]/50 focus:outline-none focus:border-[#22DFDC] group"
         whileTap={{ scale: 0.98 }}
       >
         <span className="text-white text-sm font-medium">
@@ -103,7 +103,7 @@ const StyledDropdown: React.FC<StyledDropdownProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-2 bg-[#2a2a2a] border border-[#22DFDC]/30 rounded-lg shadow-xl z-50 overflow-hidden"
+            className="absolute top-full left-0 right-0 mt-2 bg-[#2a2a2a] border border-[#22DFDC]/30 rounded-2xl shadow-xl z-50 overflow-hidden"
           >
             <div className="py-2">
               {options.map((option, index) => (
