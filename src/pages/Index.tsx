@@ -381,7 +381,7 @@ const Index = () => {
           <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-12 max-w-6xl mx-auto border border-white/10 mb-32">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] bg-clip-text text-transparent">
-                Social Proof
+                What other creators are saying
               </h2>
             </div>
         
