@@ -74,7 +74,7 @@ function Spiral({ colour = '#22EDB6' }) {
 
 // A lightweight particle system using InstancedMesh.  Each particle
 // drifts slowly upwards and wraps back when it reaches the top.
-function FloatingParticles({ count = 150, radius = 5, height = 6 }) {
+function FloatingParticles({ count = 75, radius = 5, height = 6 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   
@@ -86,7 +86,7 @@ function FloatingParticles({ count = 150, radius = 5, height = 6 }) {
         (Math.random() - 0.5) * radius * 2,
         Math.random() * height - height / 2,
         (Math.random() - 0.5) * radius * 2,
-        Math.random() * 0.005 + 0.002 // speed
+        Math.random() * 0.0025 + 0.001 // speed (half as fast)
       ]);
     }
     return arr;
