@@ -196,9 +196,9 @@ export function initHeroScene(container) {
     growth = Math.min(maxGrowth, 1 - Math.exp(-3 * elapsed));
     treeGroup.scale.set(growth, growth, growth);
 
-    // Gentle swaying based on mouse movement only
-    treeGroup.rotation.x = THREE.MathUtils.clamp(mouseY * 0.2, -0.3, 0.3);
-    treeGroup.rotation.z = THREE.MathUtils.clamp(-mouseX * 0.2, -0.3, 0.3);
+    // Gentle autonomous swaying with time-based motion
+    treeGroup.rotation.x = Math.sin(elapsed * 0.3) * 0.1;
+    treeGroup.rotation.z = Math.cos(elapsed * 0.2) * 0.08;
 
     // Animate the efficient instanced particles
     particleData.forEach((particle, i) => {
