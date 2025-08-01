@@ -140,9 +140,12 @@ export const SprintGenerationLoading: React.FC<SprintGenerationLoadingProps> = (
           </div>
 
           {/* Bottom Message */}
-          <div className="mt-12 text-center">
+          <div className="mt-12 text-center space-y-3">
             <p className="text-white/60 text-sm">
-              Hang tight - we're building something amazing for you
+              This usually takes about 2-3 minutes
+            </p>
+            <p className="text-white/50 text-xs">
+              We'll email you when it's ready if you need to step away
             </p>
           </div>
         </div>

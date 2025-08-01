@@ -93,7 +93,7 @@ const initialFormData: SprintFormData = {
   targetAudience: '',
   contentGeneration: 'ai',
   contentTypes: [],
-  toneStyle: '',
+  toneStyle: 'conversational',
   goals: '',
   specialRequirements: '',
   voiceStyle: '',
@@ -395,9 +395,13 @@ export const SprintCreationForm: React.FC = () => {
       case 1:
         return (
           <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Who's building this sprint?</h2>
+              <p className="text-white/70">Let's start with the basics</p>
+            </div>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="creatorName" className="text-white text-sm font-medium">Your Name *</Label>
+                <Label htmlFor="creatorName" className="text-white text-sm font-medium">What should we call you? *</Label>
                 <Input
                   id="creatorName"
                   placeholder="Enter your full name"
@@ -408,7 +412,7 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="creatorEmail" className="text-white text-sm font-medium">Email Address *</Label>
+                <Label htmlFor="creatorEmail" className="text-white text-sm font-medium">Where should we send your sprint? *</Label>
                 <Input
                   id="creatorEmail"
                   type="email"
@@ -417,13 +421,14 @@ export const SprintCreationForm: React.FC = () => {
                   onChange={(e) => handleInputChange('creatorEmail', e.target.value)}
                   className="mt-2 bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
                 />
+                <p className="text-xs text-white/50 mt-1">We respect your privacy and never share your email</p>
               </div>
 
               <div>
-                <Label htmlFor="creatorBio" className="text-white text-sm font-medium">About You</Label>
+                <Label htmlFor="creatorBio" className="text-white text-sm font-medium">Why are you passionate about this topic? (optional)</Label>
                 <Textarea
                   id="creatorBio"
-                  placeholder="Tell us about your background, expertise, and what drives you to create this sprint..."
+                  placeholder="Tell us why you're creating this sprint—this helps us personalize your content..."
                   value={formData.creatorBio}
                   onChange={(e) => handleInputChange('creatorBio', e.target.value)}
                   className="mt-2 min-h-[100px] bg-[#1E1E1E]/70 backdrop-blur border border-white/10 rounded px-4 py-3 text-white placeholder:text-white/50 focus:border-[#22DFDC] outline-none transition"
@@ -437,9 +442,14 @@ export const SprintCreationForm: React.FC = () => {
       case 2:
         return (
           <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Design your sprint experience</h2>
+              <p className="text-white/70">Tell us about the transformation you want to create</p>
+            </div>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="sprintTitle" className="text-white text-sm font-medium">Sprint Title *</Label>
+                <Label htmlFor="sprintTitle" className="text-white text-sm font-medium">Give your sprint a catchy, benefit-driven name *</Label>
+                <p className="text-xs text-white/50 mb-2">e.g., "30 Days to Better Habits" or "21 Days to Unshakeable Self-Worth"</p>
                 <Input
                   id="sprintTitle"
                   placeholder="e.g., 'Enough.' - 21 Days to Unshakeable Self-Worth"
@@ -450,7 +460,8 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="sprintDescription" className="text-white text-sm font-medium">Sprint Description *</Label>
+                <Label htmlFor="sprintDescription" className="text-white text-sm font-medium">Describe the journey and what people will achieve *</Label>
+                <p className="text-xs text-white/50 mb-2">Focus on the transformation and outcomes participants will experience</p>
                 <Textarea
                   id="sprintDescription"
                   placeholder="Describe what participants will learn, experience, and achieve in this sprint..."
@@ -462,7 +473,7 @@ export const SprintCreationForm: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="sprintDuration" className="text-white text-sm font-medium">Duration</Label>
+                  <Label htmlFor="sprintDuration" className="text-white text-sm font-medium">Pick a length that fits the habit you're building</Label>
                   <StyledDropdown
                     options={[
                       { value: '7', label: '7 Days' },
@@ -483,22 +494,22 @@ export const SprintCreationForm: React.FC = () => {
                   <StyledDropdown
                     options={[
                       { 
-                        value: 'health', 
+                        value: 'Health & Wellness', 
                         label: 'Health & Wellness',
                         icon: <Heart className="w-4 h-4" />
                       },
                       { 
-                        value: 'wealth', 
+                        value: 'Wealth & Finance', 
                         label: 'Wealth & Finance',
                         icon: <DollarSign className="w-4 h-4" />
                       },
                       { 
-                        value: 'relationships', 
+                        value: 'Relationships', 
                         label: 'Relationships',
                         icon: <Users className="w-4 h-4" />
                       },
                       { 
-                        value: 'personal', 
+                        value: 'Personal Development', 
                         label: 'Personal Development',
                         icon: <Brain className="w-4 h-4" />
                       },
@@ -523,7 +534,7 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="goals" className="text-white text-sm font-medium">Primary Goals</Label>
+                <Label htmlFor="goals" className="text-white text-sm font-medium">What success looks like for your participants</Label>
                 <Textarea
                   id="goals"
                   placeholder="What specific outcomes do you want participants to achieve?"
@@ -539,56 +550,21 @@ export const SprintCreationForm: React.FC = () => {
       case 3:
         return (
           <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Match the voice and tone</h2>
+              <p className="text-white/70">Customize how your sprint will sound and feel</p>
+            </div>
             <div className="space-y-6">
-              {/* Content Types - Commented out as unnecessary since we generate all content types
-              <div>
-                <Label className="text-white text-sm font-medium mb-3 block">Content Types</Label>
-                <StyledDropdown
-                  multiple
-                  options={[
-                    { 
-                      value: 'written-lessons', 
-                      label: 'Written Lessons',
-                      description: 'Daily text-based content and exercises',
-                      icon: <FileText className="w-4 h-4" />
-                    },
-                    { 
-                      value: 'audio-lessons', 
-                      label: 'Audio Lessons',
-                      description: 'Voice-narrated content for on-the-go learning',
-                      icon: <Brain className="w-4 h-4" />
-                    },
-                    { 
-                      value: 'daily-emails', 
-                      label: 'Daily Emails',
-                      description: 'Motivational emails to keep participants engaged',
-                      icon: <Heart className="w-4 h-4" />
-                    },
-                    { 
-                      value: 'challenges', 
-                      label: 'Daily Challenges',
-                      description: 'Action-oriented tasks and exercises',
-                      icon: <Sparkles className="w-4 h-4" />
-                    },
-                  ]}
-                  values={formData.contentTypes}
-                  onMultiChange={(values) => setFormData(prev => ({ ...prev, contentTypes: values }))}
-                  placeholder="Select content types..."
-                  className="mt-2"
-                />
-              </div>
-              */}
-
               <div>
                 <Label htmlFor="toneStyle" className="text-white text-sm font-medium">Tone & Style</Label>
                 <StyledDropdown
                   options={[
-                    { value: 'encouraging', label: 'Encouraging & Supportive' },
-                    { value: 'motivational', label: 'Motivational & Energetic' },
-                    { value: 'gentle', label: 'Gentle & Nurturing' },
-                    { value: 'professional', label: 'Professional & Informative' },
-                    { value: 'conversational', label: 'Conversational & Friendly' },
-                    { value: 'inspiring', label: 'Inspiring & Uplifting' },
+                    { value: 'encouraging', label: 'Encouraging & Supportive', description: 'Warm and uplifting' },
+                    { value: 'motivational', label: 'Motivational & Energetic', description: 'Dynamic and inspiring' },
+                    { value: 'gentle', label: 'Gentle & Nurturing', description: 'Soft and caring' },
+                    { value: 'professional', label: 'Professional & Informative', description: 'Clear and competent' },
+                    { value: 'conversational', label: 'Conversational & Friendly', description: 'Like chatting with a mate' },
+                    { value: 'inspiring', label: 'Inspiring & Uplifting', description: 'Transformational and wise' },
                   ]}
                   value={formData.toneStyle}
                   onChange={(value) => handleInputChange('toneStyle', value)}
@@ -598,7 +574,7 @@ export const SprintCreationForm: React.FC = () => {
               </div>
 
               <div>
-                <Label className="text-white text-sm font-medium mb-3 block">Voice Options</Label>
+                <Label className="text-white text-sm font-medium mb-3 block">Voice Type</Label>
                 <div className="space-y-4">
                   {/* Voice Gender Selection */}
                   <div className="flex justify-center">
@@ -632,7 +608,10 @@ export const SprintCreationForm: React.FC = () => {
 
                   {/* Voice Sample Upload */}
                   <div className="space-y-3">
-                    <Label className="text-white text-xs font-medium uppercase tracking-wide opacity-70">Upload Voice Sample</Label>
+                    <Label className="text-white text-xs font-medium uppercase tracking-wide opacity-70">Clone Your Voice (Optional)</Label>
+                    <p className="text-xs text-white/50 mb-3">
+                      Upload 30-60 seconds of you speaking if you want the AI to clone your voice for audio summaries
+                    </p>
                     <div className="flex gap-3">
                       <label htmlFor="voiceSample" className="flex-1 cursor-pointer">
                         <div className="border border-white/20 rounded-lg px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors">
@@ -667,10 +646,6 @@ export const SprintCreationForm: React.FC = () => {
                       </div>
                     )}
                     
-                    <p className="text-xs text-white/50">
-                      Upload or record 30-60 seconds of clear speech for voice cloning
-                    </p>
-                    
                     {(formData.voiceSampleFile || formData.voiceRecordingBlob) && (
                       <p className="text-sm text-green-400 mt-1">
                         ✓ Voice sample ready: {formData.voiceSampleFile?.name || 'Recording saved'}
@@ -687,6 +662,9 @@ export const SprintCreationForm: React.FC = () => {
                     <span className="ml-2 text-xs text-[#22DFDC]">Analyzing...</span>
                   )}
                 </Label>
+                <p className="text-xs text-white/50 mb-3">
+                  Upload a short text file if you have a specific writing style you want us to mimic
+                </p>
                 <label htmlFor="writingStyle" className="cursor-pointer block">
                   <div className="border border-white/20 rounded-lg px-4 py-3 bg-[#1E1E1E]/30 hover:bg-[#1E1E1E]/50 transition-colors flex items-center gap-3">
                     <FileText className="w-4 h-4 text-white/50" />
@@ -886,7 +864,7 @@ export const SprintCreationForm: React.FC = () => {
                       disabled={!canProceed() || isSubmitting}
                       className="bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] text-white hover:opacity-90"
                     >
-                      {isSubmitting ? 'Creating...' : 'Create Sprint'}
+                      {isSubmitting ? 'Generating...' : 'Generate my sprint'}
                       <Sparkles className="w-4 h-4 ml-2" />
                     </ConfettiButton>
                   )}
