@@ -99,7 +99,7 @@ export function initHeroScene(container) {
 
   // Create the fractal tree positioned on the right but more visible
   const treeGroup = new THREE.Group();
-  treeGroup.position.set(2.5, 0, 0); // Move tree back a bit to the left
+  treeGroup.position.set(1.8, 0, 0); // Move tree a bit more to the left
   scene.add(treeGroup);
 
   // Define a material with emissive properties to make the tree glow. The
@@ -130,7 +130,7 @@ export function initHeroScene(container) {
     const mote = new THREE.Mesh(moteGeometry, moteMaterial);
     
     // Position particles around the tree
-    const x = (Math.random() - 0.2) * 3 + 2; // Cluster around new tree position
+    const x = (Math.random() - 0.2) * 3 + 1.5; // Cluster around new tree position
     const y = Math.random() * 5;
     const z = (Math.random() - 0.5) * 3;
     mote.position.set(x, y, z);
