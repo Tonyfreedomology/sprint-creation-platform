@@ -191,12 +191,9 @@ export function initHeroScene(container) {
     growth = Math.min(maxGrowth, 1 - Math.exp(-3 * elapsed));
     treeGroup.scale.set(growth, growth, growth);
 
-    // Gentle swaying based on mouse movement
+    // Gentle swaying based on mouse movement only
     treeGroup.rotation.x = THREE.MathUtils.clamp(mouseY * 0.2, -0.3, 0.3);
     treeGroup.rotation.z = THREE.MathUtils.clamp(-mouseX * 0.2, -0.3, 0.3);
-
-    // Subtle automatic rotation for life-like movement
-    treeGroup.rotation.y += 0.002;
 
     // Animate the glowing motes with more organic movement
     motes.forEach((mote, index) => {
