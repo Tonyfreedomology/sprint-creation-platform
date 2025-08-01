@@ -20,6 +20,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import heroImage from '@/assets/hero-image.jpg';
+import { HeroTreeScene } from '@/components/HeroTreeScene';
 
 const Index = () => {
   const [showForm, setShowForm] = React.useState(false);
@@ -225,20 +226,9 @@ const Index = () => {
         <div className="container mx-auto px-4">
           {/* Hero Container with Gradient Border */}
           <div className="relative before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-tr before:from-[#22DFDC] before:to-[#22EDB6] before:p-[2px] mb-32">
-            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30">
-              {/* Video Background */}
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover rounded-3xl"
-              >
-                <source 
-                  src="https://hufbbrvmcdugfrgjxwuv.supabase.co/storage/v1/object/sign/media/jonah_10079_A_vibrant_jade_digital_sappling_particle_effects__24600ee9-ca04-47cb-913a-4a15c5d7c153_3.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82OTA2Yzk4OC0zYjdiLTRmZmUtODNkNy1mMGE1ZDVlODkyODgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJtZWRpYS9qb25haF8xMDA3OV9BX3ZpYnJhbnRfamFkZV9kaWdpdGFsX3NhcHBsaW5nX3BhcnRpY2xlX2VmZmVjdHNfXzI0NjAwZWU5LWNhMDQtNDdjYi05MTNhLTRhMTVjNWQ3YzE1M18zLm1wNCIsImlhdCI6MTc1MzkwMTc3MiwiZXhwIjoyMDY5MjYxNzcyfQ.Tk48j-rookfz-ZBZTm0guHfTyfCm0Sn5NMwJBN52eM8" 
-                  type="video/mp4" 
-                />
-              </video>
+            <div className="relative bg-[#111111] rounded-3xl p-8 md:p-12 border border-[#22DFDC]/30 overflow-hidden">
+              {/* Three.js Tree Scene Background */}
+              <HeroTreeScene className="rounded-3xl" />
 
               {/* Content Overlay */}
               <div className="relative z-10 flex items-center min-h-[600px]">
