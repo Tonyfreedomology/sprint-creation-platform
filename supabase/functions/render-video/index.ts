@@ -89,14 +89,14 @@ serve(async (req) => {
     };
 
     console.log('Calling external video generation service...');
-    console.log('Video service URL:', 'https://sprint-video-service.onrender.com/generate');
+    console.log('Video service URL:', 'https://sprint-video-service.onrender.com/generate-video');
     console.log('API Key exists:', !!Deno.env.get('VIDEO_SERVICE_API_KEY'));
     console.log('API Key value (first 10 chars):', Deno.env.get('VIDEO_SERVICE_API_KEY')?.substring(0, 10) + '...');
     console.log('Payload size:', JSON.stringify(videoServicePayload).length, 'bytes');
 
     // Call external video service
     try {
-      const videoServiceResponse = await fetch('https://sprint-video-service.onrender.com/generate', {
+      const videoServiceResponse = await fetch('https://sprint-video-service.onrender.com/generate-video', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
