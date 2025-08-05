@@ -117,7 +117,7 @@ serve(async (req) => {
           'X-Request-ID': `${sprintId}-${dayNumber}-${Date.now()}`
         },
         body: JSON.stringify(videoServicePayload),
-        signal: AbortSignal.timeout(30000) // 30 second timeout
+        signal: AbortSignal.timeout(120000) // 2 minute timeout for initial response
       });
 
       console.log('Video service response status:', videoServiceResponse.status);
@@ -132,7 +132,22 @@ serve(async (req) => {
       const videoResult = await videoServiceResponse.json();
       console.log('Video service response:', videoResult);
 
-      // Use the video URL from the external service or create a mock one
+      // Check if this is an async job (recommended for long processing)
+      if (videoResult.jobId && !videoResult.videoUrl) {
+        // Async processing - video service will process in background
+        return new Response(JSON.stringify({
+          success: true,
+          jobId: videoResult.jobId,
+          status: 'processing',
+          message: 'Video generation started - processing in background',
+          estimatedTime: videoScript.totalDuration * 2, // Rough estimate in seconds
+          statusUrl: `https://sprint-video-service.onrender.com/video-status/${sprintId}/${dayNumber}`
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Immediate completion (less likely for video generation)
       const videoUrl = videoResult.videoUrl || `https://sprint-video-service.onrender.com/videos/${sprintId}/day-${dayNumber}.mp4`;
       
       return new Response(JSON.stringify({
@@ -145,7 +160,7 @@ serve(async (req) => {
         fps: 30,
         brandColors: BRAND_COLORS,
         renderJobId: videoResult.jobId || `job-${sprintId}-${dayNumber}`,
-        message: 'Video generation started successfully'
+        message: 'Video generation completed successfully'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
