@@ -89,6 +89,9 @@ serve(async (req) => {
     };
 
     console.log('Calling external video generation service...');
+    console.log('Video service URL:', 'https://sprint-video-service.onrender.com/generate');
+    console.log('API Key exists:', !!Deno.env.get('VIDEO_SERVICE_API_KEY'));
+    console.log('Payload size:', JSON.stringify(videoServicePayload).length, 'bytes');
 
     // Call external video service
     try {
@@ -102,15 +105,20 @@ serve(async (req) => {
         body: JSON.stringify(videoServicePayload)
       });
 
+      console.log('Video service response status:', videoServiceResponse.status);
+      console.log('Video service response headers:', Object.fromEntries(videoServiceResponse.headers.entries()));
+
       if (!videoServiceResponse.ok) {
-        throw new Error(`Video service returned ${videoServiceResponse.status}: ${videoServiceResponse.statusText}`);
+        const errorText = await videoServiceResponse.text();
+        console.error('Video service error response:', errorText);
+        throw new Error(`Video service returned ${videoServiceResponse.status}: ${videoServiceResponse.statusText} - ${errorText}`);
       }
 
       const videoResult = await videoServiceResponse.json();
       console.log('Video service response:', videoResult);
 
       // Use the video URL from the external service or create a mock one
-      const videoUrl = videoResult.videoUrl || `https://your-video-service.com/videos/${sprintId}/day-${dayNumber}.mp4`;
+      const videoUrl = videoResult.videoUrl || `https://sprint-video-service.onrender.com/videos/${sprintId}/day-${dayNumber}.mp4`;
       
       return new Response(JSON.stringify({
         success: true,
@@ -128,7 +136,12 @@ serve(async (req) => {
       });
 
     } catch (videoServiceError) {
-      console.log('External video service not available, using mock response...');
+      console.error('External video service error:', videoServiceError);
+      console.error('Error details:', {
+        name: videoServiceError.name,
+        message: videoServiceError.message,
+        stack: videoServiceError.stack
+      });
       
       // Create a realistic mock video URL since external service isn't deployed yet
       const mockVideoUrl = `https://sample-videos.com/zip/10/mp4/1920x1080/magnetic-sprint-day-${dayNumber}.mp4`;
