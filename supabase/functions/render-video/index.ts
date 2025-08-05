@@ -94,6 +94,19 @@ serve(async (req) => {
     console.log('API Key value (first 10 chars):', Deno.env.get('VIDEO_SERVICE_API_KEY')?.substring(0, 10) + '...');
     console.log('Payload size:', JSON.stringify(videoServicePayload).length, 'bytes');
 
+    // First test if the service is reachable
+    try {
+      console.log('Testing service health...');
+      const healthResponse = await fetch('https://sprint-video-service.onrender.com/health', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      console.log('Health check status:', healthResponse.status);
+      console.log('Health check response:', await healthResponse.text());
+    } catch (healthError) {
+      console.error('Health check failed:', healthError);
+    }
+
     // Call external video service
     try {
       const videoServiceResponse = await fetch('https://sprint-video-service.onrender.com/generate-video', {
