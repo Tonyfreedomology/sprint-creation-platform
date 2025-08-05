@@ -309,8 +309,25 @@ export class VideoGenerationService {
         throw new Error(`Video rendering failed: ${renderData?.error || 'Unknown error'}`);
       }
 
-      console.log('Video render successful:', renderData.videoUrl);
-      return renderData.videoUrl;
+      // Handle async video generation (most common case)
+      if (renderData.jobId && renderData.status === 'processing') {
+        console.log('Video render started with job ID:', renderData.jobId);
+        
+        // For now, return a status URL that indicates processing
+        // In a production app, you'd typically poll the status URL or use webhooks
+        const statusMessage = `Video generation started (Job ID: ${renderData.jobId}). Processing time: ${Math.round((renderData.estimatedTime || 300) / 60)} minutes.`;
+        
+        // Return a placeholder that indicates processing status
+        return `processing:${renderData.jobId}:${renderData.statusUrl || ''}`;
+      }
+
+      // Handle immediate completion (less common for video generation)
+      if (renderData.videoUrl) {
+        console.log('Video render completed immediately:', renderData.videoUrl);
+        return renderData.videoUrl;
+      }
+
+      throw new Error('Video generation response missing both jobId and videoUrl');
 
     } catch (error) {
       console.error('Error during video rendering:', error);

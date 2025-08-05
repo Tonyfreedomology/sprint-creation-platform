@@ -835,18 +835,38 @@ export const SprintPreview: React.FC = () => {
         }
       );
       
-      // Get the generated video URL
-      const videoUrl = videoResults[lessonDay.toString()];
-      if (videoUrl) {
-        setVideoUrls(prev => ({ ...prev, [lessonDay]: videoUrl }));
+      // Get the generated video result
+      const videoResult = videoResults[lessonDay.toString()];
+      
+      if (videoResult) {
+        // Check if it's a processing status
+        if (videoResult.startsWith('processing:')) {
+          const [, jobId, statusUrl] = videoResult.split(':');
+          
+          toast({
+            title: "Video Generation Started! 🎬",
+            description: `Video for "${lesson.title}" is now being processed. This may take several minutes.`,
+          });
+          
+          // For now, we'll store the processing status as the video URL
+          // In a production app, you'd typically implement polling or webhooks
+          setVideoUrls(prev => ({ ...prev, [lessonDay]: `processing:${jobId}` }));
+          
+        } else {
+          // It's a complete video URL
+          setVideoUrls(prev => ({ ...prev, [lessonDay]: videoResult }));
+        }
       } else {
-        throw new Error('Video generation failed - no URL returned');
+        throw new Error('Video generation failed - no result returned');
       }
 
-      toast({
-        title: "Video Created Successfully! 🎬",
-        description: `Video for "${lesson.title}" is ready to view.`,
-      });
+      // Only show success message if it's a complete video, not processing
+      if (!videoResult.startsWith('processing:')) {
+        toast({
+          title: "Video Created Successfully! 🎬",
+          description: `Video for "${lesson.title}" is ready to view.`,
+        });
+      }
 
     } catch (error) {
       console.error('Error creating video:', error);
@@ -1269,22 +1289,25 @@ export const SprintPreview: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          if (videoUrls[lesson.day]) {
+                          const videoUrl = videoUrls[lesson.day];
+                          if (videoUrl && !videoUrl.startsWith('processing:')) {
                             openVideoModal(lesson.day);
                           } else {
                             generateVideo(lesson.day);
                           }
                         }}
                         disabled={generatingVideo[lesson.day] || !audioUrls[lesson.day]}
-                        className={`text-white hover:bg-white/10 ${!audioUrls[lesson.day] ? 'opacity-50 cursor-not-allowed' : ''} ${videoUrls[lesson.day] ? 'bg-green-600/20' : ''}`}
+                        className={`text-white hover:bg-white/10 ${!audioUrls[lesson.day] ? 'opacity-50 cursor-not-allowed' : ''} ${videoUrls[lesson.day] && !videoUrls[lesson.day].startsWith('processing:') ? 'bg-green-600/20' : videoUrls[lesson.day]?.startsWith('processing:') ? 'bg-yellow-600/20' : ''}`}
                         title={
                           !audioUrls[lesson.day] 
                             ? 'Generate audio first to create video' 
                             : generatingVideo[lesson.day] 
                               ? 'Creating Video...' 
-                              : videoUrls[lesson.day]
-                                ? 'View Video'
-                                : 'Create Video Lesson'
+                              : videoUrls[lesson.day]?.startsWith('processing:')
+                                ? 'Video is being processed (takes several minutes)'
+                                : videoUrls[lesson.day]
+                                  ? 'View Video'
+                                  : 'Create Video Lesson'
                         }
                       >
                         {generatingVideo[lesson.day] ? (
