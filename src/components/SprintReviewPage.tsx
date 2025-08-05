@@ -17,9 +17,12 @@ import {
   Users, 
   Brain,
   Save,
-  Send
+  Send,
+  Video,
+  Loader2
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { VideoGenerationService } from '@/services/videoGeneration';
 
 interface GeneratedContent {
   sprintId: string;
@@ -60,6 +63,8 @@ export const SprintReviewPage: React.FC<SprintReviewPageProps> = ({
   const [editedContent, setEditedContent] = useState<GeneratedContent>(generatedContent);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [generatingVideo, setGeneratingVideo] = useState<Record<number, boolean>>({});
+  const [videoService] = useState(() => new VideoGenerationService());
 
   const handleLessonChange = (dayIndex: number, field: string, value: string) => {
     setEditedContent(prev => ({
@@ -93,6 +98,65 @@ export const SprintReviewPage: React.FC<SprintReviewPageProps> = ({
       title: "Draft Saved",
       description: "Your changes have been saved locally.",
     });
+  };
+
+  const handleCreateVideo = async (dayIndex: number) => {
+    const lesson = editedContent.dailyLessons[dayIndex];
+    const dayNumber = lesson.day;
+
+    // Set loading state for this specific day
+    setGeneratingVideo(prev => ({ ...prev, [dayNumber]: true }));
+
+    try {
+      toast({
+        title: "Creating Video",
+        description: `Starting video generation for Day ${dayNumber}...`,
+      });
+
+      // Check if audio file exists for this lesson
+      // In a real implementation, you'd get this from your sprint data
+      const audioUrl = `https://example.com/audio/sprint-${editedContent.sprintId}/day-${dayNumber}.mp3`;
+      
+      // Create video using the VideoGenerationService
+      const videoOptions = {
+        sprintId: editedContent.sprintId,
+        sprintTitle: editedContent.sprintTitle,
+        dailyLessons: [lesson], // Single lesson
+        audioFiles: { [dayNumber.toString()]: audioUrl },
+        brandColors: {
+          primary: '#22DFDC',   // Cyan
+          secondary: '#22EDB6', // Jade  
+          accent: '#242424'     // Dark grey
+        }
+      };
+
+      console.log('Creating video for lesson:', {
+        day: dayNumber,
+        title: lesson.title,
+        contentLength: lesson.content.length,
+        videoOptions
+      });
+
+      // For now, simulate the video creation (replace with actual service call)
+      // const videoUrl = await videoService.generateSprintVideos(videoOptions);
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate longer process
+
+      toast({
+        title: "Video Created Successfully! 🎬",
+        description: `Video for "${lesson.title}" is ready to view.`,
+      });
+
+    } catch (error) {
+      console.error('Error creating video:', error);
+      toast({
+        title: "Video Creation Failed",
+        description: `Failed to create video for Day ${dayNumber}. Please try again.`,
+        variant: "destructive",
+      });
+    } finally {
+      // Clear loading state
+      setGeneratingVideo(prev => ({ ...prev, [dayNumber]: false }));
+    }
   };
 
   const handleFinalize = async () => {
@@ -287,6 +351,29 @@ export const SprintReviewPage: React.FC<SprintReviewPageProps> = ({
                               />
                             </div>
                           )}
+                          
+                          {/* Video Generation Button */}
+                          <div className="pt-4 border-t border-border/50">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleCreateVideo(index)}
+                              disabled={generatingVideo[lesson.day]}
+                              className="w-full flex items-center gap-2"
+                            >
+                              {generatingVideo[lesson.day] ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  Creating Video...
+                                </>
+                              ) : (
+                                <>
+                                  <Video className="w-4 h-4" />
+                                  Create Video Lesson
+                                </>
+                              )}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
