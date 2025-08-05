@@ -363,7 +363,7 @@ export const SprintPreview: React.FC = () => {
       
       toast({
         title: "Generation Complete! 🎉",
-        description: "All 21 lessons have been generated successfully.",
+        description: `All ${sprintData.sprintDuration} lessons have been generated successfully.`,
       });
       
     } catch (error) {
