@@ -62,7 +62,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold text-white">
-                    Day {lessonDay}: {lessonTitle}
+                    {lessonTitle}
                   </h2>
                   <p className="text-sm text-neutral-400 mt-1">{sprintTitle}</p>
                 </div>
@@ -88,13 +88,14 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               </div>
             </div>
             
-            {/* Video container with no extra padding */}
-            <div className="flex-1 flex items-center justify-center p-4">
+            {/* Video container - full height with no padding */}
+            <div className="flex-1 relative overflow-hidden rounded-b-[11px]">
               <video
                 src={videoUrl}
                 controls
-                className="w-full h-full max-h-[60vh] rounded-lg bg-black"
+                className="w-full h-full object-cover"
                 preload="metadata"
+                style={{ minHeight: '100%' }}
               >
                 Your browser does not support the video tag.
               </video>
