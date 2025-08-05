@@ -116,7 +116,8 @@ serve(async (req) => {
           'Authorization': `Bearer ${Deno.env.get('VIDEO_SERVICE_API_KEY') || 'placeholder-key'}`,
           'X-Request-ID': `${sprintId}-${dayNumber}-${Date.now()}`
         },
-        body: JSON.stringify(videoServicePayload)
+        body: JSON.stringify(videoServicePayload),
+        signal: AbortSignal.timeout(30000) // 30 second timeout
       });
 
       console.log('Video service response status:', videoServiceResponse.status);
