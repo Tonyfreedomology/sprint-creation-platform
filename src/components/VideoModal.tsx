@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Download, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -88,17 +89,18 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               </div>
             </div>
             
-            {/* Video container - full height with no padding */}
-            <div className="flex-1 relative overflow-hidden rounded-b-[11px]">
-              <video
-                src={videoUrl}
-                controls
-                className="w-full h-full object-cover"
-                preload="metadata"
-                style={{ minHeight: '100%' }}
-              >
-                Your browser does not support the video tag.
-              </video>
+            {/* Video container with proper 16:9 aspect ratio */}
+            <div className="flex-1 flex items-center justify-center p-4">
+              <AspectRatio ratio={16 / 9} className="w-full">
+                <video
+                  src={videoUrl}
+                  controls
+                  className="w-full h-full rounded-lg object-contain bg-black"
+                  preload="metadata"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </AspectRatio>
             </div>
           </div>
         </div>
