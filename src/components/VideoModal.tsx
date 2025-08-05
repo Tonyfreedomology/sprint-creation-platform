@@ -52,46 +52,54 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-[90vw] h-[80vh] p-0 bg-background border-border">
-        <DialogHeader className="p-6 pb-4 border-b border-border">
-          <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle className="text-xl font-bold text-foreground">
-                Day {lessonDay}: {lessonTitle}
-              </DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1">{sprintTitle}</p>
+      <DialogContent className="max-w-4xl w-[90vw] h-[80vh] p-0 bg-transparent border-none">
+        {/* Gradient border container */}
+        <div className="p-[1px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] h-full">
+          {/* Inner container with dark background */}
+          <div className="rounded-[11px] bg-neutral-950/95 backdrop-blur-sm h-full flex flex-col">
+            {/* Header */}
+            <div className="p-6 pb-4 border-b border-white/10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Day {lessonDay}: {lessonTitle}
+                  </h2>
+                  <p className="text-sm text-neutral-400 mt-1">{sprintTitle}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleDownload}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 border-white/20 bg-white/10 text-white hover:bg-white/20"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </Button>
+                  <Button
+                    onClick={onClose}
+                    variant="ghost"
+                    size="sm"
+                    className="p-2 text-white hover:bg-white/20"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handleDownload}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
+            
+            {/* Video container with no extra padding */}
+            <div className="flex-1 flex items-center justify-center p-4">
+              <video
+                src={videoUrl}
+                controls
+                className="w-full h-full max-h-[60vh] rounded-lg bg-black"
+                preload="metadata"
               >
-                <Download className="w-4 h-4" />
-                Download
-              </Button>
-              <Button
-                onClick={onClose}
-                variant="ghost"
-                size="sm"
-                className="p-2"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
-        </DialogHeader>
-        
-        <div className="flex-1 p-6 flex items-center justify-center bg-black/5">
-          <video
-            src={videoUrl}
-            controls
-            className="w-full h-full max-h-[60vh] rounded-lg bg-black"
-            preload="metadata"
-          >
-            Your browser does not support the video tag.
-          </video>
         </div>
       </DialogContent>
     </Dialog>
