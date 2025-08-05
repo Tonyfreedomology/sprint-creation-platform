@@ -53,19 +53,19 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-[90vw] h-[80vh] p-0 bg-transparent border-none">
+      <DialogContent className="max-w-4xl w-[90vw] p-0 bg-transparent border-none">
         {/* Gradient border container */}
-        <div className="p-[1px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] h-full">
+        <div className="p-[1px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
           {/* Inner container with dark background */}
-          <div className="rounded-[11px] bg-neutral-950/95 backdrop-blur-sm h-full flex flex-col">
+          <div className="rounded-[11px] bg-neutral-950/95 backdrop-blur-sm flex flex-col">
             {/* Header */}
-            <div className="p-6 pb-4 border-b border-white/10">
+            <div className="p-4 pb-3 border-b border-white/10">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-white">
+                  <h2 className="text-lg font-bold text-white">
                     {lessonTitle}
                   </h2>
-                  <p className="text-sm text-neutral-400 mt-1">{sprintTitle}</p>
+                  <p className="text-xs text-neutral-400 mt-1">{sprintTitle}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
@@ -90,7 +90,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
             </div>
             
             {/* Video container with proper 16:9 aspect ratio */}
-            <div className="flex-1 flex items-center justify-center p-4">
+            <div className="p-4">
               <AspectRatio ratio={16 / 9} className="w-full">
                 <video
                   src={videoUrl}
