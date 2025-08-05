@@ -33,6 +33,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { orchestrateBatchGeneration, type BatchGenerationProgress } from "@/services/batchSprintGeneration";
 import { SprintPackageGenerator } from '@/services/sprintPackageGenerator';
 import { VideoGenerationService } from '@/services/videoGeneration';
+import { VideoModal } from '@/components/VideoModal';
 
 interface GeneratedContent {
   sprintId: string;
@@ -88,6 +89,7 @@ export const SprintPreview: React.FC = () => {
   const [generatingVideo, setGeneratingVideo] = useState<Record<number, boolean>>({});
   const [videoUrls, setVideoUrls] = useState<Record<number, string>>({});
   const [videoService] = useState(() => new VideoGenerationService());
+  const [selectedVideo, setSelectedVideo] = useState<{ lessonDay: number; videoUrl: string; lessonTitle: string } | null>(null);
 
   // Enhanced text formatter for better readability
   const formatText = (text: string) => {
@@ -127,6 +129,39 @@ export const SprintPreview: React.FC = () => {
       .replace(/\n/g, '<br>');
   };
 
+  // State persistence functions
+  const saveStateToStorage = (data: any) => {
+    try {
+      const stateKey = `sprint-preview-${sprintData?.sprintId}`;
+      const stateData = {
+        sprintData: data,
+        audioUrls,
+        videoUrls,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(stateKey, JSON.stringify(stateData));
+    } catch (error) {
+      console.error('Error saving state:', error);
+    }
+  };
+
+  const loadStateFromStorage = (sprintId: string) => {
+    try {
+      const stateKey = `sprint-preview-${sprintId}`;
+      const saved = localStorage.getItem(stateKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Only load if saved within last 24 hours
+        if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading state:', error);
+    }
+    return null;
+  };
+
   useEffect(() => {
     const contentData = location.state?.sprintData || location.state?.generatedContent;
     
@@ -164,6 +199,16 @@ export const SprintPreview: React.FC = () => {
       
       if (sprintId && channelName) {
         console.log('Setting up sprint preview from URL params:', { sprintId, channelName, voiceId: extractedVoiceId });
+        
+        // Try to load saved state first
+        const savedState = loadStateFromStorage(sprintId);
+        if (savedState) {
+          setSprintData(savedState.sprintData);
+          setAudioUrls(savedState.audioUrls || {});
+          setVideoUrls(savedState.videoUrls || {});
+          console.log('Loaded saved state for sprint:', sprintId);
+          return;
+        }
         
         // Try to get voice ID from localStorage first
         const storedVoiceId = localStorage.getItem(`sprint_voice_${sprintId}`);
@@ -295,6 +340,13 @@ export const SprintPreview: React.FC = () => {
     
     setRealtimeChannel(channel);
   };
+
+  // Save state when data changes
+  useEffect(() => {
+    if (sprintData) {
+      saveStateToStorage(sprintData);
+    }
+  }, [sprintData, audioUrls, videoUrls]);
 
   // Cleanup real-time channel on unmount
   useEffect(() => {
@@ -741,21 +793,32 @@ export const SprintPreview: React.FC = () => {
         sprintId: sprintData.sprintId,
         sprintTitle: sprintData.sprintTitle,
         dailyLessons: [lesson], // Single lesson
+        audioFiles: { [lessonDay.toString()]: audioUrls[lessonDay] }, // Pass the audio URL
         brandColors: {
           primary: '#22DFDC',   // Cyan
           secondary: '#2D3748', // Dark gray
           accent: '#ED64A6',    // Pink
-          background: '#1A202C', // Very dark gray
-          text: '#FFFFFF'       // White
         }
       };
 
-      // For now, simulate the video creation (replace with actual service call when ready)
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate process
+      // Call the actual video generation service
+      const videoResults = await videoService.generateSprintVideos(
+        videoOptions,
+        (step: string, progress: number) => {
+          toast({
+            title: "Video Generation Progress",
+            description: `${step} (${Math.round(progress)}%)`,
+          });
+        }
+      );
       
-      // Simulate a video URL (in real implementation, this would come from the service)
-      const simulatedVideoUrl = `https://example.com/videos/sprint-${sprintData.sprintId}/day-${lessonDay}.mp4`;
-      setVideoUrls(prev => ({ ...prev, [lessonDay]: simulatedVideoUrl }));
+      // Get the generated video URL
+      const videoUrl = videoResults[lessonDay.toString()];
+      if (videoUrl) {
+        setVideoUrls(prev => ({ ...prev, [lessonDay]: videoUrl }));
+      } else {
+        throw new Error('Video generation failed - no URL returned');
+      }
 
       toast({
         title: "Video Created Successfully! 🎬",
@@ -771,6 +834,19 @@ export const SprintPreview: React.FC = () => {
       });
     } finally {
       setGeneratingVideo(prev => ({ ...prev, [lessonDay]: false }));
+    }
+  };
+
+  const openVideoModal = (lessonDay: number) => {
+    const videoUrl = videoUrls[lessonDay];
+    const lesson = sprintData?.dailyLessons.find(l => l.day === lessonDay);
+    
+    if (videoUrl && lesson) {
+      setSelectedVideo({
+        lessonDay,
+        videoUrl,
+        lessonTitle: lesson.title
+      });
     }
   };
 
@@ -1169,15 +1245,23 @@ export const SprintPreview: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => generateVideo(lesson.day)}
+                        onClick={() => {
+                          if (videoUrls[lesson.day]) {
+                            openVideoModal(lesson.day);
+                          } else {
+                            generateVideo(lesson.day);
+                          }
+                        }}
                         disabled={generatingVideo[lesson.day] || !audioUrls[lesson.day]}
-                        className={`text-white hover:bg-white/10 ${!audioUrls[lesson.day] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`text-white hover:bg-white/10 ${!audioUrls[lesson.day] ? 'opacity-50 cursor-not-allowed' : ''} ${videoUrls[lesson.day] ? 'bg-green-600/20' : ''}`}
                         title={
                           !audioUrls[lesson.day] 
                             ? 'Generate audio first to create video' 
                             : generatingVideo[lesson.day] 
                               ? 'Creating Video...' 
-                              : 'Create Video Lesson'
+                              : videoUrls[lesson.day]
+                                ? 'View Video'
+                                : 'Create Video Lesson'
                         }
                       >
                         {generatingVideo[lesson.day] ? (
@@ -1377,6 +1461,18 @@ export const SprintPreview: React.FC = () => {
         </div>
         </div>
       </div>
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <VideoModal
+          isOpen={true}
+          onClose={() => setSelectedVideo(null)}
+          videoUrl={selectedVideo.videoUrl}
+          lessonTitle={selectedVideo.lessonTitle}
+          lessonDay={selectedVideo.lessonDay}
+          sprintTitle={sprintData?.sprintTitle || ''}
+        />
+      )}
     </div>
   );
 };
