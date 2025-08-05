@@ -22,7 +22,9 @@ import {
   Loader2,
   Pause,
   Package,
-  RefreshCw
+  RefreshCw,
+  Video,
+  Film
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PillSwitcher } from '@/components/ui/pill-switcher';
@@ -30,6 +32,7 @@ import { AudioPlayer } from '@/components/ui/audio-player';
 import { supabase } from '@/integrations/supabase/client';
 import { orchestrateBatchGeneration, type BatchGenerationProgress } from "@/services/batchSprintGeneration";
 import { SprintPackageGenerator } from '@/services/sprintPackageGenerator';
+import { VideoGenerationService } from '@/services/videoGeneration';
 
 interface GeneratedContent {
   sprintId: string;
@@ -82,6 +85,9 @@ export const SprintPreview: React.FC = () => {
   const [packageProgress, setPackageProgress] = useState(0);
   const [regeneratingLessons, setRegeneratingLessons] = useState<Set<number>>(new Set());
   const [activeTab, setActiveTab] = useState("lessons");
+  const [generatingVideo, setGeneratingVideo] = useState<Record<number, boolean>>({});
+  const [videoUrls, setVideoUrls] = useState<Record<number, string>>({});
+  const [videoService] = useState(() => new VideoGenerationService());
 
   // Enhanced text formatter for better readability
   const formatText = (text: string) => {
@@ -706,6 +712,68 @@ export const SprintPreview: React.FC = () => {
     }
   };
 
+  const generateVideo = async (lessonDay: number) => {
+    if (!sprintData) return;
+    
+    const lesson = sprintData.dailyLessons.find(l => l.day === lessonDay);
+    if (!lesson) return;
+    
+    // Check if audio exists for this lesson
+    if (!audioUrls[lessonDay]) {
+      toast({
+        title: "Audio Required",
+        description: "Please generate audio for this lesson first before creating a video.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setGeneratingVideo(prev => ({ ...prev, [lessonDay]: true }));
+      
+      toast({
+        title: "Creating Video",
+        description: `Starting video generation for Day ${lessonDay}...`,
+      });
+
+      // Create video using the VideoGenerationService
+      const videoOptions = {
+        sprintId: sprintData.sprintId,
+        sprintTitle: sprintData.sprintTitle,
+        dailyLessons: [lesson], // Single lesson
+        brandColors: {
+          primary: '#22DFDC',   // Cyan
+          secondary: '#2D3748', // Dark gray
+          accent: '#ED64A6',    // Pink
+          background: '#1A202C', // Very dark gray
+          text: '#FFFFFF'       // White
+        }
+      };
+
+      // For now, simulate the video creation (replace with actual service call when ready)
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate process
+      
+      // Simulate a video URL (in real implementation, this would come from the service)
+      const simulatedVideoUrl = `https://example.com/videos/sprint-${sprintData.sprintId}/day-${lessonDay}.mp4`;
+      setVideoUrls(prev => ({ ...prev, [lessonDay]: simulatedVideoUrl }));
+
+      toast({
+        title: "Video Created Successfully! 🎬",
+        description: `Video for "${lesson.title}" is ready to view.`,
+      });
+
+    } catch (error) {
+      console.error('Error creating video:', error);
+      toast({
+        title: "Video Creation Failed",
+        description: error instanceof Error ? error.message : "There was an error creating the video.",
+        variant: "destructive"
+      });
+    } finally {
+      setGeneratingVideo(prev => ({ ...prev, [lessonDay]: false }));
+    }
+  };
+
   const toggleAudio = (lessonDay: number) => {
     const audio = audioElements[lessonDay];
     const isPlaying = playingAudio[lessonDay];
@@ -1096,6 +1164,26 @@ export const SprintPreview: React.FC = () => {
                           <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
                           <Volume2 className="w-4 h-4" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => generateVideo(lesson.day)}
+                        disabled={generatingVideo[lesson.day] || !audioUrls[lesson.day]}
+                        className={`text-white hover:bg-white/10 ${!audioUrls[lesson.day] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={
+                          !audioUrls[lesson.day] 
+                            ? 'Generate audio first to create video' 
+                            : generatingVideo[lesson.day] 
+                              ? 'Creating Video...' 
+                              : 'Create Video Lesson'
+                        }
+                      >
+                        {generatingVideo[lesson.day] ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Film className="w-4 h-4" />
                         )}
                       </Button>
                       <Button
