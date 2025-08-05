@@ -1101,9 +1101,9 @@ export const SprintPreview: React.FC = () => {
         {/* Overview Card */}
         <div className="relative">
           {/* Gradient border container */}
-          <div className="p-[0.5px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
+          <div className="p-[1px] rounded-xl bg-gradient-to-r from-[#22DFDC] to-[#22EDB6]">
             {/* Inner container with darker background to match lesson cards */}
-            <div className="rounded-xl bg-neutral-950/90 backdrop-blur-sm p-8">
+            <div className="rounded-[11px] bg-neutral-950/90 backdrop-blur-sm p-8">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#22DFDC] to-[#22EDB6] flex items-center justify-center">
@@ -1214,13 +1214,15 @@ export const SprintPreview: React.FC = () => {
         </div>
 
         {/* Content Tabs */}
-        <div className="space-y-8">
-          <PillSwitcher 
-            activeTab={activeTab}
-            onChange={setActiveTab}
-            lessonCount={sprintData.dailyLessons.length}
-            emailCount={sprintData.emailSequence.length}
-          />
+        <div className="space-y-6">
+          <div className="flex justify-center">
+            <PillSwitcher 
+              activeTab={activeTab}
+              onChange={setActiveTab}
+              lessonCount={sprintData.dailyLessons.length}
+              emailCount={sprintData.emailSequence.length}
+            />
+          </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
