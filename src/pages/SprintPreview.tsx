@@ -732,15 +732,38 @@ export const SprintPreview: React.FC = () => {
       
       const audioBuffer = base64ToArrayBuffer(data.audioContent);
       const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
       
-      // Create audio element
+      // Upload audio to Supabase storage for video service access
+      const fileName = `${sprintData.sprintId}/day-${lessonDay}-audio.mp3`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('sprint-audio')
+        .upload(fileName, audioBlob, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Audio upload error:', uploadError);
+        // Fallback to blob URL for browser playback
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioUrls(prev => ({ ...prev, [lessonDay]: audioUrl }));
+      } else {
+        // Get the public URL for the uploaded audio
+        const { data: urlData } = supabase.storage
+          .from('sprint-audio')
+          .getPublicUrl(fileName);
+        
+        console.log('Audio uploaded successfully:', urlData.publicUrl);
+        setAudioUrls(prev => ({ ...prev, [lessonDay]: urlData.publicUrl }));
+      }
+      
+      // Create audio element for browser playback (use blob URL for better performance)
+      const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
       audio.onended = () => {
         setPlayingAudio(prev => ({ ...prev, [lessonDay]: false }));
       };
       
-      setAudioUrls(prev => ({ ...prev, [lessonDay]: audioUrl }));
       setAudioElements(prev => ({ ...prev, [lessonDay]: audio }));
       
       const voiceMessage = data.isNewVoice ? 
