@@ -90,9 +90,9 @@ serve(async (req) => {
 
     console.log('Calling external video generation service...');
 
-    // Call external video service (placeholder for now)
+    // Call external video service
     try {
-      const videoServiceResponse = await fetch('https://your-video-service.com/generate', {
+      const videoServiceResponse = await fetch('https://sprint-video-service.onrender.com/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
